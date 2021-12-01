@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portrait</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+        crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Cinzel:wght@500&display=swap"
+        rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>const socket = io();</script>
+    <style>
+        .progress {
+            height: 100px;
+        }
+
+        .fixed {
+            /*position: fixed; z-index: -1;*/
+        }
+    </style>
+</head>
+
+<body>
+    <div id="idleContainer">
+        <div class="row">
+            <div class="col-8 fixed">
+                <img class="img-fluid" src="{{avatar}}">
+            </div>
+            <div class="col align-self-center">
+                {{#each attributes}}
+                {{#with this}}
+                <div class="row">
+                    <div id="attribute{{../playerID}}{{attribute_id}}" class="col h2" style="color: #{{fill_color}}">
+                        {{value}}/{{max_value}}
+                    </div>
+                </div>
+                {{/with}}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+
+    <div id="combatContainer" style="display: none;">
+
+    </div>
+
+    <script>
+        socket.on('switch mode', data => {
+            $('.container', '.container-fluid').fadeOut('slow',
+                () => showContainer(data.mode));
+        });
+
+        socket.on('attribute changed', content => {
+            let playerID = content.playerID;
+            let attrID = content.attributeID;
+            let newValue = content.value;
+            let newMaxValue = content.maxValue;
+
+            let element = $(`#attribute${playerID}${attrID}`);
+
+            if (element.length === 0) return;
+
+            const split = element.text().split('/');
+
+            const value = split[0];
+            const maxValue = split[1];
+
+            let newText = '';
+
+            if (newValue)
+                newText += `${newValue}/`;
+            else
+                newText += `${value}/`;
+
+            if (newMaxValue)
+                newText += `${newMaxValue}`;
+            else
+                newText += `${maxValue}`;
+
+            element.text(newText);
+        });
+
+        function showContainer(mode) {
+            switch (data.mode) {
+                case 'idle':
+                    $('#idleContainer').fadeIn();
+                    break;
+                case 'combat':
+                    $('#combatContainer').fadeIn();
+                    break;
+            }
+        }
+    </script>
+</body>
+
+</html>
