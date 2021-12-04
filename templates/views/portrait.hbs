@@ -22,10 +22,6 @@
         .progress {
             height: 100px;
         }
-
-        .fixed {
-            /*position: fixed; z-index: -1;*/
-        }
     </style>
 </head>
 
@@ -54,7 +50,7 @@
     </div>
 
     <script>
-        socket.on('switch mode', data => {
+        socket.on('environment change', data => {
             $('.container', '.container-fluid').fadeOut('slow',
                 () => showContainer(data.mode));
         });
@@ -87,6 +83,10 @@
                 newText += `${maxValue}`;
 
             element.text(newText);
+        });
+
+        socket.on('dice roll', data => {
+            const playerID = data.playerID;
         });
 
         function showContainer(mode) {

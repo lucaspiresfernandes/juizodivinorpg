@@ -9,11 +9,22 @@ const handlebars = require('hbs').handlebars;
 
 //#region routes
 
+router.get('/leave', async (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send();
+        }
+        res.redirect('/');
+    });
+});
+
 router.get('/1', async (req, res) => {
     let playerID = req.session.playerID;
+    let isAdmin = req.session.isAdmin;
 
-    if (!playerID)
-        return res.status(401).render('rejected', { message: 'ID de jogador não foi detectado. Você esqueceu de logar?' });
+    if (!playerID) return res.redirect('/');
+    if (isAdmin) return res.redirect('/sheet/admin/1');
 
     const queries =
         [
@@ -24,9 +35,9 @@ router.get('/1', async (req, res) => {
                 .where('player_info.player_id', playerID),
 
             //Avatar: 1
-            con.select('avatar.*', 'player_avatar.link')
-                .from('avatar')
-                .join('player_avatar', 'avatar.avatar_id', 'player_avatar.avatar_id')
+            con.select('attribute_status.name', 'player_avatar.link', 'player_avatar.attribute_status_id')
+                .from('player_avatar')
+                .leftJoin('attribute_status', 'player_avatar.attribute_status_id', 'attribute_status.attribute_status_id')
                 .where('player_avatar.player_id', playerID),
 
             //Attributes and Attribute Status: 2
@@ -172,7 +183,7 @@ router.get('/1', async (req, res) => {
             });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -180,8 +191,10 @@ router.get('/1', async (req, res) => {
 router.get('/2', async (req, res) => {
     let playerID = req.session.playerID;
 
-    if (!playerID)
-        return res.status(401).render('rejected', { message: 'ID de jogador não foi detectado. Você esqueceu de logar?' });
+    let isAdmin = req.session.isAdmin;
+
+    if (!playerID) return res.redirect('/');
+    if (isAdmin) return res.redirect('/sheet/admin/2');
 
     try {
         const extraInfo = await con.select('extra_info.*', 'player_extra_info.value')
@@ -192,7 +205,7 @@ router.get('/2', async (req, res) => {
         res.render('sheet2', { playerID, extraInfo });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -201,11 +214,9 @@ router.get('/admin/1', async (req, res) => {
     let playerID = req.session.playerID;
     let isAdmin = req.session.isAdmin;
 
-    if (!playerID)
-        return res.status(401).render('rejected', { message: 'ID não foi detectado. Você esqueceu de logar?' });
+    if (!playerID) return res.redirect('/');
 
-    if (!isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+    if (!isAdmin) return res.redirect('/sheet/1');
 
     const charIDs = await con.select('player_id').from('player').where('admin', false);
     const characters = [];
@@ -308,7 +319,7 @@ router.get('/admin/1', async (req, res) => {
         res.render('sheetadmin1', { characters, adminNotes: results[0] });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         return res.status(500).end();
     }
 });
@@ -317,11 +328,9 @@ router.get('/admin/2', async (req, res) => {
     let playerID = req.session.playerID;
     let isAdmin = req.session.isAdmin;
 
-    if (!playerID)
-        return res.status(401).render('rejected', { message: 'ID não foi detectado. Você esqueceu de logar?' });
+    if (!playerID) return res.redirect('/');
 
-    if (!isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+    if (!isAdmin) return res.redirect('/sheet/2');
 
     const queries = [
         //All Equipments: 0
@@ -362,7 +371,7 @@ router.get('/admin/2', async (req, res) => {
             });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         return res.status(500).end();
     }
 })
@@ -389,7 +398,7 @@ router.post('/player/info', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -414,7 +423,7 @@ router.post('/player/attribute', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -437,7 +446,7 @@ router.post('/player/attributestatus', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -461,7 +470,7 @@ router.post('/player/spec', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -484,7 +493,7 @@ router.post('/player/characteristic', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -517,7 +526,7 @@ router.put('/player/equipment', urlParser, async (req, res) => {
         res.send({ html });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 
@@ -533,8 +542,8 @@ router.put('/player/equipment', urlParser, async (req, res) => {
         });
     }
     catch (err) {
-        console.log('Could not call equipment changed event.');
-        console.log(err);
+        console.error('Could not call equipment changed event.');
+        console.error(err);
     }
 });
 
@@ -557,7 +566,7 @@ router.post('/player/equipment', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -579,7 +588,7 @@ router.delete('/player/equipment', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -608,7 +617,7 @@ router.put('/equipment', urlParser, async (req, res) => {
         res.send({ equipmentID });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -616,7 +625,7 @@ router.put('/equipment', urlParser, async (req, res) => {
 router.post('/equipment', urlParser, async (req, res) => {
 
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let equipmentID = req.body.equipmentID;
     let name = req.body.name;
@@ -643,14 +652,14 @@ router.post('/equipment', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
 
 router.delete('/equipment', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let equipmentID = req.body.equipmentID;
 
@@ -661,7 +670,7 @@ router.delete('/equipment', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -697,7 +706,7 @@ router.put('/player/skill', urlParser, async (req, res) => {
         res.send({ html });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -721,7 +730,7 @@ router.post('/player/skill', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -746,7 +755,7 @@ router.put('/skill', urlParser, async (req, res) => {
         res.send({ skillID });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -754,7 +763,7 @@ router.put('/skill', urlParser, async (req, res) => {
 router.post('/skill', urlParser, async (req, res) => {
 
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let skillID = req.body.skillID;
     let specializationID = req.body.specializationID;
@@ -777,14 +786,14 @@ router.post('/skill', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
 
 router.delete('/skill', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let skillID = req.body.skillID;
 
@@ -795,7 +804,7 @@ router.delete('/skill', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -819,7 +828,7 @@ router.post('/player/finance', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -853,7 +862,7 @@ router.put('/player/item', urlParser, async (req, res) => {
         res.send({ html });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 
@@ -871,8 +880,8 @@ router.put('/player/item', urlParser, async (req, res) => {
         io.emit('item changed', { playerID, itemID, name, description, type: 'create' });
     }
     catch (err) {
-        console.log('Could not call new item event.');
-        console.log(err);
+        console.error('Could not call new item event.');
+        console.error(err);
     }
 });
 
@@ -896,7 +905,7 @@ router.post('/player/item', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -919,7 +928,7 @@ router.delete('/player/item', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -934,7 +943,7 @@ router.put('/item', urlParser, async (req, res) => {
         res.send({ itemID: query[0] });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -942,7 +951,7 @@ router.put('/item', urlParser, async (req, res) => {
 router.post('/item', urlParser, async (req, res) => {
 
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let itemID = req.body.itemID;
     let name = req.body.name;
@@ -959,14 +968,14 @@ router.post('/item', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
 
 router.delete('/item', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let itemID = req.body.itemID;
 
@@ -977,7 +986,7 @@ router.delete('/item', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -1000,7 +1009,7 @@ router.post('/player/extrainfo', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 });
@@ -1011,7 +1020,7 @@ router.post('/admin/note', urlParser, async (req, res) => {
     if (!playerID)
         return res.status(401).end();
     if (!req.session.isAdmin)
-        return res.status(401).render('rejected', { message: 'Não é um administrador.' });
+        return res.status(401).send();
 
     let value = req.body.value;
 
@@ -1022,7 +1031,7 @@ router.post('/admin/note', urlParser, async (req, res) => {
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
     }
 })

@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="/css/sheetstyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 
+    <script src="/js/sheet1.js" defer></script>
+
     <title>{{rpgname}}</title>
 </head>
 
@@ -25,7 +27,9 @@
     <div class="container">
         <div class="row">
             <div class="col mt-2 text-start">
-                <a href="/" style="font-size: 21px;">Sair</a>
+                <form action="/sheet/leave">
+                    <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
+                </form>
             </div>
             <div class="col mt-2 text-end">
                 <a href="/sheet/2" style="font-size: 21px;">Acessar 2° Página</a>
@@ -35,7 +39,7 @@
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
         <div class="row my-3">
-            <div class="col acds-container">
+            <div class="col acds-container py-2">
                 <div class="row mt-3 text-center">
                     <div class="col h2">Detalhes Pessoais</div>
                     <hr>
@@ -50,7 +54,7 @@
                         <div class="row">
                             <div class="col">
                                 <input class="acds-element acds-bottom-text" type="text" id="info{{info_id}}"
-                                    value="{{value}}" onchange="infoChange(event, {{info_id}})">
+                                    value="{{value}}" onchange="infoChange(event, {{info_id}})" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -71,7 +75,6 @@
                 </div>
                 <div class="row my-3 justify-content-center">
                     <div class="col">
-                        <script>const avatarEval = new Map();</script>
                         {{#each attributes}}
                         {{#with this}}
                         <div class="row">
@@ -99,16 +102,16 @@
                                 </div>
                                 <div class="row text-center my-2" {{#if rollable}} style="width: 85%" {{/if}}>
                                     <div class="col">
-                                        <input id="attributeIncrease{{attribute_id}}" type="button" value="+"
-                                            onclick="attributeIncreaseClick(event, {{attribute_id}})"
+                                        <input id="attributeDecrease{{attribute_id}}" type="button" value="-"
+                                            onclick="attributeDecreaseClick(event, {{attribute_id}})"
                                             class="acds-element" style="border: solid 1px; width: 75px">
                                     </div>
                                     <div id="attributeDesc{{attribute_id}}" class="col" style="font-size: 22px;">
                                         {{value}}/{{max_value}}
                                     </div>
                                     <div class="col">
-                                        <input id="attributeDecrease{{attribute_id}}" type="button" value="-"
-                                            onclick="attributeDecreaseClick(event, {{attribute_id}})"
+                                        <input id="attributeIncrease{{attribute_id}}" type="button" value="+"
+                                            onclick="attributeIncreaseClick(event, {{attribute_id}})"
                                             class="acds-element" style="border: solid 1px; width: 75px">
                                     </div>
                                 </div>
@@ -119,12 +122,12 @@
                             {{#each status}}
                             {{#with this}}
                             <div class="col form-check">
-                                <input class="form-check-input" type="checkbox" id="status{{attribute_status_id}}"
+                                <input class="form-check-input attribute-status-field" type="checkbox"
+                                    attribute-status-id="{{attribute_status_id}}" id="status{{attribute_status_id}}"
                                     onchange="attributeStatusChange(event, {{attribute_status_id}})" {{#if
                                     checked}}checked{{/if}}>
                                 <label class="form-check-label" for="status{{attribute_status_id}}">{{name}}</label>
                             </div>
-                            <script>avatarEval.set({{ attribute_status_id }}, {{ checked }})</script>
                             {{/with}}
                             {{/each}}
                         </div>
@@ -134,20 +137,20 @@
                     </div>
                 </div>
                 <div class="row my-3 text-center">
-                    <script>const specs = new Map();</script>
                     {{#each specs}}
                     {{#with this}}
                     <div class="col mt-3">
                         <div class="row">
                             <div class="col">
-                                <input class="acds-element acds-bottom-text" type="text" id="spec{{spec_id}}"
-                                    value="{{value}}" style="text-align: center; max-width: 120px; font-size: 25px;"
-                                    onchange="specs.set('{{name}}', $(event.target).val()); specChange(event, {{spec_id}}); ">
+                                <input class="acds-element acds-bottom-text spec-field" type="text" value="{{value}}"
+                                    style="text-align: center; max-width: 120px; font-size: 25px;" name="{{name}}"
+                                    id="specField{{@index}}" onchange="specChange(event, {{spec_id}});">
                             </div>
                         </div>
                         <div class="row my-1">
-                            <div id="specLabel{{spec_id}}" class="col">{{name}}</div>
-                            <script>specs.set('{{name}}', '{{value}}');</script>
+                            <div class="col">
+                                <label for="specField{{@index}}">{{name}}</label>
+                            </div>
                         </div>
                     </div>
                     {{/with}}
@@ -296,7 +299,9 @@
         </div>
         <div class="row">
             <div class="col mb-2 text-start">
-                <a href="/" style="font-size: 21px;">Sair</a>
+                <form action="/sheet/leave">
+                    <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
+                </form>
             </div>
             <div class="col mb-2 text-end">
                 <a href="/sheet/2" style="font-size: 21px;">Acessar 2° Página</a>
@@ -321,18 +326,18 @@
                         <div class="modal-body text-center">
                             {{> loading}}
                             <div id="uploadAvatarContainer" class="container-fluid">
-                                <script>const avatarElements = new Map();</script>
                                 {{#each avatars}}
                                 {{#with this}}
                                 <div class="row my-3">
                                     <div class="col">
-                                        <label for="avatarLink{{avatar_id}}">Link de Avatar {{name}}</label>
-                                        <input id="avatarLink{{avatar_id}}" type="text" autocomplete="off"
-                                            class="acds-element form-control" value="{{link}}"
+                                        <label for="avatar{{@index}}">Link de Avatar
+                                            {{#if name}}{{name}}{{else}}Padrão{{/if}}</label>
+                                        <input id="avatar{{@index}}" type="text"
+                                            class="acds-element form-control avatar-field" autocomplete="off"
+                                            avatar-id="{{attribute_status_id}}" value="{{link}}"
                                             style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
                                     </div>
                                 </div>
-                                <script>avatarElements.set({{ avatar_id }}, $('#avatarLink{{avatar_id}}'));</script>
                                 {{/with}}
                                 {{/each}}
                             </div>
@@ -587,8 +592,6 @@
             </div>
         </div>
     </div>
-
-    <script src="/js/sheet1.js"></script>
 </body>
 
 </html>

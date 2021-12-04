@@ -60,152 +60,109 @@ async function registerPost(req, res) {
             }).into('player'))[0];
 
         if (admin)
-            registerAdminData(playerID);
+            await registerAdminData(playerID);
         else
-            registerPlayerData(playerID);
+            await registerPlayerData(playerID);
 
         res.end();
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).send('500: Fatal Error');
     }
 }
 
-function registerPlayerData(playerID) {
-    con.select('characteristic_id').from('characteristic').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const characteristicID = results[i];
-            con.insert(
-                {
-                    player_id: playerID,
-                    characteristic_id: characteristicID.characteristic_id,
-                    value: 0
-                })
-                .into('player_characteristic').then(() => { });
-        }
-    });
+async function registerPlayerData(playerID) {
+    const results = await Promise.all([
+        con.select('characteristic_id').from('characteristic'),
+        con.select('attribute_id').from('attribute'),
+        con.select('attribute_status_id').from('attribute_status'),
+        con.select('skill_id', 'start_value', 'mandatory').from('skill'),
+        con.select('spec_id').from('spec'),
+        con.select('info_id').from('info'),
+        con.select('extra_info_id').from('extra_info'),
+        con.select('finance_id').from('finance'),
+    ]);
 
-    con.select('attribute_id').from('attribute').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const attributeID = results[i];
-            con.insert(
-                {
-                    player_id: playerID,
-                    attribute_id: attributeID.attribute_id,
-                    value: 0
-                })
-                .into('player_attribute').then(() => { });
-        }
-    });
+    await con.insert({
+        player_id: playerID,
+        attribute_status_id: null,
+        link: null
+    }).into('player_avatar');
 
-    con.select('attribute_status_id').from('attribute_status').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const attributeStatusID = results[i];
-            con.insert(
-                {
-                    player_id: playerID,
-                    attribute_status_id: attributeStatusID.attribute_status_id,
-                    value: false
-                })
-                .into('player_attribute_status').then(() => { });
-        }
-    });
+    await Promise.all([
+        ...results[0].map(char => con.insert({
+            player_id: playerID,
+            characteristic_id: char.characteristic_id,
+            value: 0
+        }).into('player_characteristic')),
 
-    con.select('skill_id', 'start_value', 'mandatory').from('skill').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const skill = results[i];
+        ...results[1].map(attr => con.insert({
+            player_id: playerID,
+            attribute_id: attr.attribute_id,
+            value: 0
+        }).into('player_attribute')),
 
-            if (!skill.mandatory)
-                continue;
+        results[2].map(async attrStatus => {
+            const playerAttrStatus = con.insert({
+                player_id: playerID,
+                attribute_status_id: attrStatus.attribute_status_id,
+                value: false
+            }).into('player_attribute_status');
+            const playerAvatar = con.insert({
+                player_id: playerID,
+                attribute_status_id: attrStatus.attribute_status_id,
+                link: null
+            }).into('player_avatar');
+            await playerAttrStatus;
+            await playerAvatar;
+        }),
 
-            con.insert(
-                {
-                    player_id: playerID,
-                    skill_id: skill.skill_id,
-                    value: skill.start_value,
-                    checked: false
-                })
-                .into('player_skill').then(() => { });
-        }
-    });
+        ...results[3].map(skill => {
+            if (!skill.mandatory) return undefined;
+            return con.insert({
+                player_id: playerID,
+                skill_id: skill.skill_id,
+                value: skill.start_value,
+                checked: false
+            }).into('player_skill');
+        }),
 
-    con.select('spec_id').from('spec').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const spec_id = results[i].spec_id;
-            con.insert(
-                {
-                    player_id: playerID,
-                    spec_id,
-                    value: 0
-                })
-                .into('player_spec').then(() => { });
-        }
-    });
+        ...results[4].map(spec => con.insert({
+            player_id: playerID,
+            spec_id: spec.spec_id,
+            value: 0
+        }).into('player_spec')),
 
-    con.select('info_id').from('info').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const info_id = results[i].info_id;
-            con.insert(
-                {
-                    player_id: playerID,
-                    info_id,
-                    value: ''
-                })
-                .into('player_info').then(() => { });
-        }
-    });
+        ...results[5].map(info => con.insert({
+            player_id: playerID,
+            info_id: info.info_id,
+            value: ''
+        }).into('player_info')),
 
-    con.select('extra_info_id').from('extra_info').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const extra_info_id = results[i].extra_info_id;
-            con.insert(
-                {
-                    player_id: playerID,
-                    extra_info_id,
-                    value: ''
-                })
-                .into('player_extra_info').then(() => { });
-        }
-    });
+        ...results[6].map(extraInfo => con.insert({
+            player_id: playerID,
+            extra_info_id: extraInfo.extra_info_id,
+            value: ''
+        }).into('player_extra_info')),
 
-    con.select('finance_id').from('finance').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const finance_id = results[i].finance_id;
-            con.insert(
-                {
-                    player_id: playerID,
-                    finance_id,
-                    value: '$0'
-                })
-                .into('player_finance').then(() => { });
-        }
-    });
+        ...results[7].map(finance => con.insert({
+            player_id: playerID,
+            finance_id: finance.finance_id,
+            value: '$0'
+        }).into('player_finance')),
 
-    con.select('avatar_id').from('avatar').then(results => {
-        for (let i = 0; i < results.length; i++) {
-            const avatar_id = results[i].avatar_id;
-            con.insert(
-                {
-                    player_id: playerID,
-                    avatar_id,
-                    link: null
-                })
-                .into('player_avatar').then(() => { });
-        }
-    });
-
-    con.insert(
-        {
+        con.insert({
             equipment_id: 1,
             player_id: playerID,
             using: false,
             current_ammo: '-'
-        }).into('player_equipment').then(() => { });
+        }).into('player_equipment')
+    ]);
 }
 
 function registerAdminData(playerID) {
-    con.insert({ 'admin_id': playerID, 'value': '' }).into('admin_note').then(() => { });
+    return con.insert({ 'admin_id': playerID, 'value': '' }).into('admin_note').then(() => { });
 }
 
 module.exports = router;

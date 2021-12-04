@@ -3,7 +3,7 @@ const failureToastBody = $('#failureToast > .toast-body');
 
 //General
 function showFailureToastMessage(err) {
-    console.log(err);
+    console.error(err);
     failureToastBody.text(`Erro ao tentar aplicar mudança - ${err.text}`);
     failureToast.show();
 }

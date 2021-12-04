@@ -3,14 +3,9 @@ const express = require('express');
 const router = express.Router();
 const con = require('../utils/connection');
 const bodyParser = require('body-parser');
-const urlParser = bodyParser.urlencoded(
-    {
-        extended: false
-    });
+const urlParser = bodyParser.urlencoded({ extended: false });
 
-router.get('/', (req, res) => {
-    res.render('login');
-});
+router.get('/', (req, res) => res.render('login'));
 
 router.post('/', urlParser, async (req, res) => {
     try {
@@ -42,7 +37,7 @@ router.post('/', urlParser, async (req, res) => {
         res.send({ admin });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).send('500: Fatal Error');
     }
 });

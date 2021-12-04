@@ -2,10 +2,12 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const registerHelpers = require('./utils/registerHelpers');
-const session = require('express-session');
 const { Server } = require('socket.io');
 const hbs = require('hbs');
 const hbsutils = require('hbs-utils')(hbs);
+const expressSession = require('express-session');
+const SessionStore = require('connect-session-knex')(expressSession);
+const con = require('./utils/connection');
 
 const app = express();
 const server = http.createServer(app);
@@ -20,31 +22,32 @@ app.set('view engine', 'hbs');
 app.set('views', viewsPath);
 hbsutils.registerPartials(partialsPath, { precompile: true });
 app.use(express.static(publicPath));
-app.use(session({ secret: process.env.EXPRESS_SESSION_SECRET, resave: false, saveUninitialized: false, cookie: { sameSite: 'strict' } }));
+app.use(expressSession({
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    cookie: {
+        sameSite: 'strict',
+        maxAge: 86400000,
+    },
+    resave: true,
+    saveUninitialized: false,
+    store: new SessionStore({
+        tablename: 'player_session',
+        knex: con,
+    }),
+}));
 
 registerHelpers();
 
 module.exports.io = io;
 
-//Routes
-const login = require('./routes/login');
-const register = require('./routes/register');
-const sheet = require('./routes/sheet');
-const dice = require('./routes/dice');
-const avatar = require('./routes/avatar');
-const portrait = require('./routes/portrait');
-//End Routes
 
 app.get('/', (req, res) => {
+    if (req.session.playerID) return res.redirect('/sheet/1');
     res.render('home');
 });
 
-app.use('/register', register);
-app.use('/login', login);
-app.use('/sheet', sheet);
-app.use('/dice', dice);
-app.use('/avatar', avatar);
-app.use('/portrait', portrait);
+const routes = require('./routes');
+for (const route of routes) app.use(route.url, route.ref);
 
 app.get('*', (req, res) => {
     res.status(404).end();

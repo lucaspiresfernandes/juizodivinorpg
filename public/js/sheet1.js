@@ -1,4 +1,4 @@
-const diceRollMax = 100;
+const diceRollMax = 20;
 const diceResultContent = $('#diceResultContent');
 diceResultContent.hide();
 const diceResultDescription = $('#diceResultDescription');
@@ -21,7 +21,7 @@ const failureToastBody = $('#failureToast > .toast-body');
 
 //General
 function showFailureToastMessage(err) {
-    console.log(err);
+    console.error(err);
     failureToastBody.text(`Erro ao tentar aplicar mudança - ${err.text}`);
     failureToast.show();
 }
@@ -31,7 +31,7 @@ function rollDice(num = -1, showBranches = true, callback) {
     loading.show();
 
     function onSuccess(data) {
-        let roll = data.num;
+        let roll = data.results[0];
         const successType = resolveSuccessType(num, roll, showBranches);
         loading.hide();
 
@@ -47,9 +47,9 @@ function rollDice(num = -1, showBranches = true, callback) {
         if (callback) callback(successType);
     }
 
-    $.ajax('/dice/single',
+    $.ajax('/dice',
         {
-            data: { max: diceRollMax },
+            data: { dices: [{ n: 1, num: diceRollMax }] },
             success: onSuccess,
             error: showFailureToastMessage
         });
@@ -58,8 +58,8 @@ function rollDice(num = -1, showBranches = true, callback) {
 function rollDices(dices) {
     loading.show();
     function onSuccess(data) {
-        let sum = data.sum;
         let results = data.results;
+        let sum = data.results.reduce((a, b) => a + b);
 
         loading.hide();
         diceResultContent.text(sum)
@@ -72,7 +72,7 @@ function rollDices(dices) {
             });
     }
 
-    $.ajax('/dice/multiple',
+    $.ajax('/dice/',
         {
             data: { dices },
             success: onSuccess,
@@ -122,7 +122,7 @@ function resolveDice(dice, arr) {
         if (isNaN(div))
             div = 1;
 
-        const db = specs.get('Dano Bônus');
+        const db = $('.spec-field[name="Dano Bônus"]').val();
         const split = db.split('d');
         let text = '';
 
@@ -134,7 +134,7 @@ function resolveDice(dice, arr) {
         return resolveDice(text, arr);
     }
     if (dice.includes('db'))
-        return resolveDice(specs.get('Dano Bônus'), arr);
+        return resolveDice($('.spec-field[name="Dano Bônus"]').val(), arr);
 
     let split = dice.split('d');
 
@@ -167,8 +167,7 @@ function generalDiceClick(event) {
     const diceElements = $('.general-dice-roll');
 
     const dicesArray = [];
-    for (const dice of diceElements)
-    {
+    for (const dice of diceElements) {
         const el = $(dice);
         const n = el.text().trim();
 
@@ -219,22 +218,12 @@ function uploadAvatarClick(event) {
     uploadAvatarContainer.hide();
     loading.show();
 
-    const avatars = [];
-
-    for (let [key, value] of avatarElements) {
-        const id = key;
-        let link = value.val();
-        if (!link)
-            link = null;
-
-        const obj =
-        {
-            avatar_id: id,
-            link: link
-        };
-
-        avatars.push(obj);
-    }
+    const avatars = $('.avatar-field').map((i, el) => {
+        const avatar = $(el);
+        let id = parseInt(avatar.attr('avatar-id'));
+        if (isNaN(id)) id = null;
+        return { attribute_status_id: id, link: avatar.val() };
+    }).get();
 
     $.ajax('/avatar',
         {
@@ -242,8 +231,7 @@ function uploadAvatarClick(event) {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(avatars),
             success: () => {
-                loadAvatarLinks(avatars);
-
+                evaluateAvatar();
                 uploadAvatarModal.hide();
             },
             error: err => {
@@ -254,30 +242,12 @@ function uploadAvatarClick(event) {
 }
 
 function evaluateAvatar() {
-    const unc = avatarEval.get(1);
-    const mw = avatarEval.get(2);
-    const ins = avatarEval.get(3) || avatarEval.get(4);
-
-    let src = avatarLinks.get(1);
-    if (unc) src = avatarLinks.get(2);
-    else if (mw) src = ins ? avatarLinks.get(5) : avatarLinks.get(3);
-    else if (ins) src = avatarLinks.get(4);
-
-    avatarImage.attr('src', src);
+    const field = $('.attribute-status-field:checked').first();
+    let id = field.attr('attribute-status-id');
+    if (field.length === 0) id = 0;
+    avatarImage.attr('src', `/avatar/${id}?v=${Date.now()}`);
 }
-
-async function loadAvatarLinks(data) {
-    if (!data)
-        data = (await $.get('/avatar')).avatars;
-
-    for (let i = 0; i < data.length; i++) {
-        const el = data[i];
-        avatarLinks.set(el.avatar_id, el.link);
-    }
-
-    evaluateAvatar();
-}
-$(document).ready(() => loadAvatarLinks());
+evaluateAvatar();
 
 //Attributes
 function attributeBarClick(ev, attributeID) {
@@ -383,7 +353,6 @@ function attributeDiceClick(ev, id) {
 //Attribute Status
 function attributeStatusChange(ev, attributeStatusID) {
     const checked = $(ev.target).prop('checked');
-    avatarEval.set(attributeStatusID, checked);
     evaluateAvatar();
     $.ajax('/sheet/player/attributestatus',
         {

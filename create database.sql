@@ -1,3 +1,5 @@
+drop database juizodivinodb;
+
 create database juizodivinodb;
 
 use juizodivinodb;
@@ -18,14 +20,14 @@ CREATE TABLE `characteristic` (
 );
 
 INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Força', TRUE);
-INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Destreza', TRUE);
-INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Inteligência', TRUE);
+INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Agilidade', TRUE);
 INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Constituição', TRUE);
-INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Aparência', TRUE);
-INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Poder', TRUE);
+INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Intelecto', TRUE);
+INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Presença', TRUE);
+INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Sabedoria', TRUE);
 INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Tamanho', TRUE);
 INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Educação', TRUE);
-INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Movimento', FALSE);
+INSERT INTO `characteristic` (`name`, `rollable`) VALUES ('Deslocamento', FALSE);
 
 CREATE TABLE `player_characteristic` (
     `player_characteristic_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -163,23 +165,24 @@ CREATE TABLE `attribute` (
     PRIMARY KEY (`attribute_id`)
 );
 
-INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Vida', 0, '5a1e1e', 'b62323');
-INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Armadura', 0, '916b03', 'ffbb00');
+INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Pontos de Vida', 0, '5a1e1e', 'b62323');
 INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Sanidade', 1, '2c4470', '1f3ce0');
-INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Magia', 0, '682f5b', 'ae00ff');
+INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Energia', 0, '916b03', 'ffbb00');
+-- INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES ('Armadura', 0, '916b03', 'ffbb00');
 
 CREATE TABLE `attribute_status` (
     `attribute_status_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `attribute_id` INT UNSIGNED NOT NULL,
     `name` varchar(255) NOT NULL,
+    `attribute_id` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`attribute_status_id`),
     CONSTRAINT `fk_attribute_status_attribute_id` FOREIGN KEY (`attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Inconsciente', 1);
-INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Ferimento Grave', 1);
-INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Traumatizado', 3);
-INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Enlouquecido', 3);
+INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Morrendo', 1);
+INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Lesão Grave', 1);
+INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Enfraquecendo', 1);
+INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES ('Traumatizado', 2);
 
 CREATE TABLE `player_attribute` (
     `player_attribute_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -300,7 +303,7 @@ CREATE TABLE `spec` (
 
 INSERT INTO `spec` (`name`) VALUES ('Dano Bônus');
 INSERT INTO `spec` (`name`) VALUES ('Corpo');
-INSERT INTO `spec` (`name`) VALUES ('Exposição Paranormal');
+INSERT INTO `spec` (`name`) VALUES ('Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
     `player_spec_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -417,27 +420,15 @@ CREATE TABLE `player_finance` (
     CONSTRAINT `fk_player_finance_finance_id` FOREIGN KEY (`finance_id`) REFERENCES `finance`(`finance_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `avatar` (
-    `avatar_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    PRIMARY KEY (`avatar_id`)
-);
-
-INSERT INTO `avatar` (`name`) VALUES ('Padrão');
-INSERT INTO `avatar` (`name`) VALUES ('Inconsciente');
-INSERT INTO `avatar` (`name`) VALUES ('Ferido');
-INSERT INTO `avatar` (`name`) VALUES ('Louco');
-INSERT INTO `avatar` (`name`) VALUES ('Ferido e Louco');
-
 CREATE TABLE `player_avatar` (
     `player_avatar_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
-    `avatar_id` INT UNSIGNED NOT NULL,
+    `attribute_status_id` INT UNSIGNED NULL,
     `link` MEDIUMTEXT NULL,
     PRIMARY KEY (`player_avatar_id`),
-    CONSTRAINT `uk_player_id_avatar_id` UNIQUE (`player_id`, `avatar_id`),
+    CONSTRAINT `uk_player_id_attribute_status_id` UNIQUE (`player_id`, `attribute_status_id`),
     CONSTRAINT `fk_player_avatar_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `fk_player_avatar_avatar_id` FOREIGN KEY (`avatar_id`) REFERENCES `avatar`(`avatar_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT `fk_player_avatar_attribute_status_id` FOREIGN KEY (`attribute_status_id`) REFERENCES `attribute_status`(`attribute_status_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `admin_key`

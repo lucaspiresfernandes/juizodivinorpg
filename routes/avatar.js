@@ -2,15 +2,34 @@ const express = require('express');
 const router = express.Router();
 const jsonParser = require('body-parser').json();
 const con = require('../utils/connection');
+const axios = require('axios');
 
-router.get('/', async (req, res) => {
+router.get('/:attrStatusID', async (req, res) => {
     const playerID = req.session.playerID;
+    let attrStatusID = req.params.attrStatusID;
 
-    const avatars = await con.select('avatar_id', '.link')
-        .from('player_avatar')
-        .where('player_avatar.player_id', playerID);
+    if (attrStatusID < 1 || isNaN(attrStatusID))
+        attrStatusID = null;
 
-    res.send({ avatars });
+    if (!playerID)
+        return res.status(401).send();
+
+    try {
+        const link = (await con.select('link')
+            .from('player_avatar')
+            .where('attribute_status_id', attrStatusID)
+            .andWhere('player_id', playerID).first()).link;
+
+        if (!link) return res.send();
+
+        const response = await axios.get(link, { responseType: 'arraybuffer', timeout: 10000 });
+        res.contentType(response.headers['content-type']);
+        res.end(response.data, 'binary');
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 router.post('/', jsonParser, async (req, res) => {
@@ -18,40 +37,36 @@ router.post('/', jsonParser, async (req, res) => {
     const data = req.body;
 
     if (!playerID)
-        return res.status(401).render('rejected', { message: 'ID de jogador não foi detectado. Você esqueceu de logar?' });
+        return res.status(401).send();
 
-    const avatars = await con.select('avatar_id').from('player_avatar').where('player_id', playerID);
+    const avatars = await con.select('attribute_status_id')
+        .from('player_avatar').where('player_id', playerID);
 
     let queries = [];
+    for (const avatar of avatars) {
+        const id = avatar.attribute_status_id;
 
-    for (let i = 0; i < avatars.length; i++) {
-        const id = avatars[i].avatar_id;
-
-        const obj = data.find(av => av.avatar_id === id);
+        const obj = data.find(av => av.attribute_status_id == id);
 
         if (!obj)
-            return res.status(400).end();
+            return res.status(400).send();
 
-        const avatarID = obj.avatar_id;
-        const link = obj.link || null;
-        if (link === '')
-            link = null;
+        let link = obj.link;
+        if (link === '') link = null;
 
-        const query = con('player_avatar')
+        queries.push(con('player_avatar')
             .update({ 'link': link })
-            .where('avatar_id', avatarID)
-            .andWhere('player_id', playerID);
-
-        queries.push(query);
+            .where('attribute_status_id', id)
+            .andWhere('player_id', playerID));
     }
 
     try {
         await Promise.all(queries);
-        res.end();
+        res.send();
     }
     catch (err) {
-        console.log(err);
-        res.status(500).end();
+        console.error(err);
+        res.status(500).send();
     }
 });
 

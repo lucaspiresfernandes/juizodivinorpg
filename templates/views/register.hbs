@@ -43,13 +43,13 @@
         function onRegisterSuccess() {
             const success = $(document.createElement('p'));
             success.css({ color: 'green', fontSize: '24' })
-                .text(`Cadastro realizado com sucesso! - Redirecionando para a página de login...`);
+                .text(`Cadastro realizado com sucesso! - Redirecionando para a ficha...`);
 
             $('body').append(success);
 
             setTimeout(() => {
-                location.replace('/login');
-            }, 2500);
+                location.replace('/sheet/1');
+            }, 2000);
         }
 
         function onRegisterFail(err) {
