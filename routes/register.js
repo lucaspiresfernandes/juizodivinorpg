@@ -2,8 +2,7 @@ const encrypter = require('../utils/encrypter');
 const con = require('../utils/connection');
 const express = require('express');
 const router = express.Router();
-const bodyParser = require('body-parser');
-var urlParser = bodyParser.urlencoded(
+var urlParser = express.urlencoded(
     {
         extended: false
     });

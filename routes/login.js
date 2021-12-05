@@ -2,8 +2,7 @@ const encrypter = require('../utils/encrypter');
 const express = require('express');
 const router = express.Router();
 const con = require('../utils/connection');
-const bodyParser = require('body-parser');
-const urlParser = bodyParser.urlencoded({ extended: false });
+const urlParser = express.urlencoded({ extended: false });
 
 router.get('/', (req, res) => res.render('login'));
 

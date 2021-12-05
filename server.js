@@ -23,7 +23,7 @@ app.set('views', viewsPath);
 hbsutils.registerPartials(partialsPath, { precompile: true });
 app.use(express.static(publicPath));
 app.use(expressSession({
-    secret: process.env.EXPRESS_SESSION_SECRET,
+    secret: process.env.EXPRESS_SESSION_SECRET || 'unkown',
     cookie: {
         sameSite: 'strict',
         maxAge: 86400000,

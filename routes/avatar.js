@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const jsonParser = require('body-parser').json();
+const jsonParser = express.json();
 const con = require('../utils/connection');
 const axios = require('axios');
 const path = require('path');

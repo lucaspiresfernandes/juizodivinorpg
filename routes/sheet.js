@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const bodyParser = require('body-parser');
 const con = require('../utils/connection');
 const io = require('../server').io;
-var urlParser = bodyParser.urlencoded({ extended: false });
+var urlParser = express.urlencoded({ extended: false });
 
 const handlebars = require('hbs').handlebars;
 
