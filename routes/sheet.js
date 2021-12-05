@@ -236,13 +236,6 @@ router.get('/admin/1', async (req, res) => {
 
             const playerQueries =
                 [
-                    //Avatar: 0
-                    con.select('link')
-                        .from('player_avatar')
-                        .where('player_id', playerID)
-                        .andWhere('avatar_id', 1)
-                        .first(),
-
                     //Info: 1
                     new Promise(async (resolve, reject) => {
                         const info = await con.select('info.info_id', 'player_info.value')
@@ -301,14 +294,13 @@ router.get('/admin/1', async (req, res) => {
             const char =
             {
                 playerID: playerID,
-                avatar: results[0],
-                name: results[1],
-                attributes: results[2],
-                specs: results[3],
-                characteristics: results[4],
-                equipments: results[5],
-                items: results[6],
-                finances: results[7],
+                name: results[0],
+                attributes: results[1],
+                specs: results[2],
+                characteristics: results[3],
+                equipments: results[4],
+                items: results[5],
+                finances: results[6],
             };
 
             characters.push(char);

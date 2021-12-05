@@ -31,8 +31,6 @@ router.get('/', async (req, res) => {
 
     let results = new Array(dices.length);
 
-    console.log(dices)
-
     try {
         await Promise.all(dices.map((dice, i) => {
             const numDices = parseInt(dice.n);

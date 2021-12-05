@@ -64,7 +64,10 @@ async function registerPost(req, res) {
         else
             await registerPlayerData(playerID);
 
-        res.end();
+        req.session.playerID = playerID;
+        req.session.isAdmin = admin;
+
+        res.send();
     }
     catch (err) {
         console.error(err);

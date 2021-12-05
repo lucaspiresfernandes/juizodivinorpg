@@ -7,10 +7,10 @@ const loading = $('.loading');
 const generalDiceModal = new bootstrap.Modal($('#generalDiceRoll')[0]);
 const diceRollModal = new bootstrap.Modal($('#diceRoll')[0]);
 
-const generalDiceText = $('#generalDiceText');
-
 const failureToast = new bootstrap.Toast($('#failureToast')[0], { delay: 4000 });
 const failureToastBody = $('#failureToast > .toast-body');
+
+$('#generalDiceRoll').on('hidden.bs.modal', ev => $('.general-dice-roll').text('0'));
 
 //General
 function showFailureToastMessage(err) {
@@ -19,41 +19,43 @@ function showFailureToastMessage(err) {
     failureToast.show();
 }
 
-$('#generalDiceRoll').on('shown.bs.modal', ev => {
-    generalDiceText[0].focus();
-});
-
 function generalDiceClick(event) {
-    let dices = resolveDices(generalDiceText.val());
-    rollDices(dices);
     generalDiceModal.hide();
-    diceRollModal.show();
-    generalDiceText.val('');
+    const diceElements = $('.general-dice-roll');
+    const dicesArray = [];
+    for (const dice of diceElements) {
+        const el = $(dice);
+        const n = el.text().trim();
+
+        if (n === '0')
+            continue;
+
+        const num = el.attr('dice');
+        dicesArray.push(`${n}d${num}`);
+    }
+    const dicesText = dicesArray.join('+');
+    const dices = resolveDices(dicesText);
+    if (dices) rollDices(dices);
 }
 
 function rollDices(dices) {
     loading.show();
-    function onSuccess(data) {
-        let results = data.results;
-        let sum = data.results.reduce((a, b) => a + b);
-
-        loading.hide();
-        diceResultContent.text(sum)
-            .fadeIn('slow', () => {
+    diceRollModal.show();
+    $.ajax('/dice', {
+        data: { dices },
+        success: data => {
+            let results = data.results;
+            let sum = data.results.reduce((a, b) => a + b);
+            loading.hide();
+            diceResultContent.text(sum).fadeIn('slow', () => {
                 if (results.length <= 1)
                     return;
-
                 diceResultDescription.text(results.join(' + '))
                     .fadeIn('slow');
             });
-    }
-
-    $.ajax('/dice',
-        {
-            data: { dices },
-            success: onSuccess,
-            error: showFailureToastMessage
-        });
+        },
+        error: showFailureToastMessage
+    });
 }
 
 function resolveDices(str) {
@@ -67,20 +69,15 @@ function resolveDices(str) {
 }
 
 function resolveDice(dice, arr) {
-    let n = 0, num;
-
     let split = dice.split('d');
-
     if (split.length === 1)
-        return arr.push({ n, num: dice });
+        return arr.push({ n: 0, num: dice });
 
-    n = split[0];
-    if (n === '')
+    let n = parseInt(split[0]);
+    if (isNaN(n))
         n = 1;
-    num = split[1];
-    for (let i = 0; i < n; i++) {
-        arr.push({ n: '1', num });
-    }
+    let num = parseInt(split[1]);
+    arr.push({ n, num });
 }
 
 $('#diceRoll').on('hidden.bs.modal', ev => {
@@ -297,14 +294,14 @@ socket.on('dice roll', content => {
     if (children.length > 10)
         children[children.length - 1].remove();
 
-    let html = `<li><span style="color:red;">${playerName}</span>
+    let html = `<li><span style='color:red;'>${playerName}</span>
     rolou
-    <span style="color:green;">${dices.join(', ')}</span> 
+    <span style='color:green;'>${dices.join(', ')}</span> 
     e tirou 
-    <span style="color:green;">${results.join(', ')}</span>.`;
+    <span style='color:green;'>${results.join(', ')}</span>.`;
 
     if (results.length > 1) html += ` Soma: 
-    <span style="color:green;">${results.reduce((a, b) => a + b)}</span>.`;
+    <span style='color:green;'>${results.reduce((a, b) => a + b)}</span>.`;
 
     html += '</li>';
 
