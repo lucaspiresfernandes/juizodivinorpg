@@ -9,7 +9,7 @@ async function nextInt(min, max, n) {
     try {
         return (await random.generateIntegers({ min, max, n })).random;
     }
-    catch (err) { console.error('Random.org inactive. Reason: ' + err); }
+    catch (err) { console.error('Random.org inactive. Reason:', err); }
 
     let data = [];
 
@@ -25,42 +25,42 @@ async function nextInt(min, max, n) {
 router.get('/', async (req, res) => {
     let playerID = req.session.playerID;
     let isAdmin = req.session.isAdmin;
-
-    if (!playerID) return res.status(401).end();
-
     let dices = req.query.dices;
+
+    if (!playerID || !dices) return res.status(401).send();
 
     let results = new Array(dices.length);
 
-    const tasks = [];
+    console.log(dices)
 
-    for (let i = 0; i < dices.length; i++) {
-        const dice = dices[i];
-        const numDices = parseInt(dice.n);
-        const diceNumber = parseInt(dice.num);
+    try {
+        await Promise.all(dices.map((dice, i) => {
+            const numDices = parseInt(dice.n);
+            const diceNumber = parseInt(dice.num);
 
-        if (isNaN(diceNumber) || isNaN(numDices))
-            return res.status(400).send();
+            if (isNaN(numDices) || isNaN(diceNumber))
+                throw new Error();
 
-        if (numDices === 0 || diceNumber < 1) {
-            results[i] = diceNumber;
-            continue;
-        }
+            if (numDices === 0 || diceNumber < 1) {
+                results[i] = diceNumber;
+                return;
+            }
 
-        if (diceNumber === 1) {
-            results[i] = numDices;
-            continue;
-        }
+            if (diceNumber === 1) {
+                results[i] = numDices;
+                return;
+            }
 
-        tasks.push(nextInt(numDices, numDices * diceNumber, 1).then(result =>
-            results[i] = result.data.reduce((a, b) => a + b)));
+            return nextInt(numDices, numDices * diceNumber, 1).then(result =>
+                results[i] = result.data.reduce((a, b) => a + b));
+        }));
+
+        res.send({ results });
+        if (!isAdmin) io.emit('dice roll', { playerID, dices, results });
     }
-
-    await Promise.all(tasks);
-
-    res.send({ results });
-
-    if (!isAdmin) io.emit('dice roll', { playerID, dices, results });
+    catch (err) {
+        res.status(401).send();
+    }
 });
 
 module.exports = router;

@@ -554,7 +554,8 @@ router.post('/player/equipment', urlParser, async (req, res) => {
         return res.status(401).end();
 
     let equipmentID = req.body.equipmentID;
-    let using = req.body.using === 'true' ? true : false;
+    let using = req.body.using;
+    if (using) using = using === 'true' ? true : false;
     let currentAmmo = req.body.currentAmmo;
 
     try {

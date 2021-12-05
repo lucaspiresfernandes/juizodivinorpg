@@ -56,28 +56,25 @@ function rollDice(num = -1, showBranches = true, callback) {
 }
 
 function rollDices(dices) {
+    diceRollModal.show();
     loading.show();
-    function onSuccess(data) {
-        let results = data.results;
-        let sum = data.results.reduce((a, b) => a + b);
+    $.ajax('/dice/', {
+        data: { dices },
+        success: data => {
+            let results = data.results;
+            let sum = data.results.reduce((a, b) => a + b);
 
-        loading.hide();
-        diceResultContent.text(sum)
-            .fadeIn('slow', () => {
-                if (results.length <= 1)
-                    return;
-
-                diceResultDescription.text(results.join(' + '))
-                    .fadeIn('slow');
-            });
-    }
-
-    $.ajax('/dice/',
-        {
-            data: { dices },
-            success: onSuccess,
-            error: showFailureToastMessage
-        });
+            loading.hide();
+            diceResultContent.text(sum)
+                .fadeIn('slow', () => {
+                    if (results.length <= 1)
+                        return;
+                    diceResultDescription.text(results.join(' + '))
+                        .fadeIn('slow');
+                });
+        },
+        error: showFailureToastMessage
+    });
 }
 
 $('#diceRoll').on('hidden.bs.modal', ev => {
@@ -107,12 +104,21 @@ function resolveSuccessType(num, roll, showBranches) {
 }
 
 function resolveDices(str) {
-    let dices = str.replace(/\s+/g, '').toLowerCase().split('+');
-    let arr = [];
-    for (let i = 0; i < dices.length; i++) {
-        const dice = dices[i];
-        resolveDice(dice, arr);
+    const diceCollection = str.trim().toLowerCase();
+
+    const options = diceCollection.split('/');
+    if (options.length > 1) {
+        const selected = parseInt(prompt('Escolha dentre as opções de rolagem a seguir:\n' +
+            options.map((opt, i) => `${i + 1}: ${opt}`).join('\n')));
+
+        if (isNaN(selected) || selected < 1 || selected > options.length) return;
+
+        return resolveDices(options[selected - 1]);
     }
+
+    const dices = diceCollection.split('+');
+    const arr = [];
+    for (let i = 0; i < dices.length; i++) resolveDice(dices[i], arr);
     return arr;
 }
 
@@ -164,6 +170,7 @@ function resolveAttributeBar(now, max, bar) {
 $('#generalDiceRoll').on('hidden.bs.modal', ev => $(".general-dice-roll").text("0"));
 
 function generalDiceClick(event) {
+    generalDiceModal.hide();
     const diceElements = $('.general-dice-roll');
 
     const dicesArray = [];
@@ -180,10 +187,7 @@ function generalDiceClick(event) {
     const dicesText = dicesArray.join('+');
 
     const dices = resolveDices(dicesText);
-    rollDices(dices);
-
-    generalDiceModal.hide();
-    diceRollModal.show();
+    if (dices) rollDices(dices);
 }
 
 //Info
@@ -542,37 +546,33 @@ function equipmentAmmoChange(ev, equipmentID) {
 
 function equipmentDiceClick(ev, id) {
     const using = $(`#equipmentUsing${id}`).prop('checked');
-
-    if (!using)
-        return alert('Você não está usando esse equipamento.');
+    if (!using) return alert('Você não está usando esse equipamento.');
 
     const damageField = $(`#equipmentDamage${id}`);
     const ammoTxt = $(`#equipmentAmmo${id}`);
-
     let ammo = parseInt(ammoTxt.val());
     let maxAmmo = parseInt($(`#equipmentMaxAmmo${id}`).text());
 
-    if (!isNaN(maxAmmo)) {
-        if (isNaN(ammo) || ammo <= 0)
-            return alert('Você não tem munição para isso.');
-        else {
-            ammoTxt.val(--ammo);
-            postCurrentAmmo(id, ammo);
-        }
+    if (!isNaN(maxAmmo) && (isNaN(ammo) || ammo <= 0))
+        return alert('Você não tem munição para isso.');
+
+    let dices = resolveDices(damageField.text());
+    if (!dices) return;
+
+    if (!isNaN(ammo)) {
+        ammoTxt.val(--ammo);
+        postCurrentAmmo(id, ammo);
     }
 
-    diceRollModal.show();
-    let dmg = resolveDices(damageField.text());
-    rollDices(dmg);
+    rollDices(dices);
 }
 
 function postCurrentAmmo(equipmentID, currentAmmo) {
-    $.ajax('/sheet/player/equipment',
-        {
-            method: 'POST',
-            data: { equipmentID, currentAmmo },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/equipment', {
+        method: 'POST',
+        data: { equipmentID, currentAmmo },
+        error: showFailureToastMessage
+    });
 }
 
 
