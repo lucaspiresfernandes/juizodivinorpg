@@ -460,11 +460,11 @@ const addEquipmentCreate = $('#addEquipmentCreate');
 
 const createEquipmentContainer = $('#createEquipmentContainer');
 const createEquipmentName = $('#createEquipmentName');
+const createEquipmentType = $('#createEquipmentType');
 const createEquipmentDamage = $('#createEquipmentDamage');
 const createEquipmentRange = $('#createEquipmentRange');
 const createEquipmentAttacks = $('#createEquipmentAttacks');
 const createEquipmentAmmo = $('#createEquipmentAmmo');
-const createEquipmentMalf = $('#createEquipmentMalf');
 const createEquipmentSpecialization = $('#combatSpecializationList');
 const createEquipmentButton = $('#createEquipmentButton');
 const createEquipmentCloseButton = $('#createEquipmentCloseButton');
@@ -538,11 +538,11 @@ function deleteEquipmentClick(event, equipmentID) {
 function createEquipmentClick(event) {
     const name = createEquipmentName.val();
     const skillID = createEquipmentSpecialization.val();
+    const type = createEquipmentType.val();
     const damage = createEquipmentDamage.val();
     const range = createEquipmentRange.val();
     const attacks = createEquipmentAttacks.val();
     const ammo = createEquipmentAmmo.val();
-    const malf = createEquipmentMalf.val();
 
     createEquipmentButton.prop('disabled', true);
     createEquipmentCloseButton.prop('disabled', true);
@@ -552,7 +552,7 @@ function createEquipmentClick(event) {
     $.ajax('/sheet/equipment',
         {
             method: 'PUT',
-            data: { name, skillID, damage, range, attacks, ammo, malf },
+            data: { name, skillID, type, damage, range, attacks, ammo, visible: true },
             success: (data) => {
                 const id = data.equipmentID;
                 const opt = $(document.createElement('option'));
@@ -647,6 +647,7 @@ const createSkillContainer = $('#createSkillContainer');
 const createSkillButton = $('#createSkillButton');
 const createSkillCloseButton = $('#createSkillCloseButton');
 const createSkillName = $('#createSkillName');
+const createSkillCharacteristic = $('#createSkillCharacteristic');
 const createSkillSpecialization = $('#createSkillSpecialization');
 
 $('#createSkill').on('hidden.bs.modal', () => {
@@ -669,13 +670,14 @@ function createSkillClick(event) {
     createSkillCloseButton.prop('disabled', true);
     loading.show();
 
-    let specializationID = createSkillSpecialization.val();
-    let name = createSkillName.val();
+    const specializationID = createSkillSpecialization.val();
+    const characteristicID = createSkillCharacteristic.val();
+    const name = createSkillName.val();
 
     $.ajax('/sheet/skill',
         {
             method: 'PUT',
-            data: { name, specializationID },
+            data: { name, specializationID, characteristicID },
             success: (data) => {
                 createSkillModal.hide();
 
@@ -743,9 +745,8 @@ function skillSearchBarInput(ev) {
 }
 
 function skillChange(event, id) {
-    let value = $(event.target).val();
-    const minValue = $(event.target).attr('min-value');
-    
+    let value = parseInt($(event.target).val());
+    const minValue = parseInt($(event.target).attr('min-value'));
     if (value < minValue) {
         value = minValue;
         $(event.target).val(minValue);
@@ -858,7 +859,7 @@ function createItemClick(ev) {
     $.ajax('/sheet/item',
         {
             method: 'PUT',
-            data: { name, description },
+            data: { name, description, visible: true },
             success: (data) => {
                 createItemModal.hide();
 

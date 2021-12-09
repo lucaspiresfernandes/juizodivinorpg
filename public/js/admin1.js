@@ -296,15 +296,14 @@ socket.on('dice roll', content => {
 
     let html = `<li><span style='color:red;'>${playerName}</span>
     rolou
-    <span style='color:green;'>${dices.join(', ')}</span> 
+    <span style='color:lightgreen;'>${dices.join(', ')}</span> 
     e tirou 
-    <span style='color:green;'>${results.join(', ')}</span>.`;
+    <span style='color:lightgreen;'>${results.join(', ')}</span>.`;
 
     if (results.length > 1) html += ` Soma: 
-    <span style='color:green;'>${results.reduce((a, b) => a + b)}</span>.`;
+    <span style='color:lightgreen;'>${results.reduce((a, b) => a + b)}</span>.`;
 
     html += '</li>';
 
     diceList.prepend($(html));
-
 });

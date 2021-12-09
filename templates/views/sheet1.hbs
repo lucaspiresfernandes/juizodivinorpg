@@ -243,6 +243,7 @@
                                     <th scope="col"></th>
                                     <th scope="col">Usando</th>
                                     <th scope="col">Nome</th>
+                                    <th scope="col">Perícia</th>
                                     <th scope="col">Tipo</th>
                                     <th scope="col">Dano</th>
                                     <th scope="col"></th>
@@ -279,7 +280,7 @@
                             oninput="skillSearchBarInput(event);" />
                     </div>
                 </div>
-                <div id="skillTable" class="row mb-3 text-center">
+                <div id="skillTable" class="row mb-3 text-center justify-content-center">
                     {{#each skills}}
                     {{> skills this}}
                     {{/each}}
@@ -327,7 +328,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <textarea id="playerAnotations" class="form-control acds-element"
-                            onchange="playerAnotationsChange(event)" rows="20">{{playerNotes.value}}</textarea>
+                            onchange="playerAnotationsChange(event)" rows="10">{{playerNotes.value}}</textarea>
                     </div>
                 </div>
             </div>
@@ -405,6 +406,11 @@
                                 </div>
                                 <div class="row">
                                     <div class="col my-2">
+                                        <input id="createEquipmentType" type="text" placeholder="Tipo" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col my-2">
                                         <input id="createEquipmentDamage" type="text" autocomplete="off"
                                             placeholder="Dano" required>
                                     </div>
@@ -429,13 +435,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col my-2">
-                                        <input id="createEquipmentMalf" type="text" autocomplete="off"
-                                            placeholder="Defeito" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <label for="combatSpecializationList">Especialização</label>
+                                        <label for="combatSpecializationList">Perícia</label>
                                         <select id="combatSpecializationList" class="form-select acds-element my-2">
                                             {{#each combatSpecializations}}
                                             {{#with this}}
@@ -471,6 +471,20 @@
                                     <div class="col">
                                         <input id="createSkillName" type="text" autocomplete="off"
                                             placeholder="Nome da Perícia" class="my-2" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="createSkillCharacteristic">Atributo</label>
+                                        <select id="createSkillCharacteristic" class="form-select acds-element my-2">
+                                            {{#each characteristics}}
+                                            {{#with this}}
+                                            <option id="createSkillOption{{characteristic_id}}"
+                                                value="{{characteristic_id}}">
+                                                {{name}}</option>
+                                            {{/with}}
+                                            {{/each}}
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="row">

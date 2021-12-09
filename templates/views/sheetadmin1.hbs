@@ -29,7 +29,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>const socket = io(); const playerNames = new Map();</script>
 
-    <title>{{rpgname}}</title>
+    <title>{{rpgname}} - Administrador</title>
 </head>
 
 <body>
@@ -54,7 +54,8 @@
             <div class="col my-2 mx-2 text-center acds-player-container" style="max-width: 750px;">
                 <div class="row my-3">
                     <div class="col">
-                        <img id="avatar{{playerID}}" class="img-fluid rounded-circle avatar" src="/avatar/admin/{{playerID}}">
+                        <img id="avatar{{playerID}}" class="img-fluid rounded-circle avatar"
+                            src="/avatar/admin/{{playerID}}">
                     </div>
                 </div>
                 <div class="row my-3">
@@ -109,25 +110,6 @@
                     <div class="col">
                         <div class="row">
                             <div id="characteristic{{../playerID}}{{characteristic_id}}" class="col data">
-                                {{value}}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                {{name}}
-                            </div>
-                        </div>
-                    </div>
-                    {{/with}}
-                    {{/each}}
-                </div>
-                <hr>
-                <div class="row my-3">
-                    {{#each finances}}
-                    {{#with this}}
-                    <div class="col">
-                        <div class="row">
-                            <div id="finance{{../playerID}}{{finance_id}}" class="col data">
                                 {{value}}
                             </div>
                         </div>
@@ -218,8 +200,9 @@
             {{/with}}
             {{/each}}
             {{else}}
-            <div class="col text-center" style="color: gray;">
-                Não há nenhum player cadastrado. Recarregue a página quando houver algum cadastro.
+            <div class=" col text-center" style="color: gray;">
+                Não há nenhum player cadastrado. Recarregue a página quando houver algum
+                cadastro.
             </div>
             {{/if}}
         </div>

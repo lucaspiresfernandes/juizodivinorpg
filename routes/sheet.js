@@ -95,6 +95,7 @@ router.get('/1', async (req, res) => {
             //Available Equipments: 6
             con.select('equipment_id', 'name')
                 .from('equipment')
+                .where('visible', true)
                 .whereNotIn('equipment_id', con.select('equipment_id').from('player_equipment').where('player_id', playerID))
                 .orderBy('name'),
 
@@ -104,7 +105,10 @@ router.get('/1', async (req, res) => {
                     'player_characteristic.value as min_value', 'skill.characteristic_id')
                     .join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
                     .leftJoin('specialization', 'specialization.specialization_id', 'skill.specialization_id')
-                    .join('player_characteristic', 'player_characteristic.characteristic_id', 'skill.characteristic_id')
+                    .join('player_characteristic', function () {
+                        this.on('player_characteristic.characteristic_id', 'skill.characteristic_id')
+                            .andOn('player_characteristic.player_id', 'player_skill.player_id')
+                    })
                     .where('player_skill.player_id', playerID);
 
                 for (let i = 0; i < skills.length; i++) {
@@ -137,6 +141,7 @@ router.get('/1', async (req, res) => {
             //Available Items: 10
             con.select('item_id', 'name')
                 .from('item')
+                .where('visible', true)
                 .whereNotIn('item_id', con.select('item_id').from('player_item').where('player_id', playerID))
                 .orderBy('name'),
 
@@ -144,11 +149,7 @@ router.get('/1', async (req, res) => {
             con.select().from('specialization'),
 
             //Combat Specializations: 13
-            con.select('skill.name', 'skill.skill_id')
-                .from('skill')
-                .join('specialization', 'skill.specialization_id', 'specialization.specialization_id')
-                .where('specialization.name', 'Lutar')
-                .orWhere('specialization.name', 'Armas de Fogo'),
+            con('skill').select('skill.name', 'skill.skill_id'),
 
             //Notes
             con('player_note').select('value').where('player_id', playerID).first(),
@@ -224,77 +225,57 @@ router.get('/admin/1', async (req, res) => {
     const charIDs = await con.select('player_id').from('player').where('admin', false);
     const characters = [];
 
-    const adminQueries =
-        [
-            //Admin Notes: 0
-            con.select('admin_id', 'value')
-                .from('admin_note')
-                .where('admin_id', playerID)
-                .first(),
-        ]
-
     try {
         for (let i = 0; i < charIDs.length; i++) {
             let playerID = charIDs[i].player_id;
+            const results = await Promise.all([
+                //Info: 0
+                (async () => {
+                    const info = await con.select('info.info_id', 'player_info.value')
+                        .from('info')
+                        .join('player_info', 'info.info_id', 'player_info.info_id')
+                        .where('player_id', playerID)
+                        .andWhere('info.name', 'Nome')
+                        .first();
 
-            const playerQueries =
-                [
-                    //Info: 1
-                    (async () => {
-                        const info = await con.select('info.info_id', 'player_info.value')
-                            .from('info')
-                            .join('player_info', 'info.info_id', 'player_info.info_id')
-                            .where('player_id', playerID)
-                            .andWhere('info.name', 'Nome')
-                            .first();
+                    if (!info.value || info.value.length === 0)
+                        info.value = 'Desconhecido';
+                    return info;
+                })(),
 
-                        if (!info.value || info.value.length === 0)
-                            info.value = 'Desconhecido';
-                        return info;
-                    })(),
+                //Attributes: 1
+                con.select('attribute.attribute_id', 'attribute.name', 'attribute.fill_color',
+                    'player_attribute.value', 'player_attribute.max_value')
+                    .from('attribute')
+                    .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
+                    .where('player_attribute.player_id', playerID),
 
-                    //Attributes: 2
-                    con.select('attribute.attribute_id', 'attribute.name', 'attribute.fill_color',
-                        'player_attribute.value', 'player_attribute.max_value')
-                        .from('attribute')
-                        .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
-                        .where('player_attribute.player_id', playerID),
+                //Specs: 2
+                con.select('spec.*', 'player_spec.value')
+                    .from('spec')
+                    .join('player_spec', 'spec.spec_id', 'player_spec.spec_id')
+                    .where('player_spec.player_id', playerID),
 
-                    //Specs: 3
-                    con.select('spec.*', 'player_spec.value')
-                        .from('spec')
-                        .join('player_spec', 'spec.spec_id', 'player_spec.spec_id')
-                        .where('player_spec.player_id', playerID),
+                //Characteristics: 3
+                con.select('characteristic.characteristic_id', 'characteristic.name', 'player_characteristic.value')
+                    .from('characteristic')
+                    .join('player_characteristic', 'characteristic.characteristic_id', 'player_characteristic.characteristic_id')
+                    .where('player_characteristic.player_id', playerID)
+                    .andWhere('characteristic.name', 'Deslocamento'),
 
-                    //Characteristics: 4
-                    con.select('characteristic.characteristic_id', 'characteristic.name', 'player_characteristic.value')
-                        .from('characteristic')
-                        .join('player_characteristic', 'characteristic.characteristic_id', 'player_characteristic.characteristic_id')
-                        .where('player_characteristic.player_id', playerID)
-                        .andWhere('characteristic.name', 'Movimento'),
+                //Combat: 4
+                con.select('equipment.equipment_id', 'player_equipment.using', 'equipment.name', 'equipment.damage', 'equipment.range', 'equipment.attacks')
+                    .from('equipment')
+                    .join('player_equipment', 'equipment.equipment_id', 'player_equipment.equipment_id')
+                    .where('player_equipment.player_id', playerID),
 
-                    //Combat: 5
-                    con.select('equipment.equipment_id', 'player_equipment.using', 'equipment.name', 'equipment.damage', 'equipment.range', 'equipment.attacks')
-                        .from('equipment')
-                        .join('player_equipment', 'equipment.equipment_id', 'player_equipment.equipment_id')
-                        .where('player_equipment.player_id', playerID),
-
-                    //Items: 6
-                    con.select('item.item_id', 'item.name', 'player_item.description')
-                        .from('item')
-                        .join('player_item', 'item.item_id', 'player_item.item_id')
-                        .where('player_item.player_id', playerID),
-
-                    //Finances: 7
-                    con.select('finance.*', 'player_finance.value')
-                        .from('finance')
-                        .join('player_finance', 'finance.finance_id', 'player_finance.finance_id')
-                        .where('player_finance.player_id', playerID)
-                ];
-
-            const results = await Promise.all(playerQueries);
-            const char =
-            {
+                //Items: 5
+                con.select('item.item_id', 'item.name', 'player_item.description')
+                    .from('item')
+                    .join('player_item', 'item.item_id', 'player_item.item_id')
+                    .where('player_item.player_id', playerID),
+            ]);
+            characters.push({
                 playerID: playerID,
                 name: results[0],
                 attributes: results[1],
@@ -302,15 +283,21 @@ router.get('/admin/1', async (req, res) => {
                 characteristics: results[3],
                 equipments: results[4],
                 items: results[5],
-                finances: results[6],
-            };
-
-            characters.push(char);
+            });
         }
 
-        const results = await Promise.all(adminQueries);
+        const results = await Promise.all([
+            //Admin Notes: 0
+            con.select('admin_id', 'value')
+                .from('admin_note')
+                .where('admin_id', playerID)
+                .first(),
+        ]);
 
-        res.render('sheetadmin1', { characters, adminNotes: results[0] });
+        res.render('sheetadmin1', {
+            characters,
+            adminNotes: results[0]
+        });
     }
     catch (err) {
         console.error(err);
@@ -333,36 +320,34 @@ router.get('/admin/2', async (req, res) => {
             .join('skill', 'equipment.skill_id', 'skill.skill_id'),
 
         //All Skills: 1
-        con.select('skill.*', 'specialization.name as specialization_name')
-            .from('skill')
+        con('skill').select('skill.*', 'specialization.name as specialization_name')
             .leftJoin('specialization', 'skill.specialization_id', 'specialization.specialization_id')
             .orderBy('skill.name'),
 
         //All Items: 2
-        con.select('item.*').from('item'),
+        con('item').select(),
 
         //Specializations: 3
-        con.select().from('specialization'),
+        con('specialization').select(),
 
-        //Combat Specializations: 4
-        con.select('skill.name', 'skill.skill_id')
-            .from('skill')
-            .join('specialization', 'skill.specialization_id', 'specialization.specialization_id')
-            .where('specialization.name', 'Lutar')
-            .orWhere('specialization.name', 'Armas de Fogo'),
+        //Characteristics: 4
+        con('characteristic').select(),
+
+        //Combat Specializations: 5
+        con('skill').select('skill.name', 'skill.skill_id')
     ];
 
     try {
         const results = await Promise.all(queries);
 
-        res.render('sheetadmin2',
-            {
-                equipmentsList: results[0],
-                skillsList: results[1],
-                itemsList: results[2],
-                specializations: results[3],
-                combatSpecializations: results[4],
-            });
+        res.render('sheetadmin2', {
+            equipmentsList: results[0],
+            skillsList: results[1],
+            itemsList: results[2],
+            specializations: results[3],
+            characteristics: results[4],
+            combatSpecializations: results[5],
+        });
     }
     catch (err) {
         console.error(err);
@@ -502,13 +487,12 @@ router.put('/player/equipment', urlParser, async (req, res) => {
     const equipmentID = req.body.equipmentID;
 
     try {
-        await con.insert(
-            {
-                'player_id': playerID,
-                'equipment_id': equipmentID,
-                'current_ammo': '-',
-                'using': false
-            }).into('player_equipment');
+        await con('player_equipment').insert({
+            'player_id': playerID,
+            'equipment_id': equipmentID,
+            'current_ammo': '-',
+            'using': false
+        });
 
         const equip = await con.select('equipment.*', 'skill.name as skill_name', 'player_equipment.using', 'player_equipment.current_ammo')
             .from('equipment')
@@ -590,25 +574,20 @@ router.delete('/player/equipment', urlParser, async (req, res) => {
 });
 
 router.put('/equipment', urlParser, async (req, res) => {
-    let name = req.body.name;
-    let skillID = req.body.skillID;
-    let dmg = req.body.damage;
-    let range = req.body.range;
-    let atk = req.body.attacks;
-    let ammo = req.body.ammo;
-    let malf = req.body.malf;
-
     try {
-        const equipmentID = (await con.insert(
-            {
-                'name': name,
-                'skill_id': skillID,
-                'damage': dmg,
-                'range': range,
-                'attacks': atk,
-                'ammo': ammo,
-                'malfunc': malf
-            }).into('equipment'))[0];
+        let visible;
+        if (req.body.visible === 'true') visible = true;
+        else if (req.body.visible === 'false') visible = false;
+        const equipmentID = (await con.insert({
+            'name': req.body.name,
+            'type': req.body.type,
+            'skill_id': req.body.skillID,
+            'damage': req.body.damage,
+            'range': req.body.range,
+            'attacks': req.body.attacks,
+            'ammo': req.body.ammo,
+            'visible': visible
+        }).into('equipment'))[0];
 
         res.send({ equipmentID });
     }
@@ -623,29 +602,21 @@ router.post('/equipment', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
         return res.status(401).send();
 
-    let equipmentID = req.body.equipmentID;
-    let name = req.body.name;
-    let skillID = req.body.skillID;
-    let dmg = req.body.damage;
-    let range = req.body.range;
-    let atk = req.body.attacks;
-    let ammo = req.body.ammo;
-    let malf = req.body.malf;
-
     try {
-        await con('equipment')
-            .update(
-                {
-                    'name': name,
-                    'skill_id': skillID,
-                    'damage': dmg,
-                    'range': range,
-                    'attacks': atk,
-                    'ammo': ammo,
-                    'malfunc': malf,
-                })
-            .where('equipment_id', equipmentID);
-        res.end();
+        let visible;
+        if (req.body.visible === 'true') visible = true;
+        else if (req.body.visible === 'false') visible = false;
+        await con('equipment').update({
+            'name': req.body.name,
+            'type': req.body.type,
+            'skill_id': req.body.skillID,
+            'damage': req.body.damage,
+            'range': req.body.range,
+            'attacks': req.body.attacks,
+            'ammo': req.body.ammo,
+            'visible': visible,
+        }).where('equipment_id', req.body.equipmentID);
+        res.send();
     }
     catch (err) {
         console.error(err);
@@ -657,13 +628,9 @@ router.delete('/equipment', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
         return res.status(401).send();
 
-    let equipmentID = req.body.equipmentID;
-
     try {
-        await con('equipment')
-            .where('equipment_id', equipmentID)
-            .del();
-        res.end();
+        await con('equipment').where('equipment_id', req.body.equipmentID).del();
+        res.send();
     }
     catch (err) {
         console.error(err);
@@ -680,18 +647,22 @@ router.put('/player/skill', urlParser, async (req, res) => {
     let skillID = req.body.skillID;
 
     try {
-        const subquery = con.select('start_value').from('skill').where('skill_id', skillID);
-        await con.insert({ 'player_id': playerID, 'skill_id': skillID, 'value': subquery, 'checked': false })
-            .into('player_skill');
+        await con('player_skill').insert({ 'player_id': playerID, 'skill_id': skillID, 'value': 0 });
 
-        const skill = await con.select('skill.skill_id', 'skill.name', 'specialization.name as specialization_name', 'player_skill.value', 'player_skill.checked')
-            .from('skill')
+        const skill = await con('skill').select('skill.skill_id', 'skill.name', 'player_skill.value',
+            'specialization.name as specialization_name', 'player_characteristic.value as min_value',
+            'skill.characteristic_id')
             .join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
             .leftJoin('specialization', 'skill.specialization_id', 'specialization.specialization_id')
+            .join('player_characteristic', function () {
+                this.on('player_characteristic.characteristic_id', 'skill.characteristic_id')
+                    .andOn('player_characteristic.player_id', 'player_skill.player_id')
+            })
             .where('player_skill.player_id', playerID)
             .andWhere('player_skill.skill_id', skillID)
             .first();
 
+        if (skill.value < skill.min_value) skill.value = skill.min_value;
         if (skill.specialization_name) {
             let skillName = skill.name;
             skill.name = `${skill.specialization_name} (${skillName})`;
@@ -732,20 +703,13 @@ router.post('/player/skill', urlParser, async (req, res) => {
 
 router.put('/skill', urlParser, async (req, res) => {
     let specializationID = req.body.specializationID;
-    if (specializationID === '0')
-        specializationID = null;
-    let name = req.body.name;
-
+    if (specializationID === '0') specializationID = null;
     try {
-        let skill = await con.insert(
-            {
-                'specialization_id': specializationID,
-                'name': name,
-                'mandatory': false,
-            })
-            .into('skill');
-        let skillID = skill[0];
-
+        let skillID = (await con('skill').insert({
+            'specialization_id': specializationID,
+            'characteristic_id': req.body.characteristicID,
+            'name': req.body.name
+        }))[0];
         res.send({ skillID });
     }
     catch (err) {
@@ -755,28 +719,22 @@ router.put('/skill', urlParser, async (req, res) => {
 });
 
 router.post('/skill', urlParser, async (req, res) => {
-
     if (!req.session.isAdmin)
         return res.status(401).send();
 
-    let skillID = req.body.skillID;
     let specializationID = req.body.specializationID;
-    if (specializationID === '0')
-        specializationID = null;
-    let name = req.body.name;
-    let mandatory = req.body.mandatory === 'true';
-    let startValue = req.body.startValue;
+    if (specializationID === '0') specializationID = null;
+    let mandatory;
+    if (req.body.mandatory === 'true') mandatory = true;
+    else if (req.body.mandatory === 'false') mandatory = false;
 
     try {
-        await con('skill')
-            .update(
-                {
-                    'specialization_id': specializationID,
-                    'name': name,
-                    'mandatory': mandatory,
-                    'start_value': startValue,
-                })
-            .where('skill_id', skillID);
+        await con('skill').update({
+            'specialization_id': specializationID,
+            'characteristic_id': req.body.characteristicID,
+            'name': req.body.name,
+            'mandatory': mandatory,
+        }).where('skill_id', req.body.skillID);
         res.end();
     }
     catch (err) {
@@ -789,13 +747,9 @@ router.delete('/skill', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
         return res.status(401).send();
 
-    let skillID = req.body.skillID;
-
     try {
-        await con('skill')
-            .where('skill_id', skillID)
-            .del();
-        res.end();
+        await con('skill').where('skill_id', req.body.skillID).del();
+        res.send();
     }
     catch (err) {
         console.error(err);
@@ -812,16 +766,14 @@ router.put('/player/item', urlParser, async (req, res) => {
     let itemID = req.body.itemID;
 
     try {
-        await con.insert(
-            {
-                'player_id': playerID,
-                'item_id': itemID,
-                'description': con.select('description').from('item').where('item_id', itemID)
-            })
-            .into('player_item');
+        await con('player_item').insert({
+            'player_id': playerID,
+            'item_id': itemID,
+            'description': con.select('description').from('item').where('item_id', itemID)
+        });
 
-        const item = await con.select('item.item_id', 'item.name', 'player_item.description')
-            .from('item')
+        const item = await con('item').select('item.item_id', 'item.name',
+            'player_item.description', 'player_item.quantity')
             .join('player_item', 'item.item_id', 'player_item.item_id')
             .where('player_item.player_id', playerID)
             .andWhere('item.item_id', itemID)
@@ -905,11 +857,15 @@ router.delete('/player/item', urlParser, async (req, res) => {
 });
 
 router.put('/item', urlParser, async (req, res) => {
-    let name = req.body.name;
-    let desc = req.body.description;
-
     try {
-        const query = await con.insert({ 'name': name, 'description': desc }).into('item');
+        let visible;
+        if (req.body.visible === 'true') visible = true;
+        else if (req.body.visible === 'false') visible = false;
+        const query = await con('item').insert({
+            'name': req.body.name,
+            'description': req.body.description,
+            'visible': visible
+        });
 
         res.send({ itemID: query[0] });
     }
@@ -924,19 +880,17 @@ router.post('/item', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
         return res.status(401).send();
 
-    let itemID = req.body.itemID;
-    let name = req.body.name;
-    let description = req.body.description;
+    let visible;
+    if (req.body.visible === 'true') visible = true;
+    else if (req.body.visible === 'false') visible = false;
 
     try {
-        await con('item')
-            .update(
-                {
-                    'name': name,
-                    'description': description,
-                })
-            .where('item_id', itemID);
-        res.end();
+        await con('item').update({
+            'name': req.body.name,
+            'description': req.body.description,
+            'visible': visible
+        }).where('item_id', req.body.itemID);
+        res.send();
     }
     catch (err) {
         console.error(err);
@@ -948,12 +902,8 @@ router.delete('/item', urlParser, async (req, res) => {
     if (!req.session.isAdmin)
         return res.status(401).send();
 
-    let itemID = req.body.itemID;
-
     try {
-        await con('item')
-            .where('item_id', itemID)
-            .del();
+        await con('item').where('item_id', req.body.itemID).del();
         res.end();
     }
     catch (err) {

@@ -66,20 +66,35 @@ CREATE TABLE `specialization` (
 );
 
 INSERT INTO `specialization` (`name`) VALUES 
-('Armas de Fogo'),
-('Arte e Ofício'),
+('Atletismo'),
+('Luta'),
+('Furtividade'),
+('Pilotagem'),
+('Pontaria'),
+('Prestidigitação'),
+('Reflexos'),
+('Fortitude'),
+('Avaliação'),
 ('Ciência'),
-('Língua'),
-('Lutar'),
-('Pilotar'),
-('Sobrevivência');
+('História'),
+('Investigação'),
+('Medicina'),
+('Misticismo'),
+('Percepção'),
+('Profissão'),
+('Afinidade Natural'),
+('Diplomacia'),
+('Enganação'),
+('Intimidação'),
+('Intuição'),
+('Vontade');
 
 CREATE TABLE `skill` (
     `skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
     `specialization_id` INT UNSIGNED NULL,
     `characteristic_id` INT UNSIGNED NOT NULL,
-    `name` varchar(255) NOT NULL,
-    `mandatory` BOOLEAN NOT NULL,
+    `mandatory` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`skill_id`),
     CONSTRAINT `fk_skill_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_skill_specialization_id` FOREIGN KEY (`specialization_id`) REFERENCES `specialization`(`specialization_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -176,20 +191,21 @@ CREATE TABLE `player_attribute_status` (
 
 CREATE TABLE `equipment` (
     `equipment_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    -- ID da pericia,
+    `name` VARCHAR(255) NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
     `skill_id` INT UNSIGNED NOT NULL,
-    `damage` varchar(255) NOT NULL,
-    `range` varchar(255) NOT NULL,
-    `attacks` varchar(255) NOT NULL,
-    `ammo` varchar(255) NOT NULL,
-    `visible` BOOLEAN NOT NULL DEFAULT TRUE,
+    `damage` VARCHAR(255) NOT NULL,
+    `range` VARCHAR(255) NOT NULL,
+    `attacks` VARCHAR(255) NOT NULL,
+    `ammo` VARCHAR(255) NOT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`equipment_id`),
     CONSTRAINT `fk_equipment_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill` (`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO `equipment` (`name`, `skill_id`, `damage`, `range`, `attacks`, `ammo`) VALUES 
-('Desarmado', 2, '1d3+DB', 'Toque', '1', '-');
+INSERT INTO `equipment` (`name`, `type`, `skill_id`, `damage`, `range`, `attacks`, `ammo`, `visible`) VALUES 
+('Desarmado', 'Luta', 2, '1d3+DB', 'Toque', '1', '-', TRUE)
+;
 
 -- TODO: insert equipments
 
@@ -230,7 +246,7 @@ CREATE TABLE `item` (
     `item_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     `description` MEDIUMTEXT NOT NULL,
-    `visible` BOOLEAN NOT NULL DEFAULT TRUE,
+    `visible` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`item_id`)
 );
 
