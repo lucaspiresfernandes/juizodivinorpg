@@ -39,7 +39,7 @@
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
         <div class="row my-3">
-            <div class="col acds-container py-2">
+            <div class="col acds-container">
                 <div class="row mt-3 text-center">
                     <div class="col h2">Detalhes Pessoais</div>
                     <hr>
@@ -48,7 +48,7 @@
                 {{#with this}}
                 <div class="row mt-4">
                     <div class="col">
-                        <div class="row mb-1">
+                        <div class="row">
                             <div class="col mx-2 h5"><label for="info{{info_id}}">{{name}}</label></div>
                         </div>
                         <div class="row">
@@ -61,9 +61,41 @@
                 </div>
                 {{/with}}
                 {{/each}}
+                <div class="row mt-4 mb-3">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col mx-2 h5">Classe</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <select class="acds-element form-select" onchange="classChange(event)">
+                                    <option value="0" {{#unless ../playerClass.class_id}}selected{{/unless}}>Nenhum
+                                    </option>
+                                    {{#each classes}}
+                                    {{#with this}}
+                                    <option value="{{class_id}}" ability-title="{{ability_title}}"
+                                        ability-description="{{ability_description}}"
+                                        title="{{ability_title}}: {{ability_description}}" min-energy="{{energy_bonus}}"
+                                        {{#ifEquals ../playerClass.class_id class_id}}selected{{/ifEquals}}>
+                                        {{name}}
+                                    </option>
+                                    {{/with}}
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4 mb-3">
+                    <div class="col">
+                        <span id="playerClassTitle" style="color: red;">{{playerClass.ability_title}}{{#if
+                            playerClass.ability_title}}:{{/if}} </span>
+                        <span id="playerClassDescription">{{playerClass.ability_description}}</span>
+                    </div>
+                </div>
             </div>
             <div class="col mt-3">
-                <div class="row text-center">
+                <div class="row mb-3 text-center">
                     <div class="col">
                         <img id="avatar" class="img-fluid rounded-circle acds-clickable" data-bs-toggle="modal"
                             data-bs-target="#uploadAvatar">
@@ -73,7 +105,7 @@
                             data-bs-target="#generalDiceRoll" style="max-height: 75px;">
                     </div>
                 </div>
-                <div class="row my-3 justify-content-center">
+                <div class="row mb-3 justify-content-center">
                     <div class="col">
                         {{#each attributes}}
                         {{#with this}}
@@ -87,16 +119,16 @@
                                         <div class="progress acds-clickable" style="background-color: #{{bg_color}};"
                                             onclick="attributeBarClick(event, {{attribute_id}})">
                                             <div id="attributeBar{{attribute_id}}" class="progress-bar"
-                                                role="progressbar"
-                                                style="background-color: #{{fill_color}}; width: {{coeficient}}%;">
+                                                attribute-id="{{attribute_id}}" name="{{name}}" role="progressbar"
+                                                style="background-color: #{{fill_color}}; width: {{coefficient}}%;"
+                                                min="{{min_value}}" current="{{value}}" max="{{max_value}}">
                                             </div>
                                         </div>
                                     </div>
                                     {{#if rollable}}
                                     <div class="col-auto align-self-center">
-                                        <img class="acds-clickable"
-                                            onclick="attributeDiceClick(event, {{attribute_id}})" src="/assets/dice.png"
-                                            style="max-height: 40px;">
+                                        <img class="acds-clickable" onclick="attributeDiceClick(event)"
+                                            src="/assets/dice.png" style="max-height: 40px;">
                                     </div>
                                     {{/if}}
                                 </div>
@@ -161,10 +193,10 @@
         <div class="row my-3 acds-container">
             <div class="col px-4">
                 <div class="row mt-3 text-center">
-                    <div class="col h2">Características</div>
+                    <div class="col h2">Atributos</div>
                     <hr>
                 </div>
-                <div class="row text-center">
+                <div class="row mb-3 text-center">
                     {{#each characteristics}}
                     {{#with this}}
                     <div class="col my-3">
@@ -203,7 +235,7 @@
                     </div>
                     <hr>
                 </div>
-                <div class="row my-3">
+                <div class="row mb-3">
                     <div class="col table-responsive text-center">
                         <table class="table table-dark" style="--bs-table-bg: black">
                             <thead>
@@ -218,7 +250,6 @@
                                     <th scope="col">Ataques</th>
                                     <th scope="col">Mun. Atual</th>
                                     <th scope="col">Mun. Máxima</th>
-                                    <th scope="col">Defeito</th>
                                 </tr>
                             </thead>
                             <tbody id="equipmentTable">
@@ -248,7 +279,7 @@
                             oninput="skillSearchBarInput(event);" />
                     </div>
                 </div>
-                <div id="skillTable" class="row text-center">
+                <div id="skillTable" class="row mb-3 text-center">
                     {{#each skills}}
                     {{> skills this}}
                     {{/each}}
@@ -266,34 +297,38 @@
                     </div>
                     <hr>
                 </div>
-            </div>
-            <div class="row text-center my-3">
-                {{#each finances}}
-                {{#with this}}
-                <div class="col">
-                    {{name}}: <input class="acds-element acds-bottom-text" type="text" id="finance{{finance_id}}"
-                        value="{{value}}" style="outline: 0; border-width: 0 0 1px; max-width: 120px;"
-                        onchange="financeChange(event, {{finance_id}})">
+                <div class="row mb-3">
+                    <div class="col table-responsive">
+                        <table class="table table-dark" style="--bs-table-bg: black">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">Descrição Pessoal</th>
+                                    <th scope="col">Quantidade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemTable">
+                                {{#each items}}
+                                {{> items this}}
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                {{/with}}
-                {{/each}}
             </div>
-            <div class="row my-3">
-                <div class="col table-responsive">
-                    <table class="table table-dark" style="--bs-table-bg: black">
-                        <thead>
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Nome</th>
-                                <th scope="col">Descrição Pessoal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemTable">
-                            {{#each items}}
-                            {{> items this}}
-                            {{/each}}
-                        </tbody>
-                    </table>
+        </div>
+        <div class="row my-3 acds-container">
+            <div class="col">
+                <div class="row mt-3">
+                    <div class="col h2 text-center">Anotações</div>
+                    <hr>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <textarea id="playerAnotations" class="form-control acds-element"
+                            onchange="playerAnotationsChange(event)" rows="20">{{playerNotes.value}}</textarea>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
-const diceRollMax = 20;
+const defaultDiceRoll = 20;
+
 const diceResultContent = $('#diceResultContent');
 diceResultContent.hide();
 const diceResultDescription = $('#diceResultDescription');
@@ -26,33 +27,36 @@ function showFailureToastMessage(err) {
     failureToast.show();
 }
 
-function rollDice(num = -1, showBranches = true, callback) {
+function rollDice(
+    num = -1,
+    max = defaultDiceRoll,
+    showBranches = true,
+    sucessTypeResolver = defaultSuccessTypeResolver
+) {
     diceRollModal.show();
     loading.show();
 
     function onSuccess(data) {
-        let roll = data.results[0];
-        const successType = resolveSuccessType(num, roll, showBranches);
-        loading.hide();
 
-        diceResultContent.text(roll)
-            .fadeIn('slow', () => {
+    }
+
+    $.ajax('/dice', {
+        data: { dices: [{ n: 1, num: max }] },
+        success: (data) => {
+            let roll = data.results[0];
+            const successType = sucessTypeResolver(num, roll, showBranches);
+            loading.hide();
+
+            diceResultContent.text(roll).fadeIn('slow', () => {
                 if (num === -1)
                     return;
 
                 diceResultDescription.text(successType.description)
                     .fadeIn('slow');
             });
-
-        if (callback) callback(successType);
-    }
-
-    $.ajax('/dice',
-        {
-            data: { dices: [{ n: 1, num: diceRollMax }] },
-            success: onSuccess,
-            error: showFailureToastMessage
-        });
+        },
+        error: showFailureToastMessage
+    });
 }
 
 function rollDices(dices) {
@@ -84,7 +88,46 @@ $('#diceRoll').on('hidden.bs.modal', ev => {
         .hide();
 })
 
-function resolveSuccessType(num, roll, showBranches) {
+function defaultSuccessTypeResolver(number, roll, showBranches) {
+    let resolved;
+
+    const f2 = Math.floor(number / 2);
+    const f5 = Math.floor(number / 5);
+    const f10 = Math.floor(number / 10);
+    const f12 = Math.floor(number / 12);
+    const f20 = Math.floor(number / 20);
+
+    if (roll === 1 && number < 20)
+        resolved = { description: 'Desastre!', isSuccess: false };
+
+    else if (roll >= 1 && roll <= 20 - number)
+        resolved = { description: 'Fracasso', isSuccess: false };
+
+    else if (roll > 20 - number && roll <= 20 - f2)
+        resolved = { description: 'Sucesso', isSuccess: true };
+
+    else if (roll > 20 - f2 && roll <= 20 - f5)
+        resolved = { description: 'Bom', isSuccess: true };
+
+    else
+        resolved = { description: 'Extremo', isSuccess: true };
+
+    if (roll > 20 - f10 && roll <= 20 - f12)
+        resolved = { description: "Crítico Normal", isSuccess: true };
+
+    else if (roll > 20 - f12 && roll <= 20 - f20)
+        resolved = { description: "Crítico Bom", isSuccess: true };
+
+    else if (roll > 20 - f20)
+        resolved = { description: "Crítico Extremo", isSuccess: true };
+
+    if (!showBranches)
+        resolved.description = resolved.isSuccess ? 'Sucesso' : 'Fracasso';
+
+    return resolved;
+}
+
+function attributeSuccessTypeResolver(num, roll, showBranches) {
     if (showBranches) {
         if (roll === 100)
             return { description: 'Desastre', isSuccess: false };
@@ -162,9 +205,13 @@ function clamp(n, min, max) {
     return n;
 }
 
-function resolveAttributeBar(now, max, bar) {
-    let coeficient = (now / max) * 100;
-    bar.css('width', `${coeficient}%`);
+function resolveAttributeBar(min, cur, max, bar) {
+    bar.attr('min', min);
+    bar.attr('current', cur);
+    bar.attr('max', max);
+    let coefficient = (cur / max) * 100;
+    if (isNaN(coefficient)) coefficient = 0;
+    bar.css('width', `${coefficient}%`);
 }
 
 $('#generalDiceRoll').on('hidden.bs.modal', ev => $(".general-dice-roll").text("0"));
@@ -255,42 +302,47 @@ evaluateAvatar();
 
 //Attributes
 function attributeBarClick(ev, attributeID) {
-    let desc = $(`#attributeDesc${attributeID}`);
+    const desc = $(`#attributeDesc${attributeID}`);
+    const bar = $(`#attributeBar${attributeID}`);
 
-    let split = desc.text().split('/');
-    let cur = parseInt(split[0]);
-    let max = parseInt(split[1]);
+    const split = desc.text().split('/');
+    const min = parseInt(bar.attr('min'));
+    const cur = parseInt(split[0]);
+    const max = parseInt(split[1]);
 
     let newMax = prompt('Digite o novo máximo do atributo:', max);
 
     if (!newMax || isNaN(newMax) || newMax === max)
         return;
 
+    if (newMax < min) newMax = min;
+
     let newCur = clamp(cur, 0, newMax);
 
-    $.ajax('/sheet/player/attribute',
-        {
-            method: 'POST',
-            data: { attributeID, value: newCur, maxValue: newMax },
-            success: data => {
-                desc.text(`${newCur}/${newMax}`);
-                resolveAttributeBar(newCur, newMax, $(`#attributeBar${attributeID}`));
-            },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/attribute', {
+        method: 'POST',
+        data: { attributeID, value: newCur, maxValue: newMax },
+        success: () => {
+            desc.text(`${newCur}/${newMax}`);
+            resolveAttributeBar(min, newCur, newMax, bar);
+        },
+        error: showFailureToastMessage
+    });
 }
 
 function attributeIncreaseClick(ev, attributeID) {
     const desc = $(`#attributeDesc${attributeID}`);
+    const bar = $(`#attributeBar${attributeID}`);
 
     let diff = 1;
     if (ev.shiftKey)
         diff = 10;
 
-    let split = desc.text().split('/');
+    const split = desc.text().split('/');
+    const min = parseInt(bar.attr('min'));
+    const cur = parseInt(split[0]);
+    const max = parseInt(split[1]);
 
-    let cur = parseInt(split[0]);
-    let max = parseInt(split[1]);
     let newCur = clamp(cur + diff, 0, max);
 
     if (cur === newCur)
@@ -298,8 +350,7 @@ function attributeIncreaseClick(ev, attributeID) {
 
     desc.text(`${newCur}/${max}`);
 
-    const bar = $(`#attributeBar${attributeID}`);
-    resolveAttributeBar(newCur, max, bar);
+    resolveAttributeBar(min, newCur, max, bar);
 
     $.ajax('/sheet/player/attribute',
         {
@@ -307,7 +358,7 @@ function attributeIncreaseClick(ev, attributeID) {
             data: { attributeID, value: newCur },
             error: err => {
                 desc.text(`${cur}/${max}`);
-                resolveAttributeBar(cur, max, bar);
+                resolveAttributeBar(min, cur, max, bar);
                 showFailureToastMessage(err);
             }
         });
@@ -315,23 +366,23 @@ function attributeIncreaseClick(ev, attributeID) {
 
 function attributeDecreaseClick(ev, attributeID) {
     const desc = $(`#attributeDesc${attributeID}`);
+    const bar = $(`#attributeBar${attributeID}`);
 
     let diff = 1;
     if (ev.shiftKey)
         diff = 10;
 
-    let split = desc.text().split('/');
-
-    let cur = parseInt(split[0]);
-    let max = parseInt(split[1]);
-    let newCur = clamp(cur - diff, 0, max);
+    const split = desc.text().split('/');
+    const min = parseInt(bar.attr('min'));
+    const cur = parseInt(split[0]);
+    const max = parseInt(split[1]);
+    const newCur = clamp(cur - diff, 0, max);
 
     if (cur === newCur)
         return;
 
-    const bar = $(`#attributeBar${attributeID}`);
     desc.text(`${newCur}/${max}`);
-    resolveAttributeBar(newCur, max, bar);
+    resolveAttributeBar(min, newCur, max, bar);
 
     $.ajax('/sheet/player/attribute',
         {
@@ -339,19 +390,15 @@ function attributeDecreaseClick(ev, attributeID) {
             data: { attributeID, value: newCur },
             error: err => {
                 desc.text(`${cur}/${max}`);
-                resolveAttributeBar(cur, max, bar);
+                resolveAttributeBar(min, cur, max, bar);
                 showFailureToastMessage(err);
             }
         });
 }
 
 function attributeDiceClick(ev, id) {
-    let desc = $(`#attributeDesc${id}`);
-    let split = desc.text().split('/');
-
-    let cur = parseInt(split[0]);
-
-    rollDice(cur, false);
+    const exp = parseInt($('.spec-field[name="Exposição Pavorosa"]').val());
+    rollDice(exp, 100, false, attributeSuccessTypeResolver);
 }
 
 //Attribute Status
@@ -381,6 +428,14 @@ function specChange(ev, specID) {
 function characteristicChange(ev, characteristicID) {
     let value = $(ev.target).val();
 
+    const skills = $(`.skill-field[characteristic-id="${characteristicID}"]`);
+
+    for (let i = 0; i < skills.length; i++) {
+        const skill = skills.eq(i);
+        skill.attr('min-value', value);
+        skill.trigger('change');
+    }
+
     $.ajax('/sheet/player/characteristic',
         {
             method: 'POST',
@@ -391,7 +446,7 @@ function characteristicChange(ev, characteristicID) {
 
 function characteristicDiceClick(ev, id) {
     let num = $(`#characteristic${id}`).val();
-    rollDice(num);
+    rollDice(num, defaultDiceRoll);
 }
 
 //Equipments
@@ -688,16 +743,19 @@ function skillSearchBarInput(ev) {
 }
 
 function skillChange(event, id) {
-    const value = $(event.target).val();
+    let value = $(event.target).val();
+    const minValue = $(event.target).attr('min-value');
+    
+    if (value < minValue) {
+        value = minValue;
+        $(event.target).val(minValue);
+    }
 
-    $.ajax('/sheet/player/skill',
-        {
-            method: 'POST',
-            data: { skillID: id, value: value },
-            error: err => {
-                showFailureToastMessage(err);
-            }
-        });
+    $.ajax('/sheet/player/skill', {
+        method: 'POST',
+        data: { skillID: id, value: value },
+        error: showFailureToastMessage
+    });
 }
 
 function skillCheckChange(event, id) {
@@ -714,15 +772,9 @@ function skillCheckChange(event, id) {
 }
 
 function skillDiceClick(event, id) {
-    const num = $(`#skill${id}`).val();
+    const num = parseInt($(`#skill${id}`).val());
 
-    rollDice(parseInt(num), true, type => {
-        if (type.isSuccess) {
-            const skillCheck = $(`#skillCheck${id}`);
-            skillCheck.prop('checked', true)
-                .trigger('change');
-        }
-    });
+    rollDice(num, defaultDiceRoll, true);
 }
 
 //Finances
@@ -859,4 +911,69 @@ function itemDescriptionChange(ev, itemID) {
             data: { itemID, description },
             error: showFailureToastMessage
         })
+}
+
+function itemQuantityChange(ev, itemID) {
+    const quantity = $(ev.target).val();
+
+    $.ajax('/sheet/player/item',
+        {
+            method: 'POST',
+            data: { itemID, quantity },
+            error: showFailureToastMessage
+        })
+}
+
+//Notes
+
+function playerAnotationsChange(event) {
+    const value = $(event.target).val();
+
+    $.ajax('/sheet/player/note',
+        {
+            method: 'POST',
+            data: { value },
+            error: showFailureToastMessage
+        });
+}
+
+//Class
+
+function classChange(ev) {
+    const classID = parseInt($(ev.target).val());
+    const option = $(ev.target).find('option:selected');
+    const title = option.attr('ability-title');
+    const description = option.attr('ability-description') || '';
+
+    if (title) $('#playerClassTitle').text(title + ': ');
+    else $('#playerClassTitle').text('');
+    $('#playerClassDescription').text(description);
+
+    const bar = $('.progress-bar[name="Energia"]');
+    const attrID = bar.attr('attribute-id');
+    const desc = $(`#attributeDesc${attrID}`);
+    const split = desc.text().split('/');
+    let newMin = parseInt(option.attr('min-energy') || 0);
+    const cur = parseInt(split[0]);
+    const max = parseInt(split[1]);
+
+    let newMax = max;
+    if (newMax < newMin) newMax = newMin;
+    let newCur = clamp(cur, 0, newMax);
+
+    $.ajax('/sheet/player/class', {
+        method: 'POST',
+        data: { id: classID },
+        error: showFailureToastMessage
+    });
+
+    $.ajax('/sheet/player/attribute', {
+        method: 'POST',
+        data: { attributeID: attrID, minValue: newMin, value: newCur, maxValue: newMax },
+        success: () => {
+            desc.text(`${newCur}/${newMax}`);
+            resolveAttributeBar(newMin, newCur, newMax, bar);
+        },
+        error: showFailureToastMessage
+    });
 }

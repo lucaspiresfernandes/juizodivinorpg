@@ -69,6 +69,7 @@ async function registerPost(req, res) {
         res.send();
     }
     catch (err) {
+        console.error('A' * 100000);
         console.error(err);
         res.status(500).send('500: Fatal Error');
     }
@@ -79,11 +80,10 @@ async function registerPlayerData(playerID) {
         con.select('characteristic_id').from('characteristic'),
         con.select('attribute_id').from('attribute'),
         con.select('attribute_status_id').from('attribute_status'),
-        con.select('skill_id', 'start_value', 'mandatory').from('skill'),
+        con.select('skill_id', 'mandatory').from('skill'),
         con.select('spec_id').from('spec'),
         con.select('info_id').from('info'),
         con.select('extra_info_id').from('extra_info'),
-        con.select('finance_id').from('finance'),
     ]);
 
     await con.insert({
@@ -93,73 +93,71 @@ async function registerPlayerData(playerID) {
     }).into('player_avatar');
 
     await Promise.all([
-        ...results[0].map(char => con.insert({
+        ...results[0].map(char => con('player_characteristic').insert({
             player_id: playerID,
             characteristic_id: char.characteristic_id,
             value: 0
-        }).into('player_characteristic')),
+        })),
 
-        ...results[1].map(attr => con.insert({
+        ...results[1].map(attr => con('player_attribute').insert({
             player_id: playerID,
             attribute_id: attr.attribute_id,
-            value: 0
-        }).into('player_attribute')),
+            value: 0,
+            max_value: 0
+        })),
 
         results[2].map(async attrStatus => {
-            const playerAttrStatus = con.insert({
+            const playerAttrStatus = con('player_attribute_status').insert({
                 player_id: playerID,
                 attribute_status_id: attrStatus.attribute_status_id,
                 value: false
-            }).into('player_attribute_status');
-            const playerAvatar = con.insert({
+            });
+            const playerAvatar = con('player_avatar').insert({
                 player_id: playerID,
                 attribute_status_id: attrStatus.attribute_status_id,
                 link: null
-            }).into('player_avatar');
+            });
             await playerAttrStatus;
             await playerAvatar;
         }),
 
         ...results[3].map(skill => {
-            if (!skill.mandatory) return undefined;
-            return con.insert({
+            if (skill.mandatory) return con('player_skill').insert({
                 player_id: playerID,
                 skill_id: skill.skill_id,
-                value: skill.start_value,
-                checked: false
-            }).into('player_skill');
+                value: 0,
+            });
         }),
 
-        ...results[4].map(spec => con.insert({
+        ...results[4].map(spec => con('player_spec').insert({
             player_id: playerID,
             spec_id: spec.spec_id,
             value: 0
-        }).into('player_spec')),
+        })),
 
-        ...results[5].map(info => con.insert({
+        ...results[5].map(info => con('player_info').insert({
             player_id: playerID,
             info_id: info.info_id,
             value: ''
-        }).into('player_info')),
+        })),
 
-        ...results[6].map(extraInfo => con.insert({
+        ...results[6].map(extraInfo => con('player_extra_info').insert({
             player_id: playerID,
             extra_info_id: extraInfo.extra_info_id,
             value: ''
-        }).into('player_extra_info')),
+        })),
 
-        ...results[7].map(finance => con.insert({
-            player_id: playerID,
-            finance_id: finance.finance_id,
-            value: '$0'
-        }).into('player_finance')),
-
-        con.insert({
+        con('player_equipment').insert({
             equipment_id: 1,
             player_id: playerID,
             using: false,
             current_ammo: '-'
-        }).into('player_equipment')
+        }),
+
+        con('player_note').insert({
+            player_id: playerID,
+            value: ''
+        })
     ]);
 }
 

@@ -20,7 +20,7 @@ const publicPath = path.join(__dirname, './public');
 
 app.set('view engine', 'hbs');
 app.set('views', viewsPath);
-hbsutils.registerPartials(partialsPath, { precompile: true });
+hbsutils.registerWatchedPartials(partialsPath, { precompile: true });
 app.use(express.static(publicPath));
 app.use(expressSession({
     secret: process.env.EXPRESS_SESSION_SECRET || 'unkown',

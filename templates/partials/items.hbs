@@ -5,6 +5,10 @@
     <td id="itemName{{item_id}}">{{name}}</td>
     <td>
         <input id="itemDescription{{item_id}}" class="acds-element" type="text" value="{{description}}"
-            style="width: 800px; border: none; color: lightgray" onchange="itemDescriptionChange(event, {{item_id}})">
+            style="width: 40vw; border: none; color: lightgray" onchange="itemDescriptionChange(event, {{item_id}})">
+    </td>
+    <td>
+        <input id="itemQuantity{{item_id}}" class="acds-element" type="text" value="{{quantity}}"
+            style="border: none; color: lightgray" onchange="itemQuantityChange(event, {{item_id}})">
     </td>
 </tr>
