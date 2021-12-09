@@ -102,7 +102,7 @@ router.get('/1', async (req, res) => {
             //Skills: 7
             (async () => {
                 const skills = await con('skill').select('skill.skill_id', 'skill.name', 'player_skill.value', 'specialization.name as specialization_name',
-                    'player_characteristic.value as min_value', 'skill.characteristic_id')
+                    'player_characteristic.value as extra_value', 'skill.characteristic_id')
                     .join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
                     .leftJoin('specialization', 'specialization.specialization_id', 'skill.specialization_id')
                     .join('player_characteristic', function () {
@@ -113,9 +113,6 @@ router.get('/1', async (req, res) => {
 
                 for (let i = 0; i < skills.length; i++) {
                     const skill = skills[i];
-
-                    if (skill.value < skill.min_value) skill.value = skill.min_value;
-
                     let skillName = skill.name;
                     let specializationName = skill.specialization_name;
 
@@ -463,6 +460,7 @@ router.post('/player/characteristic', urlParser, async (req, res) => {
 
     let charID = req.body.characteristicID;
     let value = req.body.value;
+    if (value === '') value = 0;
     try {
         await con('player_characteristic')
             .update('value', value)
@@ -650,7 +648,7 @@ router.put('/player/skill', urlParser, async (req, res) => {
         await con('player_skill').insert({ 'player_id': playerID, 'skill_id': skillID, 'value': 0 });
 
         const skill = await con('skill').select('skill.skill_id', 'skill.name', 'player_skill.value',
-            'specialization.name as specialization_name', 'player_characteristic.value as min_value',
+            'specialization.name as specialization_name', 'player_characteristic.value as extra_value',
             'skill.characteristic_id')
             .join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
             .leftJoin('specialization', 'skill.specialization_id', 'specialization.specialization_id')
@@ -661,8 +659,6 @@ router.put('/player/skill', urlParser, async (req, res) => {
             .where('player_skill.player_id', playerID)
             .andWhere('player_skill.skill_id', skillID)
             .first();
-
-        if (skill.value < skill.min_value) skill.value = skill.min_value;
         if (skill.specialization_name) {
             let skillName = skill.name;
             skill.name = `${skill.specialization_name} (${skillName})`;
@@ -686,7 +682,7 @@ router.post('/player/skill', urlParser, async (req, res) => {
 
     let skillID = req.body.skillID;
     let value = req.body.value;
-
+    if (isNaN(value)) value = 0;
     try {
         await con('player_skill')
             .update({ 'value': value })

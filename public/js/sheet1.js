@@ -428,13 +428,10 @@ function specChange(ev, specID) {
 function characteristicChange(ev, characteristicID) {
     let value = $(ev.target).val();
 
-    const skills = $(`.skill-field[characteristic-id="${characteristicID}"]`);
+    const skills = $(`.skill-label[characteristic-id="${characteristicID}"]`);
 
-    for (let i = 0; i < skills.length; i++) {
-        const skill = skills.eq(i);
-        skill.attr('min-value', value);
-        skill.trigger('change');
-    }
+    for (let i = 0; i < skills.length; i++)
+        skills.eq(i).text(value);
 
     $.ajax('/sheet/player/characteristic',
         {
@@ -746,11 +743,6 @@ function skillSearchBarInput(ev) {
 
 function skillChange(event, id) {
     let value = parseInt($(event.target).val());
-    const minValue = parseInt($(event.target).attr('min-value'));
-    if (value < minValue) {
-        value = minValue;
-        $(event.target).val(minValue);
-    }
 
     $.ajax('/sheet/player/skill', {
         method: 'POST',
@@ -773,21 +765,8 @@ function skillCheckChange(event, id) {
 }
 
 function skillDiceClick(event, id) {
-    const num = parseInt($(`#skill${id}`).val());
-
+    const num = parseInt($(`#skill${id}`).val()) + parseInt($(`#skillExtra${id}`).text());
     rollDice(num, defaultDiceRoll, true);
-}
-
-//Finances
-function financeChange(ev, financeID) {
-    const value = $(ev.target).val();
-
-    $.ajax('/sheet/player/finance',
-        {
-            method: 'POST',
-            data: { financeID, value },
-            error: showFailureToastMessage
-        });
 }
 
 //Items
