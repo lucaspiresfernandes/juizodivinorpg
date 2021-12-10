@@ -36,10 +36,6 @@ function rollDice(
     diceRollModal.show();
     loading.show();
 
-    function onSuccess(data) {
-
-    }
-
     $.ajax('/dice', {
         data: { dices: [{ n: 1, num: max }] },
         success: (data) => {
@@ -118,7 +114,7 @@ function defaultSuccessTypeResolver(number, roll, showBranches) {
     else if (roll > 20 - f12 && roll <= 20 - f20)
         resolved = { description: "Crítico Bom", isSuccess: true };
 
-    else if (roll > 20 - f20)
+    else if (roll > 20 - f20 && number >= 30)
         resolved = { description: "Crítico Extremo", isSuccess: true };
 
     if (!showBranches)
@@ -167,9 +163,7 @@ function resolveDices(str) {
 
 function resolveDice(dice, arr) {
     if (dice.includes('db/')) {
-        let div = parseInt(dice.split('/')[1]);
-        if (isNaN(div))
-            div = 1;
+        const div = parseInt(dice.split('/')[1]) || 1;
 
         const db = $('.spec-field[name="Dano Bônus"]').val();
         const split = db.split('d');
@@ -190,9 +184,7 @@ function resolveDice(dice, arr) {
     if (split.length === 1)
         return arr.push({ n: 0, num: dice });
 
-    let n = parseInt(split[0]);
-    if (isNaN(n))
-        n = 1;
+    let n = parseInt(split[0]) || 1;
     let num = parseInt(split[1]);
     arr.push({ n, num });
 }
@@ -205,12 +197,11 @@ function clamp(n, min, max) {
     return n;
 }
 
-function resolveAttributeBar(min, cur, max, bar) {
+function updateAttributeBar(min, cur, max, bar) {
     bar.attr('min', min);
     bar.attr('current', cur);
     bar.attr('max', max);
-    let coefficient = (cur / max) * 100;
-    if (isNaN(coefficient)) coefficient = 0;
+    let coefficient = ((cur / max) * 100) || 0;
     bar.css('width', `${coefficient}%`);
 }
 
@@ -271,8 +262,7 @@ function uploadAvatarClick(event) {
 
     const avatars = $('.avatar-field').map((i, el) => {
         const avatar = $(el);
-        let id = parseInt(avatar.attr('avatar-id'));
-        if (isNaN(id)) id = null;
+        let id = parseInt(avatar.attr('avatar-id')) || null;
         return { attribute_status_id: id, link: avatar.val() };
     }).get();
 
@@ -324,76 +314,41 @@ function attributeBarClick(ev, attributeID) {
         data: { attributeID, value: newCur, maxValue: newMax },
         success: () => {
             desc.text(`${newCur}/${newMax}`);
-            resolveAttributeBar(min, newCur, newMax, bar);
+            updateAttributeBar(min, newCur, newMax, bar);
         },
         error: showFailureToastMessage
     });
 }
 
-function attributeIncreaseClick(ev, attributeID) {
+function attributeButtonClick(ev, attributeID, coef) {
     const desc = $(`#attributeDesc${attributeID}`);
     const bar = $(`#attributeBar${attributeID}`);
 
-    let diff = 1;
-    if (ev.shiftKey)
-        diff = 10;
+    if (ev.shiftKey) coef *= 10;
 
     const split = desc.text().split('/');
     const min = parseInt(bar.attr('min'));
     const cur = parseInt(split[0]);
     const max = parseInt(split[1]);
 
-    let newCur = clamp(cur + diff, 0, max);
+    let newCur = clamp(cur + coef, 0, max);
 
     if (cur === newCur)
         return;
 
     desc.text(`${newCur}/${max}`);
 
-    resolveAttributeBar(min, newCur, max, bar);
+    updateAttributeBar(min, newCur, max, bar);
 
-    $.ajax('/sheet/player/attribute',
-        {
-            method: 'POST',
-            data: { attributeID, value: newCur },
-            error: err => {
-                desc.text(`${cur}/${max}`);
-                resolveAttributeBar(min, cur, max, bar);
-                showFailureToastMessage(err);
-            }
-        });
-}
-
-function attributeDecreaseClick(ev, attributeID) {
-    const desc = $(`#attributeDesc${attributeID}`);
-    const bar = $(`#attributeBar${attributeID}`);
-
-    let diff = 1;
-    if (ev.shiftKey)
-        diff = 10;
-
-    const split = desc.text().split('/');
-    const min = parseInt(bar.attr('min'));
-    const cur = parseInt(split[0]);
-    const max = parseInt(split[1]);
-    const newCur = clamp(cur - diff, 0, max);
-
-    if (cur === newCur)
-        return;
-
-    desc.text(`${newCur}/${max}`);
-    resolveAttributeBar(min, newCur, max, bar);
-
-    $.ajax('/sheet/player/attribute',
-        {
-            method: 'POST',
-            data: { attributeID, value: newCur },
-            error: err => {
-                desc.text(`${cur}/${max}`);
-                resolveAttributeBar(min, cur, max, bar);
-                showFailureToastMessage(err);
-            }
-        });
+    $.ajax('/sheet/player/attribute', {
+        method: 'POST',
+        data: { attributeID, value: newCur },
+        error: err => {
+            desc.text(`${cur}/${max}`);
+            updateAttributeBar(min, cur, max, bar);
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function attributeDiceClick(ev, id) {
@@ -428,17 +383,20 @@ function specChange(ev, specID) {
 function characteristicChange(ev, characteristicID) {
     let value = $(ev.target).val();
 
-    const skills = $(`.skill-label[characteristic-id="${characteristicID}"]`);
+    const skills = $(`.skill-total[characteristic-id="${characteristicID}"]`);
+    for (let i = 0; i < skills.length; i++) {
+        const skill = skills.eq(i);
+        const skillValue = skill.parents('.skill-container').find('.skill-field').val();
+        skill.text(parseInt(skillValue) + parseInt(value));
+    }
 
-    for (let i = 0; i < skills.length; i++)
-        skills.eq(i).text(value);
+    setAttributeBarMinimum($(`.attribute-bar[characteristic-id="${characteristicID}"]`));
 
-    $.ajax('/sheet/player/characteristic',
-        {
-            method: 'POST',
-            data: { characteristicID, value },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/characteristic', {
+        method: 'POST',
+        data: { characteristicID, value },
+        error: showFailureToastMessage
+    });
 }
 
 function characteristicDiceClick(ev, id) {
@@ -744,6 +702,15 @@ function skillSearchBarInput(ev) {
 function skillChange(event, id) {
     let value = parseInt($(event.target).val());
 
+    //Characteristic
+    const total = $(event.target).parents('.skill-container').find('.skill-total');
+    const charID = total.attr('characteristic-id');
+    const characteristicValue = parseInt($(`#characteristic${charID}`).val());
+    total.text(characteristicValue + value);
+
+    //Attribute
+    setAttributeBarMinimum($(`.attribute-bar[skill-id="${id}"]`));
+
     $.ajax('/sheet/player/skill', {
         method: 'POST',
         data: { skillID: id, value: value },
@@ -754,18 +721,17 @@ function skillChange(event, id) {
 function skillCheckChange(event, id) {
     const checked = $(event.target).prop('checked');
 
-    $.ajax('/sheet/player/skill',
-        {
-            method: 'POST',
-            data: { skillID: id, checked: checked },
-            error: err => {
-                showFailureToastMessage(err);
-            }
-        });
+    $.ajax('/sheet/player/skill', {
+        method: 'POST',
+        data: { skillID: id, checked: checked },
+        error: err => {
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function skillDiceClick(event, id) {
-    const num = parseInt($(`#skill${id}`).val()) + parseInt($(`#skillExtra${id}`).text());
+    const num = parseInt($(`#skillTotal${id}`).text());
     rollDice(num, defaultDiceRoll, true);
 }
 
@@ -924,35 +890,50 @@ function classChange(ev) {
     const option = $(ev.target).find('option:selected');
     const title = option.attr('ability-title');
     const description = option.attr('ability-description') || '';
+    const energyBonus = parseInt(option.attr('energy-bonus')) || 0;
 
     if (title) $('#playerClassTitle').text(title + ': ');
     else $('#playerClassTitle').text('');
     $('#playerClassDescription').text(description);
+    $('#playerClass').attr('energy-bonus', energyBonus);
 
-    const bar = $('.progress-bar[name="Energia"]');
-    const attrID = bar.attr('attribute-id');
-    const desc = $(`#attributeDesc${attrID}`);
-    const split = desc.text().split('/');
-    let newMin = parseInt(option.attr('min-energy') || 0);
-    const cur = parseInt(split[0]);
-    const max = parseInt(split[1]);
-
-    let newMax = max;
-    if (newMax < newMin) newMax = newMin;
-    let newCur = clamp(cur, 0, newMax);
+    setAttributeBarMinimum($('.progress-bar[name="Energia"]'));
 
     $.ajax('/sheet/player/class', {
         method: 'POST',
         data: { id: classID },
         error: showFailureToastMessage
     });
+}
+
+function setAttributeBarMinimum(bar) {
+    if (bar.length === 0) return;
+
+    const attrID = bar.attr('attribute-id');
+
+    const desc = $(`#attributeDesc${attrID}`);
+    const split = desc.text().split('/');
+
+    const charValue = parseInt($(`#characteristic${bar.attr('characteristic-id')}`).val()) || 0;
+    const skillValue = parseInt($(`#skill${bar.attr('skill-id')}`).val()) || 0;
+    const evaluation = eval(bar.attr('operation').replace('{characteristic}', charValue)
+        .replace('{skill}', skillValue));
+    const energyBonus = bar.attr('name') === 'Energia' ?
+        parseInt($('#playerClass').attr('energy-bonus')) || 0 : 0;
+    const newMin = energyBonus + evaluation;
+    const cur = parseInt(split[0]);
+    const max = parseInt(split[1]);
+    let newMax = max;
+    if (newMax < newMin) newMax = newMin;
+    let newCur = clamp(cur, 0, newMax);
 
     $.ajax('/sheet/player/attribute', {
         method: 'POST',
         data: { attributeID: attrID, minValue: newMin, value: newCur, maxValue: newMax },
         success: () => {
             desc.text(`${newCur}/${newMax}`);
-            resolveAttributeBar(newMin, newCur, newMax, bar);
+            $(`#attributeMinimum${attrID}`).text(newMin);
+            updateAttributeBar(newMin, newCur, newMax, bar);
         },
         error: showFailureToastMessage
     });

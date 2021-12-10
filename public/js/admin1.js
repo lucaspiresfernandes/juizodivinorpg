@@ -73,10 +73,8 @@ function resolveDice(dice, arr) {
     if (split.length === 1)
         return arr.push({ n: 0, num: dice });
 
-    let n = parseInt(split[0]);
-    if (isNaN(n))
-        n = 1;
-    let num = parseInt(split[1]);
+    const n = parseInt(split[0]) || 1;
+    const num = parseInt(split[1]);
     arr.push({ n, num });
 }
 

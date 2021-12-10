@@ -75,8 +75,9 @@
                                     {{#with this}}
                                     <option value="{{class_id}}" ability-title="{{ability_title}}"
                                         ability-description="{{ability_description}}"
-                                        title="{{ability_title}}: {{ability_description}}" min-energy="{{energy_bonus}}"
-                                        {{#ifEquals ../playerClass.class_id class_id}}selected{{/ifEquals}}>
+                                        title="{{ability_title}}: {{ability_description}}"
+                                        energy-bonus="{{energy_bonus}}" {{#ifEquals ../playerClass.class_id
+                                        class_id}}selected{{/ifEquals}}>
                                         {{name}}
                                     </option>
                                     {{/with}}
@@ -87,7 +88,7 @@
                     </div>
                 </div>
                 <div class="row mt-4 mb-3">
-                    <div class="col">
+                    <div class="col" id="playerClass" energy-bonus="{{playerClass.energy_bonus}}">
                         <span id="playerClassTitle" style="color: red;">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>
                         <span id="playerClassDescription">{{playerClass.ability_description}}</span>
@@ -118,8 +119,10 @@
                                     <div class="col">
                                         <div class="progress acds-clickable" style="background-color: #{{bg_color}};"
                                             onclick="attributeBarClick(event, {{attribute_id}})">
-                                            <div id="attributeBar{{attribute_id}}" class="progress-bar"
-                                                attribute-id="{{attribute_id}}" name="{{name}}" role="progressbar"
+                                            <div id="attributeBar{{attribute_id}}" class="progress-bar attribute-bar"
+                                                attribute-id="{{attribute_id}}" skill-id="{{skill_id}}"
+                                                characteristic-id="{{characteristic_id}}" name="{{name}}"
+                                                operation="{{operation}}" role="progressbar"
                                                 style="background-color: #{{fill_color}}; width: {{coefficient}}%;"
                                                 min="{{min_value}}" current="{{value}}" max="{{max_value}}">
                                             </div>
@@ -132,10 +135,10 @@
                                     </div>
                                     {{/if}}
                                 </div>
-                                <div class="row text-center my-2" {{#if rollable}} style="width: 85%" {{/if}}>
+                                <div class="row text-center mt-2" {{#if rollable}} style="width: 85%" {{/if}}>
                                     <div class="col">
                                         <input id="attributeDecrease{{attribute_id}}" type="button" value="-"
-                                            onclick="attributeDecreaseClick(event, {{attribute_id}})"
+                                            onclick="attributeButtonClick(event, {{attribute_id}}, -1)"
                                             class="acds-element" style="border: solid 1px; width: 75px">
                                     </div>
                                     <div id="attributeDesc{{attribute_id}}" class="col" style="font-size: 22px;">
@@ -143,8 +146,13 @@
                                     </div>
                                     <div class="col">
                                         <input id="attributeIncrease{{attribute_id}}" type="button" value="+"
-                                            onclick="attributeIncreaseClick(event, {{attribute_id}})"
+                                            onclick="attributeButtonClick(event, {{attribute_id}}, 1)"
                                             class="acds-element" style="border: solid 1px; width: 75px">
+                                    </div>
+                                </div>
+                                <div class="row text-center mb-2" {{#if rollable}} style="width: 85%" {{/if}}>
+                                    <div class="col" id="attributeMinimum{{attribute_id}}">
+                                        {{min_value}}
                                     </div>
                                 </div>
                             </div>
@@ -215,8 +223,7 @@
                             <div class="col"><input class="acds-element" type="text" maxlength="3"
                                     id="characteristic{{characteristic_id}}" value="{{value}}"
                                     style="outline: 0; border-width: 0 0 1px; text-align: center; max-width: 120px; font-size: 25px;"
-                                    onchange="characteristicChange(event, {{characteristic_id}})"
-                                    autocomplete="off">
+                                    onchange="characteristicChange(event, {{characteristic_id}})" autocomplete="off">
                             </div>
                         </div>
                     </div>

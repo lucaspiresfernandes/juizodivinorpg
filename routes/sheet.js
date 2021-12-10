@@ -115,7 +115,7 @@ router.get('/1', async (req, res) => {
                     const skill = skills[i];
                     let skillName = skill.name;
                     let specializationName = skill.specialization_name;
-
+                    skill.total_value = skill.value + skill.extra_value;
                     if (specializationName)
                         skills[i].name = `${specializationName} (${skillName})`;
                 }
@@ -155,7 +155,8 @@ router.get('/1', async (req, res) => {
             con('class').select(),
 
             //Player Class
-            con('player').select('player.class_id', 'class.ability_title', 'class.ability_description')
+            con('player').select('player.class_id', 'class.ability_title', 'class.ability_description',
+            'class.energy_bonus')
                 .join('class', 'class.class_id', 'player.class_id')
                 .where('player_id', playerID)
                 .first(),
@@ -659,6 +660,8 @@ router.put('/player/skill', urlParser, async (req, res) => {
             .where('player_skill.player_id', playerID)
             .andWhere('player_skill.skill_id', skillID)
             .first();
+
+        skill.total_value = skill.value + skill.extra_value;
         if (skill.specialization_name) {
             let skillName = skill.name;
             skill.name = `${skill.specialization_name} (${skillName})`;

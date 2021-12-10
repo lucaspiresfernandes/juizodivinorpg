@@ -141,13 +141,18 @@ CREATE TABLE `attribute` (
     `rollable` BOOLEAN NOT NULL,
     `bg_color` varchar(6) NOT NULL,
     `fill_color` varchar(6) NOT NULL,
-    PRIMARY KEY (`attribute_id`)
+    `characteristic_id` INT UNSIGNED NOT NULL,
+    `skill_id` INT UNSIGNED NULL,
+    `operation` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`attribute_id`),
+    CONSTRAINT `fk_attribute_characteristic_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_attribute_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`) VALUES 
-('Pontos de Vida', FALSE, '5a1e1e', 'b62323'),
-('Sanidade', TRUE, '2c4470', '1f3ce0'),
-('Energia', FALSE, '916b03', 'ffbb00');
+INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`, `characteristic_id`, `skill_id`, `operation`) VALUES 
+('Pontos de Vida', FALSE, '5a1e1e', 'b62323', 7, 8, '({characteristic} + {skill}) / 2'),
+('Sanidade', TRUE, '2c4470', '1f3ce0', 4, 22, '{characteristic} + ({skill} * 5)'),
+('Energia', FALSE, '916b03', 'ffbb00', 5, NULL, '{characteristic} * 2');
 
 CREATE TABLE `attribute_status` (
     `attribute_status_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

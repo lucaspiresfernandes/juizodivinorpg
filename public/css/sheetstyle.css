@@ -36,7 +36,12 @@ body {
     color: white;
 }
 
-.skill-container:hover .skill-label {
+.skill-container .skill-total {
+    color: lightgray;
+}
+
+.skill-container:hover .skill-label,
+.skill-container:hover .skill-total {
     color: black;
 }
 
