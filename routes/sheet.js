@@ -431,6 +431,7 @@ router.post('/player/attributestatus', urlParser, async (req, res) => {
             .where('player_id', playerID)
             .andWhere('attribute_status_id', attrStatusID);
 
+        io.to(`portrait${playerID}`).emit('attribute status changed', { attrStatusID, value: checked });
         res.end();
     }
     catch (err) {

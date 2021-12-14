@@ -75,7 +75,7 @@ body {
 
 #avatar {
     border: solid 1px white;
-    max-height: 255px;
+    max-height: 375px;
     min-width: 100px;
     min-height: 100px;
 }

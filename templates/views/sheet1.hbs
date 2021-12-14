@@ -39,7 +39,7 @@
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
         <div class="row my-3">
-            <div class="col acds-container">
+            <div class="col acds-container d-flex flex-column h-100">
                 <div class="row mt-3 text-center">
                     <div class="col h2">Detalhes Pessoais</div>
                     <hr>
@@ -61,7 +61,7 @@
                 </div>
                 {{/with}}
                 {{/each}}
-                <div class="row mt-4 mb-3">
+                <div class="row mt-4">
                     <div class="col">
                         <div class="row">
                             <div class="col mx-2 h5">Classe</div>
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-4 mb-3">
+                <div class="row my-4">
                     <div class="col" id="playerClass" energy-bonus="{{playerClass.energy_bonus}}">
                         <span id="playerClassTitle" style="color: red;">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>

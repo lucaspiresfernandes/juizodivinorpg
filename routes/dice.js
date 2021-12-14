@@ -27,8 +27,8 @@ router.get('/', async (req, res) => {
     const isAdmin = req.session.isAdmin;
     const dices = req.query.dices;
     const resolverKey = req.query.resolverKey;
+    
     if (!playerID || !dices) return res.status(401).send();
-    console.log(dices);
 
     if (dices.length === 1 && dices[0].n == 1)
         io.to(`portrait${playerID}`).emit('dice roll');

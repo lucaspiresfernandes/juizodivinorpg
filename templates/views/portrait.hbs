@@ -157,7 +157,7 @@
             <img src="/assets/frame_upside.png" class="bottom">
 
             {{! TODO: set avatar}}
-            <img src="/assets/avatar_ref.png" class="middle">
+            <img id="avatar" class="middle">
 
             <img src="/assets/frame_bottom.png" class="top">
             <div class="energy-container" style=" width: 250px; height: 400px;">
@@ -192,6 +192,19 @@
     </div>
 
     <script>
+        const attributes = {
+            '1': $('.health'),
+            '2': $('.sanity'),
+            '3': $('.energy')
+        };
+
+        const statusState = {
+            {{#each attribute_status}}
+            '{{attribute_status_id}}': {{value}},
+            {{/each}}
+        };
+
+
         socket.on('environment change', data => {
             const timeout = 100;
             $('.container.switchable .text').fadeOut(timeout);
@@ -207,12 +220,6 @@
             }, timeout);
         });
 
-        const attributes = {
-            '1': $('.health'),
-            '2': $('.sanity'),
-            '3': $('.energy')
-        }
-
         socket.on('attribute changed', content => {
             let attrID = content.attrID;
             let newValue = content.value;
@@ -222,9 +229,16 @@
             attributes[attrID].text(newText);
         });
 
+        socket.on('attribute status changed', content => {
+            const id = content.attrStatusID;
+            statusState[id] = content.value;
+            evaluateAvatar();
+        });
+
         const $dice = $('.dice video');
         const $result = $('.dice .result');
         const $description = $('.dice .description');
+        const $avatar = $('#avatar');
 
         const queue = [];
         let showingDice = false;
@@ -315,6 +329,13 @@
 
             return resolved;
         }
+
+        function evaluateAvatar() {
+            for (const id in statusState) {
+                if (statusState[id]) return $avatar.attr('src', `/avatar/${id}?v=${Date.now()}`)
+            }
+        }
+        evaluateAvatar();
     </script>
 </body>
 

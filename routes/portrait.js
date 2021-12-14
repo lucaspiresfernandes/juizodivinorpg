@@ -13,19 +13,26 @@ router.get('/:id', async (req, res) => {
             .where('player_id', playerID)
             .andWhere('name', 'Nome')
             .first(),
-        con('player_avatar').select('link').where('player_id', playerID).first(),
         con('player_attribute').select('value', 'total_value').where('player_id', playerID)
-            .orderBy('attribute_id')
+            .orderBy('attribute_id'),
+        con('player_attribute_status').select('attribute_status_id', 'value')
+            .where('player_id', playerID)
+            .orderBy('attribute_status_id', 'DESC')
     ]);
 
     let name = results[0].name.toUpperCase();
     if (!name) name = 'DESCONHECIDO';
 
+    const attribute_status = results[2];
+    for (const attribute of attribute_status) {
+        attribute.value = attribute.value === 0 ? false : true;
+    }
+
     res.render('portrait', {
         playerID,
         name,
-        avatar: results[1],
-        attributes: results[2]
+        attributes: results[1],
+        attribute_status,
     });
 });
 
