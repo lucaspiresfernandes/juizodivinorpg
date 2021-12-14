@@ -71,8 +71,7 @@ router.post('/', jsonParser, async (req, res) => {
         if (!obj)
             return res.status(400).send();
 
-        let link = obj.link;
-        if (link === '') link = null;
+        let link = obj.link || null;
 
         queries.push(con('player_avatar')
             .update({ 'link': link })

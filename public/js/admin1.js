@@ -44,8 +44,8 @@ function rollDices(dices) {
     $.ajax('/dice', {
         data: { dices },
         success: data => {
-            let results = data.results;
-            let sum = data.results.reduce((a, b) => a + b);
+            let results = data.results.map(res => res.roll);
+            let sum = results.reduce((a, b) => a + b);
             loading.hide();
             diceResultContent.text(sum).fadeIn('slow', () => {
                 if (results.length <= 1)
@@ -63,19 +63,13 @@ function resolveDices(str) {
     let arr = [];
     for (let i = 0; i < dices.length; i++) {
         const dice = dices[i];
-        resolveDice(dice, arr);
+        let split = dice.split('d');
+        if (split.length === 1) return arr.push({ n: 0, roll: dice });
+        const n = parseInt(split[0]) || 1;
+        const roll = parseInt(split[1]);
+        arr.push({ n, roll });
     }
     return arr;
-}
-
-function resolveDice(dice, arr) {
-    let split = dice.split('d');
-    if (split.length === 1)
-        return arr.push({ n: 0, num: dice });
-
-    const n = parseInt(split[0]) || 1;
-    const num = parseInt(split[1]);
-    arr.push({ n, num });
 }
 
 $('#diceRoll').on('hidden.bs.modal', ev => {
@@ -122,6 +116,16 @@ function adminAnotationsChange(event) {
             data: { value },
             error: showFailureToastMessage
         });
+}
+
+function onChangeEnvironment(ev) {
+    const combat = $(ev.target).prop('checked');
+
+    $.ajax('/portrait/environment', {
+        method: 'POST',
+        data: { combat },
+        error: showFailureToastMessage
+    });
 }
 
 socket.on('info changed', content => {
@@ -264,7 +268,7 @@ socket.on('item changed', content => {
 
 const diceList = $('#diceList');
 
-socket.on('dice roll', content => {
+socket.on('dice result', content => {
     let id = content.playerID;
     let playerName = playerNames.get(id);
     if (!playerName)
@@ -277,16 +281,19 @@ socket.on('dice roll', content => {
         for (let i = 0; i < auxDices.length; i++) {
             const dice = auxDices[i];
             const n = dice.n;
-            const num = dice.num;
+            const roll = dice.roll;
 
-            if (n > 0)
-                dices.push(`${n}d${num}`);
-            else
-                dices.push(num);
+            if (n > 0) dices.push(`${n}d${roll}`);
+            else dices.push(roll);
         }
     }
 
-    let results = content.results;
+    let results = content.results.map(res => {
+        let roll = res.roll;
+        let successType = res.successType?.description;
+        if (successType) return `${roll} (${successType})`;
+        else return roll;
+    });
 
     const children = diceList.children();
     if (children.length > 10)

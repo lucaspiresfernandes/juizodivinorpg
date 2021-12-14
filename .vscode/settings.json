@@ -1,0 +1,12 @@
+{
+    "database.connections": [
+        {
+            "type": "mysql",
+            "name": "root@localhost (MySql)",
+            "host": "localhost:3306",
+            "username": "root",
+            "database": "juizodivinodb",
+            "password": "1234"
+        }
+    ]
+}

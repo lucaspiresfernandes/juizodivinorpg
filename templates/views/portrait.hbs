@@ -6,98 +6,314 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portrait</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
-        crossorigin="anonymous"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Cinzel:wght@500&display=swap"
-        rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script src="/socket.io/socket.io.js"></script>
-    <script>const socket = io();</script>
+    <script>const socket = io(); socket.emit('room:join', 'portrait' + '{{playerID}}');</script>
+
     <style>
-        .progress {
-            height: 100px;
+        @font-face {
+            font-family: bebas-neue-pro;
+            src: url(/assets/portrait_font.otf);
+            font-weight: bolder;
+            font-style: normal;
+        }
+
+        body {
+            background-color: transparent;
+            font-family: bebas-neue-pro, sans-serif;
+        }
+
+        .popout {
+            animation: popout 1s ease;
+            -webkit-animation: popout 1s ease;
+        }
+
+        @keyframes popout {
+            from {
+                transform: scale(0)
+            }
+
+            80% {
+                transform: scale(1.2)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        @-webkit-keyframes popout {
+            from {
+                -webkit-transform: scale(0)
+            }
+
+            80% {
+                -webkit-transform: scale(1.2)
+            }
+
+            to {
+                -webkit-transform: scale(1)
+            }
+        }
+
+        .container .main,
+        .container .text div {
+            position: absolute;
+        }
+
+        .container .main {
+            top: -70px;
+            left: 0px;
+        }
+
+        img {
+            height: 500px;
+            position: absolute;
+        }
+
+        .top {
+            z-index: -998;
+        }
+
+        .middle {
+            z-index: -999;
+        }
+
+        .bottom {
+            z-index: -1000;
+        }
+
+        .name {
+            left: 305px;
+            top: 110px;
+
+            line-height: 100%;
+
+            max-width: 350px;
+
+            color: white;
+
+            font-size: 84px;
+            font-style: italic;
+
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.75);
+        }
+
+        .health,
+        .sanity {
+            left: 305px;
+            font-size: 96px;
+            font-style: italic;
+            max-width: 250px;
+            color: white;
+        }
+
+        .health {
+            top: 80px;
+            text-shadow: 0 0 10px #df3d60b7, 0 0 30px #df3d60b7, 0 0 50px #df3d60;
+        }
+
+        .sanity {
+            top: 180px;
+            text-shadow: 0 0 10px #7f3ddfb7, 0 0 30px #7f3ddfb7, 0 0 50px #7e3ddf;
+        }
+
+        .energy {
+            top: 100%;
+            left: 35%;
+            transform: translate(-50%, -50%);
+
+            color: #27ffbe;
+
+            font-size: 56px;
+            text-shadow: 0 0 20px #00FFFEb7, 0 0 50px #00ffff;
+        }
+
+        .result {
+            font-size: 56px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .description {
+            font-size: 28px;
+            color: white;
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     </style>
 </head>
 
 <body>
-    <div id="idleContainer">
-        <div class="row">
-            <div class="col-8 fixed">
-                <img class="img-fluid" src="{{avatar}}">
-            </div>
-            <div class="col align-self-center">
-                {{#each attributes}}
-                {{#with this}}
-                <div class="row">
-                    <div id="attribute{{../playerID}}{{attribute_id}}" class="col h2" style="color: #{{fill_color}}">
-                        {{value}}/{{max_value}}
-                    </div>
+    <div class="container">
+        <div class="main">
+            <img src="/assets/avatar_bg.png" class="bottom">
+
+            <img src="/assets/frame_upside.png" class="bottom">
+
+            {{! TODO: set avatar}}
+            <img src="/assets/avatar_ref.png" class="middle">
+
+            <img src="/assets/frame_bottom.png" class="top">
+            <div class="energy-container" style=" width: 250px; height: 400px;">
+                <img src="/assets/energy_placeholder.png" class="top" style="height: 400px; top: 75px; left: 25px;">
+                <div class="text">
+                    <div class="energy top">{{attributes.2.value}}</div>
                 </div>
-                {{/with}}
-                {{/each}}
             </div>
         </div>
     </div>
 
-    <div id="combatContainer" style="display: none;">
+    <div class="container switchable">
+        <div id="idleText" class="text">
+            <div class="name top">{{name}}</div>
+        </div>
+        <div id="combatText" class="text" style="display: none;">
+            <div class="health top">{{attributes.0.value}}/{{attributes.0.total_value}}</div>
+            <div class="sanity top">{{attributes.1.value}}/{{attributes.1.total_value}}</div>
+        </div>
+    </div>
 
+    <div class="container">
+        <div class="main" style="top: 252px; left: 150px;">
+            <div class="dice">
+                <video height="150" style="display: none;" muted>
+                    <source src="/assets/dice_animation.webm">
+                </video>
+                <div class="result" style="display: none;">18</div>
+                <div class="description" style="display: none;">Sucesso</div>
+            </div>
+        </div>
     </div>
 
     <script>
         socket.on('environment change', data => {
-            $('.container', '.container-fluid').fadeOut('slow',
-                () => showContainer(data.mode));
+            const timeout = 100;
+            $('.container.switchable .text').fadeOut(timeout);
+            setTimeout(() => {
+                switch (data.mode) {
+                    case 'idle':
+                        $('#idleText').fadeIn(timeout);
+                        break;
+                    case 'combat':
+                        $('#combatText').fadeIn(timeout);
+                        break;
+                }
+            }, timeout);
         });
+
+        const attributes = {
+            '1': $('.health'),
+            '2': $('.sanity'),
+            '3': $('.energy')
+        }
 
         socket.on('attribute changed', content => {
-            let playerID = content.playerID;
-            let attrID = content.attributeID;
+            let attrID = content.attrID;
             let newValue = content.value;
-            let newMaxValue = content.maxValue;
-
-            let element = $(`#attribute${playerID}${attrID}`);
-
-            if (element.length === 0) return;
-
-            const split = element.text().split('/');
-
-            const value = split[0];
-            const maxValue = split[1];
-
-            let newText = '';
-
-            if (newValue)
-                newText += `${newValue}/`;
-            else
-                newText += `${value}/`;
-
-            if (newMaxValue)
-                newText += `${newMaxValue}`;
-            else
-                newText += `${maxValue}`;
-
-            element.text(newText);
+            let newTotalValue = content.totalValue;
+            let newText = `${newValue}`;
+            if (attrID !== '3') newText += `/${newTotalValue}`;
+            attributes[attrID].text(newText);
         });
 
-        socket.on('dice roll', data => {
-            const playerID = data.playerID;
-        });
+        const $dice = $('.dice video');
+        const $result = $('.dice .result');
+        const $description = $('.dice .description');
 
-        function showContainer(mode) {
-            switch (data.mode) {
-                case 'idle':
-                    $('#idleContainer').fadeIn();
-                    break;
-                case 'combat':
-                    $('#combatContainer').fadeIn();
-                    break;
+        const queue = [];
+        let showingDice = false;
+        let showingResult = false;
+
+        socket.on('dice roll', onDiceRoll);
+        socket.on('dice result', onDiceResult);
+
+        function onDiceRoll() {
+            if (showingDice) return;
+            showDice();
+        }
+
+        function onDiceResult(data) {
+            if (showingResult) return queue.push(data);
+
+            if (!showingDice) {
+                showDice();
+                return setTimeout(() => onDiceResult(data), 1500);
             }
+
+            const roll = data.results[0].roll;
+            const successType = data.results[0].successType.description;
+
+            $result.text(roll).fadeIn('fast', () => $description.text(successType).fadeIn('fast'));
+            showingResult = true;
+
+            setTimeout(() => {
+                $description.fadeOut('fast', () => $description.text(''));
+                $result.fadeOut('fast', () => {
+                    showingResult = false;
+                    $result.text('');
+                    showingDice = false;
+                    $dice.fadeOut('fast', () => {
+                        const next = queue.shift();
+                        if (next) {
+                            showDice();
+                            setTimeout(() => onDiceResult(next), 1500);
+                        }
+                    });
+                });
+            }, 3000);
+        }
+
+        function showDice() {
+            $dice[0].load();
+            showingDice = true;
+            $dice.fadeIn('fast', () => {
+                $dice[0].play();
+            });
+        }
+
+        function successTypeResolver(number, roll, showBranches) {
+            let resolved;
+
+            const f2 = Math.floor(number / 2);
+            const f5 = Math.floor(number / 5);
+            const f10 = Math.floor(number / 10);
+            const f12 = Math.floor(number / 12);
+            const f20 = Math.floor(number / 20);
+
+            if (roll === 1 && number < 20)
+                resolved = { description: 'Desastre!', isSuccess: false };
+
+            else if (roll >= 1 && roll <= 20 - number)
+                resolved = { description: 'Fracasso', isSuccess: false };
+
+            else if (roll > 20 - number && roll <= 20 - f2)
+                resolved = { description: 'Sucesso', isSuccess: true };
+
+            else if (roll > 20 - f2 && roll <= 20 - f5)
+                resolved = { description: 'Bom', isSuccess: true };
+
+            else
+                resolved = { description: 'Extremo', isSuccess: true };
+
+            if (roll > 20 - f10 && roll <= 20 - f12)
+                resolved = { description: "Crítico Normal", isSuccess: true };
+
+            else if (roll > 20 - f12 && roll <= 20 - f20)
+                resolved = { description: "Crítico Bom", isSuccess: true };
+
+            else if (roll > 20 - f20 && number >= 30)
+                resolved = { description: "Crítico Extremo", isSuccess: true };
+
+            if (!showBranches)
+                resolved.description = resolved.isSuccess ? 'Sucesso' : 'Fracasso';
+
+            return resolved;
         }
     </script>
 </body>

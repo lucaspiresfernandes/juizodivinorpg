@@ -51,12 +51,11 @@ async function registerPost(req, res) {
 
         let hash = await encrypter.encrypt(password);
 
-        const playerID = (await con.insert(
-            {
-                username: username,
-                password: hash,
-                admin: admin
-            }).into('player'))[0];
+        const playerID = (await con('player').insert({
+            username: username,
+            password: hash,
+            admin: admin
+        }))[0];
 
         if (admin)
             await registerAdminData(playerID);
@@ -103,7 +102,8 @@ async function registerPlayerData(playerID) {
             player_id: playerID,
             attribute_id: attr.attribute_id,
             value: 0,
-            max_value: 0
+            max_value: 0,
+            extra_value: 0
         })),
 
         results[2].map(async attrStatus => {

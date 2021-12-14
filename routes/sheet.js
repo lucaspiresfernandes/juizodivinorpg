@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const con = require('../utils/connection');
 const io = require('../server').io;
-var urlParser = express.urlencoded({ extended: false });
+const urlParser = express.urlencoded({ extended: false });
 
 const handlebars = require('hbs').handlebars;
 
@@ -43,8 +43,8 @@ router.get('/1', async (req, res) => {
             (async () => {
                 const results = await Promise.all([
                     //Attributes
-                    con.select('attribute.*', 'player_attribute.value', 'player_attribute.min_value', 'player_attribute.max_value',
-                        'player_attribute.coefficient')
+                    con.select('attribute.*', 'player_attribute.value', 'player_attribute.max_value',
+                        'player_attribute.coefficient', 'player_attribute.extra_value', 'player_attribute.total_value')
                         .from('attribute')
                         .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
                         .where('player_attribute.player_id', playerID),
@@ -156,7 +156,7 @@ router.get('/1', async (req, res) => {
 
             //Player Class
             con('player').select('player.class_id', 'class.ability_title', 'class.ability_description',
-            'class.energy_bonus')
+                'class.energy_bonus')
                 .join('class', 'class.class_id', 'player.class_id')
                 .where('player_id', playerID)
                 .first(),
@@ -243,7 +243,8 @@ router.get('/admin/1', async (req, res) => {
 
                 //Attributes: 1
                 con.select('attribute.attribute_id', 'attribute.name', 'attribute.fill_color',
-                    'player_attribute.value', 'player_attribute.max_value')
+                    'player_attribute.value', 'player_attribute.max_value', 'player_attribute.extra_value',
+                    'player_attribute.total_value')
                     .from('attribute')
                     .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
                     .where('player_attribute.player_id', playerID),
@@ -371,7 +372,7 @@ router.post('/player/info', urlParser, async (req, res) => {
             .where('player_id', playerID)
             .andWhere('info_id', infoID);
 
-        io.emit('info changed', { playerID, infoID, value });
+        io.to('admin').emit('info changed', { playerID, infoID, value });
         res.end();
     }
     catch (err) {
@@ -387,18 +388,27 @@ router.post('/player/attribute', urlParser, async (req, res) => {
         return res.status(401).end();
 
     let attrID = req.body.attributeID;
-    let minValue = req.body.minValue;
     let value = req.body.value;
     let maxValue = req.body.maxValue;
+    const extraValue = req.body.extraValue;
 
     try {
-        await con('player_attribute')
-            .update({ 'min_value': minValue, 'value': value, 'max_value': maxValue })
-            .where('player_id', playerID)
-            .andWhere('attribute_id', attrID);
+        await con('player_attribute').update({
+            'value': value,
+            'max_value': maxValue,
+            'extra_value': extraValue
+        }).where('player_id', playerID).andWhere('attribute_id', attrID);
+        io.to('admin').emit('attribute changed', { playerID, attributeID: attrID, value, maxValue });
+        res.send();
 
-        io.emit('attribute changed', { playerID, attributeID: attrID, value, maxValue });
-        res.end();
+        const result = await con('player_attribute').select('value', 'total_value')
+            .where('player_id', playerID).andWhere('attribute_id', attrID).first();
+        const data = {
+            attrID,
+            totalValue: result.total_value,
+            value: result.value,
+        };
+        io.to(`portrait${playerID}`).emit('attribute changed', data);
     }
     catch (err) {
         console.error(err);
@@ -444,7 +454,7 @@ router.post('/player/spec', urlParser, async (req, res) => {
             .where('player_id', playerID)
             .andWhere('spec_id', specID);
 
-        io.emit('spec changed', { playerID, specID, value });
+        io.to('admin').emit('spec changed', { playerID, specID, value });
         res.end();
     }
     catch (err) {
@@ -460,15 +470,14 @@ router.post('/player/characteristic', urlParser, async (req, res) => {
         return res.status(401).end();
 
     let charID = req.body.characteristicID;
-    let value = req.body.value;
-    if (value === '') value = 0;
+    let value = req.body.value || 0;
     try {
         await con('player_characteristic')
             .update('value', value)
             .where('player_id', playerID)
             .andWhere('characteristic_id', charID);
 
-        io.emit('characteristic changed', { playerID, charID, value });
+        io.to('admin').emit('characteristic changed', { playerID, charID, value });
         res.end();
     }
     catch (err) {
@@ -514,7 +523,7 @@ router.put('/player/equipment', urlParser, async (req, res) => {
             .where('equipment_id', equipmentID)
             .first();
 
-        io.emit('equipment changed', {
+        io.to('admin').emit('equipment changed', {
             playerID, equipmentID, using: false, name: equip.name,
             damage: equip.damage, range: equip.range, attacks: equip.attacks, type: 'create'
         });
@@ -541,7 +550,7 @@ router.post('/player/equipment', urlParser, async (req, res) => {
             .update({ 'using': using, 'current_ammo': currentAmmo })
             .where('player_id', playerID)
             .andWhere('equipment_id', equipmentID);
-        io.emit('equipment changed', { playerID, equipmentID, using, type: 'update' });
+        io.to('admin').emit('equipment changed', { playerID, equipmentID, using, type: 'update' });
         res.end();
     }
     catch (err) {
@@ -563,7 +572,7 @@ router.delete('/player/equipment', urlParser, async (req, res) => {
             .where('player_id', playerID)
             .andWhere('equipment_id', equipmentID)
             .del();
-        io.emit('equipment changed', { playerID, equipmentID, type: 'delete' });
+        io.to('admin').emit('equipment changed', { playerID, equipmentID, type: 'delete' });
         res.end();
     }
     catch (err) {
@@ -683,14 +692,11 @@ router.post('/player/skill', urlParser, async (req, res) => {
     if (!playerID)
         return res.status(401).end();
 
-    let skillID = req.body.skillID;
-    let value = req.body.value;
-    if (isNaN(value)) value = 0;
     try {
         await con('player_skill')
-            .update({ 'value': value })
+            .update({ 'value': req.body.value || 0 })
             .where('player_id', playerID)
-            .andWhere('skill_id', skillID);
+            .andWhere('skill_id', req.body.skillID);
 
         res.end();
     }
@@ -798,7 +804,7 @@ router.put('/player/item', urlParser, async (req, res) => {
         let name = query.name;
         let description = query.description;
 
-        io.emit('item changed', { playerID, itemID, name, description, type: 'create' });
+        io.to('admin').emit('item changed', { playerID, itemID, name, description, type: 'create' });
     }
     catch (err) {
         console.error('Could not call new item event.');
@@ -822,7 +828,7 @@ router.post('/player/item', urlParser, async (req, res) => {
             .where('player_id', playerID)
             .andWhere('item_id', itemID);
 
-        io.emit('item changed', { playerID, itemID, description, type: 'update' });
+        io.to('admin').emit('item changed', { playerID, itemID, description, type: 'update' });
 
         res.end();
     }
@@ -846,7 +852,7 @@ router.delete('/player/item', urlParser, async (req, res) => {
             .andWhere('item_id', itemID)
             .del();
 
-        io.emit('item changed', { playerID, itemID, type: 'delete' });
+        io.to('admin').emit('item changed', { playerID, itemID, type: 'delete' });
         res.end();
     }
     catch (err) {
@@ -982,25 +988,10 @@ router.post('/player/class', urlParser, async (req, res) => {
 
     try {
         let class_id = req.body.id;
-        if (class_id < 1)
-            class_id = null;
+        if (class_id < 1) class_id = null;
 
-        await Promise.all([
-            con('player').update('class_id', class_id).where('player_id', playerID),
-
-            (async () => {
-                let bonus = await con('class').select('energy_bonus').where('class_id', class_id).first();
-                if (!bonus) bonus = { energy_bonus: 0 };
-                await con('player_attribute').update('player_attribute.min_value', bonus.energy_bonus)
-                    .join('attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
-                    .where('player_attribute.player_id', playerID)
-                    .andWhere('attribute.name', 'Energia');
-                return bonus;
-            })()
-        ]).then(results => {
-            const bonus = results[1];
-            res.send(bonus);
-        });
+        await con('player').update('class_id', class_id).where('player_id', playerID);
+        res.send();
     }
     catch (err) {
         console.error(err);

@@ -27,7 +27,7 @@
     </script>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script>const socket = io(); const playerNames = new Map();</script>
+    <script>const socket = io(); socket.emit('room:join', 'admin'); const playerNames = new Map();</script>
 
     <title>{{rpgname}} - Administrador</title>
 </head>
@@ -46,6 +46,16 @@
         </div>
         <div class="row h1 text-center">
             <div class="col">Administrador</div>
+        </div>
+        <div class="row my-4">
+            <div class="col text-center h5">
+                <input class="form-check-input align-self-center" type="checkbox" id="changeEnvironment"
+                    onchange="onChangeEnvironment(event);">
+                <label class="form-check-label" for="changeEnvironment"
+                    title="Ao entrar, é recomendável que sempre marque e desmarque essa caixa para sincronizar os retratos.">
+                    Ambiente de Combate?
+                </label>
+            </div>
         </div>
         <div class="row justify-content-center">
             {{#if characters}}

@@ -14,6 +14,10 @@ const server = http.createServer(app);
 const io = new Server(server);
 const port = process.env.PORT || 80;
 
+io.on('connect', socket => {
+    socket.on('room:join', roomName => socket.join(roomName));
+});
+
 const viewsPath = path.join(__dirname, './templates/views');
 const partialsPath = path.join(__dirname, './templates/partials');
 const publicPath = path.join(__dirname, './public');
