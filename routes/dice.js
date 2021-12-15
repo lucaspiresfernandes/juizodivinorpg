@@ -83,32 +83,24 @@ const resolveSuccessType = {
         const f2 = Math.floor(number / 2);
         const f5 = Math.floor(number / 5);
         const f10 = Math.floor(number / 10);
-        const f12 = Math.floor(number / 12);
-        const f20 = Math.floor(number / 20);
+        const f10_10 = Math.floor((number - 10) / 10);
+        const f10_20 = Math.floor((number - 20) / 10);
 
-        if (roll === 1 && number < 20)
-            resolved = { description: 'Desastre' };
+        if (roll > 20 - f10_20) resolved = { description: 'Extremo', isCritical: true };
 
-        else if (roll >= 1 && roll <= 20 - number)
-            resolved = { description: 'Fracasso' };
+        else if (roll > 20 - f10_10) resolved = { description: 'Bom', isCritical: true };
 
-        else if (roll > 20 - number && roll <= 20 - f2)
-            resolved = { description: 'Normal' };
+        else if (roll > 20 - f10) resolved = { description: 'Normal', isCritical: true };
 
-        else if (roll > 20 - f2 && roll <= 20 - f5)
-            resolved = { description: 'Bom' };
+        else if (roll > 20 - f5) resolved = { description: 'Extremo' };
 
-        else
-            resolved = { description: 'Extremo' };
+        else if (roll > 20 - f2) resolved = { description: 'Bom' };
 
-        if (roll > 20 - f10 && roll <= 20 - f12)
-            resolved = { description: "Normal", isCritical: true };
+        else if (roll > 20 - number) resolved = { description: 'Normal' };
 
-        else if (roll > 20 - f12 && roll <= 20 - f20)
-            resolved = { description: "Bom", isCritical: true };
+        else if (roll == 1) resolved = { description: 'Desastre' };
 
-        else if (roll > 20 - f20 && number >= 30)
-            resolved = { description: "Extremo", isCritical: true };
+        else resolved = { description: 'Fracasso' };
 
         return resolved;
     },

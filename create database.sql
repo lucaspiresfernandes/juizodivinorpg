@@ -197,8 +197,8 @@ CREATE TABLE `attribute` (
 
 INSERT INTO `attribute` (`name`, `rollable`, `bg_color`, `fill_color`, `characteristic_id`, `skill_id`, `operation`) VALUES 
 ('Pontos de Vida', FALSE, '5a1e1e', 'b62323', 7, 8, '({characteristic} + {skill}) / 2'),
-('Sanidade', TRUE, '2c4470', '1f3ce0', 4, 22, '{characteristic} + ({skill} * 5)'),
-('Energia', FALSE, '916b03', 'ffbb00', 5, NULL, '{characteristic} * 2');
+('Sanidade', TRUE, '584377', '7d31ef', 4, 22, '{characteristic} + ({skill} * 5)'),
+('Energia', FALSE, '1d9797', '00ffff', 5, NULL, '{characteristic} * 2');
 
 CREATE TABLE `attribute_status` (
     `attribute_status_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
