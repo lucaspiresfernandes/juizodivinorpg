@@ -31,7 +31,7 @@
                     <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
                 </form>
             </div>
-            <div class="col mt-2 text-end">
+            <div class="col mt-2 text-end align-self-center">
                 <a href="/sheet/2" style="font-size: 21px;">Acessar 2° Página</a>
             </div>
         </div>
@@ -64,18 +64,20 @@
                 <div class="row mt-4">
                     <div class="col">
                         <div class="row">
-                            <div class="col mx-2 h5">Classe</div>
+                            <div class="col mx-2 h5"><label for="playerClassSelect">Classe</label></div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                <select class="acds-element form-select" onchange="classChange(event)">
-                                    <option value="0" {{#unless ../playerClass.class_id}}selected{{/unless}}>Nenhum
+                                <select id="playerClassSelect" class="acds-element form-select"
+                                    onchange="classChange(event)">
+                                    <option value="0" {{#unless playerClass.class_id}}selected{{/unless}}>
+                                        Nenhum
                                     </option>
                                     {{#each classes}}
                                     {{#with this}}
                                     <option value="{{class_id}}" ability-title="{{ability_title}}"
                                         ability-description="{{ability_description}}"
-                                        title="{{ability_title}}: {{ability_description}}"
+                                        title="{{ability_title}}: {{ability_description}}" data-skills="{{skills}}"
                                         energy-bonus="{{energy_bonus}}" {{#ifEquals ../playerClass.class_id
                                         class_id}}selected{{/ifEquals}}>
                                         {{name}}
@@ -88,7 +90,8 @@
                     </div>
                 </div>
                 <div class="row my-4">
-                    <div class="col" id="playerClass" energy-bonus="{{playerClass.energy_bonus}}">
+                    <div class="col" id="playerClass" energy-bonus="{{playerClass.energy_bonus}}"
+                        data-skills="{{playerClass.skills}}">
                         <span id="playerClassTitle" style="color: red;">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>
                         <span id="playerClassDescription">{{playerClass.ability_description}}</span>
@@ -96,12 +99,14 @@
                 </div>
             </div>
             <div class="col mt-3">
-                <div class="row mb-3 text-center">
-                    <div class="col">
-                        <img id="avatar" class="img-fluid rounded-circle acds-clickable" data-bs-toggle="modal"
-                            data-bs-target="#uploadAvatar">
+                <div class="row mb-3">
+                    <div class="col d-flex justify-content-center">
+                        <div id="avatarContainer" class="rounded-circle">
+                            <img id="avatar" class="img-fluid acds-clickable" data-bs-toggle="modal"
+                                data-bs-target="#uploadAvatar">
+                        </div>
                     </div>
-                    <div class="col align-self-center">
+                    <div class="col-auto align-self-center">
                         <img class="img-fluid acds-clickable" src="/assets/dice.png" data-bs-toggle="modal"
                             data-bs-target="#generalDiceRoll" style="max-height: 75px;">
                     </div>
@@ -113,7 +118,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="row">
-                                    <div class="col">{{name}}</div>
+                                    <div class="col"><label for="attribute{{attribute_id}}">{{name}}</label></div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
@@ -141,8 +146,9 @@
                                             onclick="attributeButtonClick(event, {{attribute_id}}, -1)"
                                             class="acds-element" style="border: solid 1px; width: 75px">
                                     </div>
-                                    <div id="attributeDesc{{attribute_id}}" class="col" style="font-size: 22px;">
-                                        {{value}}/{{total_value}}
+                                    <div class="col">
+                                        <label id="attributeDesc{{attribute_id}}" style="font-size: 22px;"
+                                            for="attribute{{attribute_id}}">{{value}}/{{total_value}}</label>
                                     </div>
                                     <div class="col">
                                         <input id="attributeIncrease{{attribute_id}}" type="button" value="+"
@@ -151,8 +157,8 @@
                                     </div>
                                 </div>
                                 <div class="row text-center mb-2" {{#if rollable}} style="width: 85%" {{/if}}>
-                                    <div class="col" id="attributeExtra{{attribute_id}}">
-                                        <input type="text" class="acds-element"
+                                    <div class="col" id="">
+                                        <input type="text" class="acds-element" id="attribute{{attribute_id}}"
                                             onchange="attributeBarMaximumChange(event, {{attribute_id}})"
                                             style="outline: 0; border-width: 0 0 1px; text-align: center; max-width: 60px; font-size: 22px;"
                                             maxlength="3" autocomplete="off" value="{{max_value}}">
@@ -220,7 +226,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col">{{name}}</div>
+                            <div class="col"><label for="characteristic{{characteristic_id}}">{{name}}</label></div>
                         </div>
                         <div class="row">
                             <div class="col"><input class="acds-element" type="text" maxlength="3"
@@ -350,7 +356,7 @@
                     <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
                 </form>
             </div>
-            <div class="col mb-2 text-end">
+            <div class="col mb-2 text-end align-self-center">
                 <a href="/sheet/2" style="font-size: 21px;">Acessar 2° Página</a>
             </div>
         </div>
@@ -366,7 +372,7 @@
         <div class="modal fade" id="uploadAvatar" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <form onsubmit="event.preventDefault(); uploadAvatarClick(event); this.reset();">
+                    <form onsubmit="event.preventDefault(); uploadAvatarClick(event);">
                         <div class="modal-header">
                             <h5 class="modal-title">Atualizar Avatar</h5>
                         </div>

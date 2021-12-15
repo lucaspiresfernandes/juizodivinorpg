@@ -7,18 +7,21 @@ const io = require('../server').io;
 router.get('/:id', async (req, res) => {
     const playerID = req.params.id;
 
+    if (!playerID) return res.status(401).send();
+
     const results = await Promise.all([
         con('player_info').select('value as name')
-            .join('info', 'player_info.info_id', 'info.info_id')
             .where('player_id', playerID)
-            .andWhere('name', 'Nome')
+            .andWhere('info_id', 1)
             .first(),
         con('player_attribute').select('value', 'total_value').where('player_id', playerID)
             .orderBy('attribute_id'),
         con('player_attribute_status').select('attribute_status_id', 'value')
             .where('player_id', playerID)
-            .orderBy('attribute_status_id', 'DESC')
+            .orderBy('attribute_status_id')
     ]);
+
+    if (!results[0]) return res.send();
 
     let name = results[0].name.toUpperCase();
     if (!name) name = 'DESCONHECIDO';

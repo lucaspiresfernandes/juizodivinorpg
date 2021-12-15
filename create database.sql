@@ -129,11 +129,57 @@ CREATE TABLE `player_skill` (
     `player_id` INT UNSIGNED NOT NULL,
     `skill_id` INT UNSIGNED NOT NULL,
     `value` INT UNSIGNED NOT NULL,
+    `extra_value` INT UNSIGNED NOT NULL,
+    `total_value` INT UNSIGNED GENERATED ALWAYS AS (`value` + `extra_value`) STORED,
     PRIMARY KEY (`player_skill_id`),
     CONSTRAINT `uk_player_id_skill_id` UNIQUE (`player_id`, `skill_id`),
     CONSTRAINT `fk_player_skill_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_skill_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE `class_skill` (
+    `class_skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `class_id` INT UNSIGNED NOT NULL,
+    `skill_id` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`class_skill_id`),
+    CONSTRAINT `uk_class_id_skill_id` UNIQUE (`class_id`, `skill_id`),
+    CONSTRAINT `fk_class_skill_class_id` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_class_skill_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+-- TODO: Insert skills.
+INSERT INTO `class_skill` (`class_id`, `skill_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 7),
+(1, 8),
+(1, 20),
+(2, 9),
+(2, 12),
+(2, 15),
+(2, 16),
+(2, 21),
+(3, 10),
+(3, 11),
+(3, 13),
+(3, 14),
+(3, 22),
+(4, 4),
+(4, 5),
+(4, 7),
+(4, 15),
+(4, 16),
+(5, 16),
+(5, 17),
+(5, 18),
+(5, 19),
+(5, 21),
+(6, 2),
+(6, 3),
+(6, 6),
+(6, 7),
+(6, 19);
 
 CREATE TABLE `attribute` (
     `attribute_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -163,9 +209,9 @@ CREATE TABLE `attribute_status` (
 );
 
 INSERT INTO `attribute_status` (`name`, `attribute_id`) VALUES 
-('Inconsciente', 1),
 ('Morrendo', 1),
 ('Enfraquecendo', 1),
+('Inconsciente', 1),
 ('Lesão Grave', 1),
 ('Traumatizado', 2);
 
@@ -320,7 +366,7 @@ CREATE TABLE `player_avatar` (
     `player_avatar_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `attribute_status_id` INT UNSIGNED NULL,
-    `link` MEDIUMTEXT NULL,
+    `link` MEDIUMTEXT NULL DEFAULT NULL,
     PRIMARY KEY (`player_avatar_id`),
     CONSTRAINT `uk_player_id_attribute_status_id` UNIQUE (`player_id`, `attribute_status_id`),
     CONSTRAINT `fk_player_avatar_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,

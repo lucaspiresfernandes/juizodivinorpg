@@ -73,11 +73,25 @@ body {
     height: 40px;
 }
 
+#avatarContainer {
+    border: solid 2px white;
+    background-color: rgb(15, 15, 15);
+    max-width: 250px;
+}
+
 #avatar {
-    border: solid 1px white;
     max-height: 375px;
     min-width: 100px;
     min-height: 100px;
+}
+
+.critical {
+    color: #cc6060 !important;
+    text-shadow: 0 0 10px #DD0F0F, 0 0 30px #DD0F0F, 0 0 50px #DD0F0F !important;
+}
+
+.unconscious {
+    filter: brightness(8%);
 }
 
 * {

@@ -1,7 +1,7 @@
 {
     "info": {
         "rpgname": "Juízo Divino RPG",
-        "playerrole": "Caçador"
+        "playerrole": "Investigador"
     },
     "encryption": {
         "saltRounds": 10

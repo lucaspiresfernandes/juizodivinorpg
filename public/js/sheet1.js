@@ -5,7 +5,6 @@ diceResultContent.hide();
 const diceResultDescription = $('#diceResultDescription');
 diceResultDescription.hide();
 const loading = $('.loading');
-const goodRate = 0.5, extremeRate = 0.2;
 
 const diceRollModal = new bootstrap.Modal($('#diceRoll')[0]);
 const uploadAvatarModal = new bootstrap.Modal($('#uploadAvatar')[0]);
@@ -40,12 +39,16 @@ function rollDice(num, roll = defaultDiceRoll, showBranches = true) {
             const successType = result.successType;
             loading.hide();
 
-            diceResultContent.text(roll).fadeIn('slow', () => {
-                if (num === -1)
-                    return;
-                diceResultDescription.text(successType.description)
-                    .fadeIn('slow');
-            });
+            let prefix = '';
+            if (successType.isCritical) {
+                diceResultContent.addClass('critical');
+                diceResultDescription.addClass('critical');
+                prefix = 'Crítico ';
+            }
+            const description = prefix + successType.description;
+
+            diceResultContent.text(roll).fadeIn('slow', () =>
+                diceResultDescription.text(description).fadeIn('slow'));
         },
         error: showFailureToastMessage
     });
@@ -72,10 +75,8 @@ function rollDices(dices) {
 }
 
 $('#diceRoll').on('hidden.bs.modal', ev => {
-    diceResultContent.text('')
-        .hide();
-    diceResultDescription.text('')
-        .hide();
+    diceResultContent.text('').hide().removeClass('critical');
+    diceResultDescription.text('').hide().removeClass('critical');
 })
 
 function resolveDices(str) {
@@ -133,7 +134,7 @@ function clamp(n, min, max) {
     return n;
 }
 
-function updateAttributeBar(bar, { newCur, newMax, newExtra }) {
+function resolveAttributeBarUI(bar, { newCur, newMax, newExtra }) {
     if (newCur === undefined) newCur = parseInt(bar.attr('current')) || 0;
     bar.attr('current', newCur);
 
@@ -217,7 +218,7 @@ function uploadAvatarClick(event) {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(avatars),
             success: () => {
-                evaluateAvatar();
+                findAvatar();
                 uploadAvatarModal.hide();
             },
             error: err => {
@@ -227,13 +228,23 @@ function uploadAvatarClick(event) {
         });
 }
 
-function evaluateAvatar() {
+function findAvatar() {
     const field = $('.attribute-status-field:checked').first();
-    let id = field.attr('attribute-status-id');
-    if (field.length === 0) id = 0;
+    let id = field.length === 0 ? 0 : parseInt(field.attr('attribute-status-id'));
+
+    switch (id) {
+        case 3:
+            id = 0;
+            avatarImage.addClass('unconscious');
+            break;
+        default:
+            avatarImage.removeClass('unconscious');
+            break;
+    }
+
     avatarImage.attr('src', `/avatar/${id}?v=${Date.now()}`);
 }
-evaluateAvatar();
+findAvatar();
 
 //Attributes
 function attributeBarMaximumChange(ev, attributeID) {
@@ -250,13 +261,12 @@ function attributeBarMaximumChange(ev, attributeID) {
     }
 
     if (newMax === max) return;
-
     let newCur = clamp(cur, 0, newMax + extra);
 
     $.ajax('/sheet/player/attribute', {
         method: 'POST',
         data: { attributeID, value: newCur, maxValue: newMax },
-        success: () => updateAttributeBar(bar, { newCur, newMax }),
+        success: () => resolveAttributeBarUI(bar, { newCur, newMax }),
         error: showFailureToastMessage
     });
 }
@@ -278,7 +288,7 @@ function attributeButtonClick(ev, attributeID, coef) {
         data: { attributeID, value: newCur },
         error: showFailureToastMessage
     });
-    updateAttributeBar(bar, { newCur });
+    resolveAttributeBarUI(bar, { newCur });
 }
 
 function attributeDiceClick() {
@@ -288,7 +298,7 @@ function attributeDiceClick() {
 //Attribute Status
 function attributeStatusChange(ev, attributeStatusID) {
     const checked = $(ev.target).prop('checked');
-    evaluateAvatar();
+    findAvatar();
     $.ajax('/sheet/player/attributestatus',
         {
             method: 'POST',
@@ -311,10 +321,13 @@ function specChange(ev, specID) {
 //Characteristics
 function characteristicChange(ev, characteristicID) {
     let value = $(ev.target).val();
-    if (value === '') $(ev.target).val(0);
+    if (value === '') {
+        $(ev.target).val(0);
+        value = 0;
+    }
 
-    setSkillTotalMax($(`.skill-total[characteristic-id="${characteristicID}"]`));
-    setAttributeBarExtra($(`.attribute-bar[characteristic-id="${characteristicID}"]`));
+    updateSkill($(`.skill-total[characteristic-id="${characteristicID}"]`));
+    updateAttributeBarExtra($(`.attribute-bar[characteristic-id="${characteristicID}"]`));
 
     $.ajax('/sheet/player/characteristic', {
         method: 'POST',
@@ -624,16 +637,13 @@ function skillSearchBarInput(ev) {
 
 function skillChange(event, id) {
     let value = $(event.target).val();
-    if (value === '') $(event.target).val(0);
+    if (value === '') {
+        $(ev.target).val(0);
+        value = 0;
+    }
 
-    setSkillTotalMax($(event.target).parents('.skill-container').find('.skill-total'));
-    setAttributeBarExtra($(`.attribute-bar[skill-id="${id}"]`));
-
-    $.ajax('/sheet/player/skill', {
-        method: 'POST',
-        data: { skillID: id, value: value },
-        error: showFailureToastMessage
-    });
+    updateSkill($(event.target).parents('.skill-container').find('.skill-total'));
+    updateAttributeBarExtra($(`.attribute-bar[skill-id="${id}"]`));
 }
 
 function skillCheckChange(event, id) {
@@ -806,13 +816,16 @@ function classChange(ev) {
     const title = option.attr('ability-title');
     const description = option.attr('ability-description') || '';
     const energyBonus = parseInt(option.attr('energy-bonus')) || 0;
+    const skills = option.data('skills') || [];
 
     if (title) $('#playerClassTitle').text(title + ': ');
     else $('#playerClassTitle').text('');
     $('#playerClassDescription').text(description);
     $('#playerClass').attr('energy-bonus', energyBonus);
+    $('#playerClass').data('skills', skills);
 
-    setAttributeBarExtra($('.progress-bar[name="Energia"]'));
+    updateSkill($('.skill-total'));
+    updateAttributeBarExtra($('.progress-bar[name="Energia"]'));
 
     $.ajax('/sheet/player/class', {
         method: 'POST',
@@ -821,7 +834,7 @@ function classChange(ev) {
     });
 }
 
-function setAttributeBarExtra(bar) {
+function updateAttributeBarExtra(bar) {
     if (bar.length === 0) return;
     const attrID = bar.attr('attribute-id');
 
@@ -839,16 +852,28 @@ function setAttributeBarExtra(bar) {
     $.ajax('/sheet/player/attribute', {
         method: 'POST',
         data: { attributeID: attrID, extraValue: newExtra, value: newCur },
-        success: () => updateAttributeBar(bar, { newExtra, newCur }),
+        success: () => resolveAttributeBarUI(bar, { newExtra, newCur }),
         error: showFailureToastMessage
     });
 }
 
-function setSkillTotalMax(skills) {
+function updateSkill(skills) {
+    const classExtras = $('#playerClass').data('skills') || [];
     for (let i = 0; i < skills.length; i++) {
         const skill = skills.eq(i);
+        const skillID = skill.data('skill-id');
+        const extra = classExtras.includes(skillID) ? 4 : 0;
         const charValue = parseInt($(`#characteristic${skill.attr('characteristic-id')}`).val()) || 0;
         const skillValue = parseInt(skill.parents('.skill-container').find('.skill-field').val()) || 0;
-        skill.text(skillValue + charValue);
+
+        const extraValue = charValue + extra;
+        const totalValue = skillValue + extraValue;
+        skill.text(totalValue);
+        $.ajax('/sheet/player/skill', {
+            method: 'POST',
+            data: { skillID, value: skillValue, extra_value: extraValue },
+            error: showFailureToastMessage
+        });
     }
+
 }

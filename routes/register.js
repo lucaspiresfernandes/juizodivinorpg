@@ -84,12 +84,27 @@ async function registerPlayerData(playerID) {
         con.select('info_id').from('info'),
         con.select('extra_info_id').from('extra_info'),
     ]);
-
-    await con.insert({
+    
+    await con('player_avatar').insert([{
         player_id: playerID,
-        attribute_status_id: null,
-        link: null
-    }).into('player_avatar');
+        attribute_status_id: null
+    },
+    {
+        player_id: playerID,
+        attribute_status_id: 1
+    },
+    {
+        player_id: playerID,
+        attribute_status_id: 2
+    },
+    {
+        player_id: playerID,
+        attribute_status_id: 4
+    },
+    {
+        player_id: playerID,
+        attribute_status_id: 5
+    }]);
 
     await Promise.all([
         ...results[0].map(char => con('player_characteristic').insert({
@@ -106,26 +121,18 @@ async function registerPlayerData(playerID) {
             extra_value: 0
         })),
 
-        results[2].map(async attrStatus => {
-            const playerAttrStatus = con('player_attribute_status').insert({
-                player_id: playerID,
-                attribute_status_id: attrStatus.attribute_status_id,
-                value: false
-            });
-            const playerAvatar = con('player_avatar').insert({
-                player_id: playerID,
-                attribute_status_id: attrStatus.attribute_status_id,
-                link: null
-            });
-            await playerAttrStatus;
-            await playerAvatar;
-        }),
+        ...results[2].map(attrStatus => con('player_attribute_status').insert({
+            player_id: playerID,
+            attribute_status_id: attrStatus.attribute_status_id,
+            value: false
+        })),
 
         ...results[3].map(skill => {
             if (skill.mandatory) return con('player_skill').insert({
                 player_id: playerID,
                 skill_id: skill.skill_id,
                 value: 0,
+                extra_value: 0
             });
         }),
 

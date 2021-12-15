@@ -9,7 +9,7 @@ async function sendAvatar(playerID, attrStatusID, res) {
     const link = (await con.select('link')
         .from('player_avatar')
         .where('attribute_status_id', attrStatusID)
-        .andWhere('player_id', playerID).first()).link;
+        .andWhere('player_id', playerID).first())?.link;
 
     if (!link) return res.sendFile(path.join(__dirname, '../public/assets/avatar404.png'));
     const response = await axios.get(link, { responseType: 'arraybuffer', timeout: 10000 });
@@ -18,7 +18,7 @@ async function sendAvatar(playerID, attrStatusID, res) {
 }
 
 router.get('/:attrStatusID', (req, res) => {
-    const playerID = req.session.playerID;
+    const playerID = req.query.playerID || req.session.playerID;
     let attrStatusID = req.params.attrStatusID;
 
     if (attrStatusID < 1 || isNaN(attrStatusID))

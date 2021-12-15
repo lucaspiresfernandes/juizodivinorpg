@@ -4,6 +4,7 @@ const RandomOrg = require('random-org');
 const apiKey = process.env.RANDOM_ORG_KEY || 'unkown';
 const random = new RandomOrg({ apiKey: apiKey });
 const io = require('../server').io;
+const goodRate = 0.5, extremeRate = 0.2;
 
 async function nextInt(min, max, n) {
     try {
@@ -27,7 +28,7 @@ router.get('/', async (req, res) => {
     const isAdmin = req.session.isAdmin;
     const dices = req.query.dices;
     const resolverKey = req.query.resolverKey;
-    
+
     if (!playerID || !dices) return res.status(401).send();
 
     if (dices.length === 1 && dices[0].n == 1)
@@ -70,6 +71,7 @@ router.get('/', async (req, res) => {
             io.to(`portrait${playerID}`).emit('dice result', { results });
     }
     catch (err) {
+        console.error(err);
         res.status(401).send();
     }
 });
@@ -85,58 +87,37 @@ const resolveSuccessType = {
         const f20 = Math.floor(number / 20);
 
         if (roll === 1 && number < 20)
-            resolved = { description: 'Desastre!', isSuccess: false };
+            resolved = { description: 'Desastre' };
 
         else if (roll >= 1 && roll <= 20 - number)
-            resolved = { description: 'Fracasso', isSuccess: false };
+            resolved = { description: 'Fracasso' };
 
         else if (roll > 20 - number && roll <= 20 - f2)
-            resolved = { description: 'Sucesso', isSuccess: true };
+            resolved = { description: 'Normal' };
 
         else if (roll > 20 - f2 && roll <= 20 - f5)
-            resolved = { description: 'Bom', isSuccess: true };
+            resolved = { description: 'Bom' };
 
         else
-            resolved = { description: 'Extremo', isSuccess: true };
+            resolved = { description: 'Extremo' };
 
         if (roll > 20 - f10 && roll <= 20 - f12)
-            resolved = { description: "Crítico Normal", isSuccess: true };
+            resolved = { description: "Normal", isCritical: true };
 
         else if (roll > 20 - f12 && roll <= 20 - f20)
-            resolved = { description: "Crítico Bom", isSuccess: true };
+            resolved = { description: "Bom", isCritical: true };
 
         else if (roll > 20 - f20 && number >= 30)
-            resolved = { description: "Crítico Extremo", isSuccess: true };
+            resolved = { description: "Extremo", isCritical: true };
 
         return resolved;
-    },
-
-    '20nobranch': function (number, roll) {
-        const resolved = resolveSuccessType['20'](number, roll);
-        resolved.description = resolved.isSuccess ? 'Sucesso' : 'Fracasso';
-        return resolved;
-    },
-
-    '100': function (number, roll) {
-        if (roll === 100)
-            return { description: 'Desastre', isSuccess: false };
-        if (roll === 1)
-            return { description: 'Perfeito', isSuccess: true };
-        if (roll <= number * extremeRate)
-            return { description: 'Extremo', isSuccess: true };
-        if (roll <= number * goodRate)
-            return { description: 'Bom', isSuccess: true };
-        if (roll <= number)
-            return { description: 'Sucesso', isSuccess: true };
-        if (roll > number)
-            return { description: 'Fracasso', isSuccess: false };
-        return { description: 'Unknown', isSuccess: false };
     },
 
     '100nobranch': function (number, roll) {
-        const resolved = resolveSuccessType['100'](number, roll);
-        resolved.description = resolved.isSuccess ? 'Sucesso' : 'Fracasso';
-        return resolved;
+        if (roll <= number)
+            return { description: 'Sucesso' };
+        if (roll > number)
+            return { description: 'Fracasso' };
     }
 }
 
