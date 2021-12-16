@@ -4,12 +4,9 @@ const RandomOrg = require('random-org');
 const apiKey = process.env.RANDOM_ORG_KEY || 'unkown';
 const random = new RandomOrg({ apiKey: apiKey });
 const io = require('../server').io;
-const goodRate = 0.5, extremeRate = 0.2;
 
 async function nextInt(min, max, n) {
-    try {
-        return (await random.generateIntegers({ min, max, n })).random;
-    }
+    try { return (await random.generateIntegers({ min, max, n })).random; }
     catch (err) { console.error('Random.org inactive. Reason:', err); }
 
     let data = [];
@@ -76,40 +73,29 @@ router.get('/', async (req, res) => {
     }
 });
 
+const goodRate = 0.5, extremeRate = 0.2;
+
 const resolveSuccessType = {
     '20': function (number, roll) {
-        let resolved;
-
         const f2 = Math.floor(number / 2);
         const f5 = Math.floor(number / 5);
         const f10 = Math.floor(number / 10);
         const f10_10 = Math.floor((number - 10) / 10);
         const f10_20 = Math.floor((number - 20) / 10);
 
-        if (roll > 20 - f10_20) resolved = { description: 'Extremo', isCritical: true };
-
-        else if (roll > 20 - f10_10) resolved = { description: 'Bom', isCritical: true };
-
-        else if (roll > 20 - f10) resolved = { description: 'Normal', isCritical: true };
-
-        else if (roll > 20 - f5) resolved = { description: 'Extremo' };
-
-        else if (roll > 20 - f2) resolved = { description: 'Bom' };
-
-        else if (roll > 20 - number) resolved = { description: 'Normal' };
-
-        else if (roll == 1) resolved = { description: 'Desastre' };
-
-        else resolved = { description: 'Fracasso' };
-
-        return resolved;
+        if (roll > 20 - f10_20) return { description: 'Extremo', isCritical: true };
+        else if (roll > 20 - f10_10) return { description: 'Bom', isCritical: true };
+        else if (roll > 20 - f10) return { description: 'Normal', isCritical: true };
+        else if (roll > 20 - f5) return { description: 'Extremo' };
+        else if (roll > 20 - f2) return { description: 'Bom' };
+        else if (roll > 20 - number) return { description: 'Normal' };
+        else if (roll == 1) return { description: 'Desastre' };
+        else return { description: 'Fracasso' };
     },
 
     '100nobranch': function (number, roll) {
-        if (roll <= number)
-            return { description: 'Sucesso' };
-        if (roll > number)
-            return { description: 'Fracasso' };
+        if (roll <= number) return { description: 'Sucesso' };
+        else return { description: 'Fracasso' };
     }
 }
 

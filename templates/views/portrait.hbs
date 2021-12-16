@@ -43,17 +43,17 @@
     </div>
 
     <div class="container switchable">
-        <div id="idleText" class="text">
+        <div id="idleText" class="text" style="display: none;">
             <div class="name top">{{name}}</div>
         </div>
-        <div id="combatText" class="text" style="display: none;">
+        <div id="combatText" class="text">
             <div class="health top">{{attributes.0.value}}/{{attributes.0.total_value}}</div>
             <div class="sanity top">{{attributes.1.value}}/{{attributes.1.total_value}}</div>
         </div>
     </div>
 
     <div class="container">
-        <div class="main" style="top: 20px; left: 50px;">
+        <div class="main" style="top: 20px; left: 20px;">
             <div class="dice">
                 <video height="240" muted class="popout">
                     <source src="/assets/dice_animation.webm">

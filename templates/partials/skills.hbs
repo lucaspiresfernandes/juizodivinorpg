@@ -4,13 +4,13 @@
         <div class="col">
             <input class="acds-element skill-field" type="text" id="skill{{skill_id}}" value="{{value}}" maxlength="3"
                 style="outline: 0; border-width: 0 0 1px; text-align: center; max-width: 80px; font-size: 16px;"
-                onchange="skillChange(event, {{skill_id}})">
+                onchange="skillChange(event, {{skill_id}})" data-last-value="{{value}}">
         </div>
     </div>
     <div class="row">
-        <div class="col">
+        <div class="col" onclick="skillDiceClick(event, {{skill_id}})">
             <small class="skill-total" id="skillTotal{{skill_id}}" style="font-size: 20px;" data-skill-id="{{skill_id}}"
-                characteristic-id="{{characteristic_id}}">{{total_value}}</small>
+                data-characteristic-id="{{characteristic_id}}">{{total_value}}</small>
         </div>
     </div>
     <div class="row h-100">

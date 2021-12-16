@@ -47,66 +47,91 @@ socket.on('info changed', content => {
 });
 
 const $dice = $('.dice video');
+const dice = $dice[0];
+dice.load();
 const $result = $('.dice .result');
 const $description = $('.dice .description');
+
 const $avatar = $('#avatar');
 const $mainContainer = $('#mainContainer');
 
 const queue = [];
 let showingDice = false;
 let showingResult = false;
+let currentData = null;
+const newResultTimeout = 900;
 
-socket.on('dice roll', onDiceRoll);
+socket.on('dice roll', showDiceRoll);
 socket.on('dice result', onDiceResult);
 
-function onDiceRoll() {
-    if (showingDice) return;
-    showDice();
+function onDiceResult(data) {
+    if (currentData) return queue.push(data);
+
+    if (!showingDice) {
+        showDiceRoll();
+        return setTimeout(() => onDiceResult(data), newResultTimeout);
+    }
+
+    showDiceResult(data);
+    setTimeout(() => {
+        hideDiceResult(() => {
+            hideDiceRoll(() => {
+                const next = queue.shift();
+                if (next) {
+                    showDiceRoll();
+                    setTimeout(() => onDiceResult(next), newResultTimeout);
+                }
+            });
+        });
+    }, 3000);
 }
 
-function onDiceResult(data) {
-    if (showingResult) return queue.push(data);
+function showDiceRoll() {
+    if (showingDice) return;
+    dice.currentTime = 0;
+    dice.play();
+    $dice.addClass('show');
+    $mainContainer.addClass('show');
+    showingDice = true;
+}
 
-    if (!showingDice) return rollDice(data);
+const diceHideTimeout = parseFloat(getComputedStyle(dice)
+    .getPropertyValue('transition-duration')) * 1000;
+function hideDiceRoll(onHiddenCallback) {
+    if (!showingDice) return;
+    $dice.removeClass('show');
+    setTimeout(() => {
+        $mainContainer.removeClass('show');
+        showingDice = false;
+        currentData = null;
+        if (onHiddenCallback) onHiddenCallback();
+    }, diceHideTimeout);
+}
+
+function showDiceResult(data) {
+    if (showingResult) return;
+
+    currentData = data;
 
     const roll = data.results[0].roll;
     const successType = data.results[0].successType;
     if (successType.isCritical) {
         $result.addClass('critical');
         $description.addClass('critical');
-        //TODO: play audio.
+        //TODO: find better details.
     }
-
-    $result.text(roll).fadeIn('slow', () => $description.text(successType.description).fadeIn('slow'));
     showingResult = true;
-    setTimeout(() => {
-        $description.fadeOut('fast', () => $description.text('').removeClass('critical'));
-        $result.fadeOut('fast', () => {
-            showingResult = false;
-            showingDice = false;
-            $result.text('').removeClass('critical');
-            $dice.removeClass('show');
-            setTimeout(() => $mainContainer.removeClass('show'), 600);
-            rollDice(queue.shift());
-        });
-    }, 3500);
+    $result.text(roll).fadeIn('slow', () => $description.text(successType.description).fadeIn('slow'));
 }
 
-$dice[0].load();
-function showDice() {
-    $dice[0].load();
-    showingDice = true;
-    $dice.addClass('show');
-    $mainContainer.addClass('show');
-    setTimeout(() => $dice[0].play(), 250);
-}
-
-function rollDice(next) {
-    if (!next) return;
-    setTimeout(() => {
-        showDice();
-        setTimeout(() => onDiceResult(next), 1000);
-    }, 750);
+function hideDiceResult(onHiddenCallback) {
+    if (!showingResult) return;
+    $description.fadeOut('fast', () => $description.text('').removeClass('critical'));
+    $result.fadeOut('fast', () => {
+        $result.text('').removeClass('critical');
+        showingResult = false;
+        if (onHiddenCallback) onHiddenCallback();
+    });
 }
 
 function findAvatar() {

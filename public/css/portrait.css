@@ -36,7 +36,7 @@ body {
 
 .container .main {
     top: -70px;
-    left: 0px;
+    left: -25px;
 }
 
 img {
@@ -57,7 +57,7 @@ img {
 }
 
 .name {
-    left: 390px;
+    left: 350px;
     top: 220px;
 
     line-height: 100%;
@@ -76,7 +76,7 @@ img {
 
 .health,
 .sanity {
-    left: 305px;
+    left: 290px;
     font-size: 96px;
     font-style: italic;
     max-width: 250px;
@@ -84,12 +84,12 @@ img {
 }
 
 .health {
-    top: 80px;
+    top: 115px;
     text-shadow: 0 0 10px #df3d60, 0 0 30px #df3d60, 0 0 50px #df3d60;
 }
 
 .sanity {
-    top: 180px;
+    top: 215px;
     text-shadow: 0 0 10px #7e3ddf, 0 0 30px #7e3ddf, 0 0 50px #7e3ddf;
 }
 
@@ -129,5 +129,5 @@ img {
 }
 
 .unconscious {
-    filter: brightness(8%);
+    filter: brightness(10%);
 }

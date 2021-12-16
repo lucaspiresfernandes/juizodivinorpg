@@ -135,19 +135,19 @@ function clamp(n, min, max) {
 }
 
 function resolveAttributeBarUI(bar, { newCur, newMax, newExtra }) {
-    if (newCur === undefined) newCur = parseInt(bar.attr('current')) || 0;
-    bar.attr('current', newCur);
+    if (newCur === undefined) newCur = bar.data('current');
+    bar.data('current', newCur);
 
-    if (newMax === undefined) newMax = parseInt(bar.attr('max')) || 0;
-    bar.attr('max', newMax);
+    if (newMax === undefined) newMax = bar.data('max');
+    bar.data('max', newMax);
 
-    if (newExtra === undefined) newExtra = parseInt(bar.attr('extra')) || 0;
-    bar.attr('extra', newExtra);
+    if (newExtra === undefined) newExtra = bar.data('extra');
+    bar.data('extra', newExtra);
 
     const newTotal = newMax + newExtra;
 
-    $(`#attributeDesc${bar.attr('attribute-id')}`).text(`${newCur}/${newTotal}`);
-    bar.attr('total', newTotal);
+    $(`#attributeDesc${bar.data('attribute-id')}`).text(`${newCur}/${newTotal}`);
+    bar.data('total', newTotal);
     bar.css('width', `${((newCur / newTotal) * 100) || 0}%`);
 }
 
@@ -165,7 +165,7 @@ function generalDiceClick(event) {
         if (n === '0')
             continue;
 
-        const num = el.attr('dice');
+        const num = el.data('dice');
         dicesArray.push(`${n}d${num}`);
     }
     const dicesText = dicesArray.join('+');
@@ -208,7 +208,7 @@ function uploadAvatarClick(event) {
 
     const avatars = $('.avatar-field').map((i, el) => {
         const avatar = $(el);
-        let id = parseInt(avatar.attr('avatar-id')) || null;
+        let id = avatar.data('avatar-id') || null;
         return { attribute_status_id: id, link: avatar.val() };
     }).get();
 
@@ -230,7 +230,7 @@ function uploadAvatarClick(event) {
 
 function findAvatar() {
     const field = $('.attribute-status-field:checked').first();
-    let id = field.length === 0 ? 0 : parseInt(field.attr('attribute-status-id'));
+    let id = field.length === 0 ? 0 : field.data('attribute-status-id');
 
     switch (id) {
         case 3:
@@ -250,15 +250,12 @@ findAvatar();
 function attributeBarMaximumChange(ev, attributeID) {
     const bar = $(`#attributeBar${attributeID}`);
 
-    const cur = parseInt(bar.attr('current'));
-    const max = parseInt(bar.attr('max'));
-    const extra = parseInt(bar.attr('extra'));
+    const cur = bar.data('current');
+    const max = bar.data('max');
+    const extra = bar.data('extra');
 
-    let newMax = parseInt($(ev.target).val());
-    if (!newMax) {
-        newMax = 0;
-        $(ev.target).val(newMax);
-    }
+    const newMax = parseInt($(ev.target).val()) || 0;
+    $(ev.target).val(newMax);
 
     if (newMax === max) return;
     let newCur = clamp(cur, 0, newMax + extra);
@@ -276,8 +273,8 @@ function attributeButtonClick(ev, attributeID, coef) {
 
     if (ev.shiftKey) coef *= 10;
 
-    const cur = parseInt(bar.attr('current'));
-    const total = parseInt(bar.attr('total'));
+    const cur = bar.data('current');
+    const total = bar.data('total');
 
     let newCur = clamp(cur + coef, 0, total);
 
@@ -299,35 +296,34 @@ function attributeDiceClick() {
 function attributeStatusChange(ev, attributeStatusID) {
     const checked = $(ev.target).prop('checked');
     findAvatar();
-    $.ajax('/sheet/player/attributestatus',
-        {
-            method: 'POST',
-            data: { attributeStatusID, checked },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/attributestatus', {
+        method: 'POST',
+        data: { attributeStatusID, checked },
+        error: showFailureToastMessage
+    });
 }
 
 //Specs
 function specChange(ev, specID) {
-    let value = $(ev.target).val();
-    $.ajax('/sheet/player/spec',
-        {
-            method: 'POST',
-            data: { specID, value },
-            error: showFailureToastMessage
-        });
+    const value = $(ev.target).val() || 0;
+    $(ev.target).val(value);
+    $.ajax('/sheet/player/spec', {
+        method: 'POST',
+        data: { specID, value },
+        error: showFailureToastMessage
+    });
 }
 
 //Characteristics
 function characteristicChange(ev, characteristicID) {
-    let value = $(ev.target).val();
-    if (value === '') {
-        $(ev.target).val(0);
-        value = 0;
-    }
+    const lastValue = $(ev.target).data('last-value');
+    const value = parseInt($(ev.target).val()) || 0;
+    $(ev.target).val(value);
+    if (lastValue === value) return;
+    $(ev.target).data('last-value', value);
 
-    updateSkill($(`.skill-total[characteristic-id="${characteristicID}"]`));
-    updateAttributeBarExtra($(`.attribute-bar[characteristic-id="${characteristicID}"]`));
+    updateSkill($(`.skill-total[data-characteristic-id="${characteristicID}"]`), true);
+    updateAttributeBarExtra($(`.attribute-bar[data-characteristic-id="${characteristicID}"]`));
 
     $.ajax('/sheet/player/characteristic', {
         method: 'POST',
@@ -383,47 +379,45 @@ function addEquipmentClick(event) {
 
     let equipmentID = addEquipmentList.val();
 
-    $.ajax('/sheet/player/equipment',
-        {
-            method: 'PUT',
-            data: { equipmentID },
-            success: (data) => {
-                addEquipmentModal.hide();
+    $.ajax('/sheet/player/equipment', {
+        method: 'PUT',
+        data: { equipmentID },
+        success: (data) => {
+            addEquipmentModal.hide();
 
-                $(`#addEquipmentOption${equipmentID}`).remove();
+            $(`#addEquipmentOption${equipmentID}`).remove();
 
-                equipmentTable.append(data.html);
+            equipmentTable.append(data.html);
 
-                addEquipmentButton.prop('disabled', addEquipmentList.children().length === 0);
-            },
-            error: err => {
-                addEquipmentModal.hide();
-                showFailureToastMessage(err);
-            }
-        });
+            addEquipmentButton.prop('disabled', addEquipmentList.children().length === 0);
+        },
+        error: err => {
+            addEquipmentModal.hide();
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function deleteEquipmentClick(event, equipmentID) {
     if (!confirm("Você realmente quer remover esse equipamento?"))
         return;
 
-    $.ajax('/sheet/player/equipment',
-        {
-            method: 'DELETE',
-            data: { equipmentID },
-            success: () => {
-                const opt = $(document.createElement('option'));
-                opt.attr('id', `addEquipmentOption${equipmentID}`);
-                opt.val(equipmentID);
-                opt.text($(`#equipmentName${equipmentID}`).text());
+    $.ajax('/sheet/player/equipment', {
+        method: 'DELETE',
+        data: { equipmentID },
+        success: () => {
+            const opt = $(document.createElement('option'));
+            opt.attr('id', `addEquipmentOption${equipmentID}`);
+            opt.val(equipmentID);
+            opt.text($(`#equipmentName${equipmentID}`).text());
 
-                addEquipmentList.append(opt);
-                $(`#equipmentRow${equipmentID}`).remove();
+            addEquipmentList.append(opt);
+            $(`#equipmentRow${equipmentID}`).remove();
 
-                addEquipmentButton.prop('disabled', false);
-            },
-            error: showFailureToastMessage
-        });
+            addEquipmentButton.prop('disabled', false);
+        },
+        error: showFailureToastMessage
+    });
 }
 
 function createEquipmentClick(event) {
@@ -440,54 +434,54 @@ function createEquipmentClick(event) {
     createEquipmentContainer.hide();
     loading.show();
 
-    $.ajax('/sheet/equipment',
-        {
-            method: 'PUT',
-            data: { name, skillID, type, damage, range, attacks, ammo, visible: true },
-            success: (data) => {
-                const id = data.equipmentID;
-                const opt = $(document.createElement('option'));
-                opt.attr('id', `addEquipmentOption${id}`);
-                opt.val(id);
-                opt.text(name);
+    $.ajax('/sheet/equipment', {
+        method: 'PUT',
+        data: { name, skillID, type, damage, range, attacks, ammo, visible: true },
+        success: (data) => {
+            const id = data.equipmentID;
+            const opt = $(document.createElement('option'));
+            opt.attr('id', `addEquipmentOption${id}`);
+            opt.val(id);
+            opt.text(name);
 
-                createEquipmentModal.hide();
-                addEquipmentList.append(opt);
-                addEquipmentButton.prop('disabled', false);
-            },
-            error: err => {
-                createEquipmentModal.hide();
+            createEquipmentModal.hide();
+            addEquipmentList.append(opt);
+            addEquipmentButton.prop('disabled', false);
+        },
+        error: err => {
+            createEquipmentModal.hide();
 
-                showFailureToastMessage(err);
-            }
-        });
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function equipmentUsingChange(ev, equipmentID) {
     const using = $(ev.target).prop('checked');
-    $.ajax('/sheet/player/equipment',
-        {
-            method: 'POST',
-            data: { equipmentID, using },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/equipment', {
+        method: 'POST',
+        data: { equipmentID, using },
+        error: showFailureToastMessage
+    });
 }
 
 function equipmentAmmoChange(ev, equipmentID) {
-    const currentAmmo = $(ev.target);
-    let curAmmo = parseInt(currentAmmo.val());
-    let maxAmmo = parseInt($(`#equipmentMaxAmmo${equipmentID}`).text());
+    const $currentAmmo = $(ev.target);
+    const currentAmmoValue = parseInt($currentAmmo.val()) || 0;
+    const maxAmmo = parseInt($(`#equipmentMaxAmmo${equipmentID}`).text());
 
     if (isNaN(maxAmmo)) {
-        currentAmmo.val('-');
+        $currentAmmo.val('-');
         return alert('Esse equipamento não possui munição.');
     }
-    else if (curAmmo > maxAmmo) {
-        currentAmmo.val('-');
+    else if (currentAmmoValue > maxAmmo) {
+        $currentAmmo.val(maxAmmo);
         return alert('Você não pode ter mais balas do que a capacidade do equipamento.');
     }
 
-    postCurrentAmmo(equipmentID, currentAmmo.val());
+    $currentAmmo.val(currentAmmoValue);
+
+    postCurrentAmmo(equipmentID, currentAmmoValue);
 }
 
 function equipmentDiceClick(ev, id) {
@@ -565,28 +559,27 @@ function createSkillClick(event) {
     const characteristicID = createSkillCharacteristic.val();
     const name = createSkillName.val();
 
-    $.ajax('/sheet/skill',
-        {
-            method: 'PUT',
-            data: { name, specializationID, characteristicID },
-            success: (data) => {
-                createSkillModal.hide();
+    $.ajax('/sheet/skill', {
+        method: 'PUT',
+        data: { name, specializationID, characteristicID },
+        success: (data) => {
+            createSkillModal.hide();
 
-                const id = data.skillID;
-                const opt = $(document.createElement('option'));
-                opt.attr('id', `createSkillOption${id}`);
-                opt.val(id);
-                opt.text(name);
-                addSkillList.append(opt);
+            const id = data.skillID;
+            const opt = $(document.createElement('option'));
+            opt.attr('id', `createSkillOption${id}`);
+            opt.val(id);
+            opt.text(name);
+            addSkillList.append(opt);
 
-                addSkillButton.prop('disabled', false);
-            },
-            error: err => {
-                createSkillModal.hide();
+            addSkillButton.prop('disabled', false);
+        },
+        error: err => {
+            createSkillModal.hide();
 
-                showFailureToastMessage(err);
-            }
-        });
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function addSkillClick(ev) {
@@ -598,24 +591,23 @@ function addSkillClick(ev) {
 
     let skillID = addSkillList.val();
 
-    $.ajax('/sheet/player/skill',
-        {
-            method: 'PUT',
-            data: { skillID },
-            success: (data) => {
-                addSkillModal.hide();
+    $.ajax('/sheet/player/skill', {
+        method: 'PUT',
+        data: { skillID },
+        success: (data) => {
+            addSkillModal.hide();
 
-                $(`#addSkillOption${skillID}`).remove();
-                skillTable.append(data.html);
+            $(`#addSkillOption${skillID}`).remove();
+            skillTable.append(data.html);
 
-                addSkillButton.prop('disabled', addSkillList.children().length === 0);
-            },
-            error: err => {
-                addSkillModal.hide();
+            addSkillButton.prop('disabled', addSkillList.children().length === 0);
+        },
+        error: err => {
+            addSkillModal.hide();
 
-                showFailureToastMessage(err);
-            }
-        });
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function skillSearchBarInput(ev) {
@@ -635,27 +627,15 @@ function skillSearchBarInput(ev) {
     }
 }
 
-function skillChange(event, id) {
-    let value = $(event.target).val();
-    if (value === '') {
-        $(ev.target).val(0);
-        value = 0;
-    }
+function skillChange(ev, id) {
+    const lastValue = $(ev.target).data('last-value');
+    const value = parseInt($(ev.target).val()) || 0;
+    $(ev.target).val(value);
+    if (lastValue === value) return;
+    $(ev.target).data('last-value', value);
 
-    updateSkill($(event.target).parents('.skill-container').find('.skill-total'));
-    updateAttributeBarExtra($(`.attribute-bar[skill-id="${id}"]`));
-}
-
-function skillCheckChange(event, id) {
-    const checked = $(event.target).prop('checked');
-
-    $.ajax('/sheet/player/skill', {
-        method: 'POST',
-        data: { skillID: id, checked: checked },
-        error: err => {
-            showFailureToastMessage(err);
-        }
-    });
+    updateSkill($(ev.target).parents('.skill-container').find('.skill-total'));
+    updateAttributeBarExtra($(`.attribute-bar[data-skill-id="${id}"]`));
 }
 
 function skillDiceClick(event, id) {
@@ -700,24 +680,22 @@ function addItemClick(ev) {
 
     let itemID = addItemList.val();
 
-    $.ajax('/sheet/player/item',
-        {
-            method: 'PUT',
-            data: { itemID },
-            success: (data) => {
-                addItemModal.hide();
+    $.ajax('/sheet/player/item', {
+        method: 'PUT',
+        data: { itemID },
+        success: (data) => {
+            addItemModal.hide();
 
-                $(`#addItemOption${itemID}`).remove();
-                itemTable.append(data.html);
+            $(`#addItemOption${itemID}`).remove();
+            itemTable.append(data.html);
 
-                addItemButton.prop('disabled', addItemList.children().length === 0);
-            },
-            error: err => {
-                addItemModal.hide();
-
-                showFailureToastMessage(err);
-            }
-        });
+            addItemButton.prop('disabled', addItemList.children().length === 0);
+        },
+        error: err => {
+            addItemModal.hide();
+            showFailureToastMessage(err);
+        }
+    });
 }
 
 function createItemClick(ev) {
@@ -775,37 +753,32 @@ function deleteItemClick(event, itemID) {
 
 function itemDescriptionChange(ev, itemID) {
     const description = $(ev.target).val();
-
-    $.ajax('/sheet/player/item',
-        {
-            method: 'POST',
-            data: { itemID, description },
-            error: showFailureToastMessage
-        })
+    $.ajax('/sheet/player/item', {
+        method: 'POST',
+        data: { itemID, description },
+        error: showFailureToastMessage
+    })
 }
 
 function itemQuantityChange(ev, itemID) {
-    const quantity = $(ev.target).val();
-
-    $.ajax('/sheet/player/item',
-        {
-            method: 'POST',
-            data: { itemID, quantity },
-            error: showFailureToastMessage
-        })
+    const quantity = parseInt($(ev.target).val()) || 0;
+    $(ev.target).val(quantity);
+    $.ajax('/sheet/player/item', {
+        method: 'POST',
+        data: { itemID, quantity },
+        error: showFailureToastMessage
+    })
 }
 
 //Notes
 
 function playerAnotationsChange(event) {
     const value = $(event.target).val();
-
-    $.ajax('/sheet/player/note',
-        {
-            method: 'POST',
-            data: { value },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/note', {
+        method: 'POST',
+        data: { value },
+        error: showFailureToastMessage
+    });
 }
 
 //Class
@@ -813,19 +786,21 @@ function playerAnotationsChange(event) {
 function classChange(ev) {
     const classID = parseInt($(ev.target).val());
     const option = $(ev.target).find('option:selected');
-    const title = option.attr('ability-title');
-    const description = option.attr('ability-description') || '';
-    const energyBonus = parseInt(option.attr('energy-bonus')) || 0;
+    const title = option.data('ability-title');
+    const description = option.data('ability-description') || '';
+    const bonus = option.data('bonus') || 0;
     const skills = option.data('skills') || [];
+    const attrID = option.data('attribute-id') || 0;
 
     if (title) $('#playerClassTitle').text(title + ': ');
     else $('#playerClassTitle').text('');
     $('#playerClassDescription').text(description);
-    $('#playerClass').attr('energy-bonus', energyBonus);
+    $('#playerClass').data('bonus', bonus);
+    $('#playerClass').data('attribute-id', attrID);
     $('#playerClass').data('skills', skills);
 
     updateSkill($('.skill-total'));
-    updateAttributeBarExtra($('.progress-bar[name="Energia"]'));
+    updateAttributeBarExtra($('.attribute-bar'));
 
     $.ajax('/sheet/player/class', {
         method: 'POST',
@@ -834,36 +809,39 @@ function classChange(ev) {
     });
 }
 
-function updateAttributeBarExtra(bar) {
-    if (bar.length === 0) return;
-    const attrID = bar.attr('attribute-id');
+function updateAttributeBarExtra(bars) {
+    for (let i = 0; i < bars.length; i++) {
+        const bar = bars.eq(i);
+        const attrID = bar.data('attribute-id');
+        const charValue = parseInt($(`#characteristic${bar.data('characteristic-id')}`).val()) || 0;
+        const skillValue = parseInt($(`#skillTotal${bar.data('skill-id')}`).text()) || 0;
+        const evaluation = eval(bar.data('operation').replace('{characteristic}', charValue).replace('{skill}', skillValue));
+        const bonus = $('#playerClass').data('attribute-id') == attrID ? $('#playerClass').data('bonus') : 0;
+        const oldExtra = bar.data('extra');
+        const newExtra = Math.floor(bonus + evaluation);
 
-    const charValue = parseInt($(`#characteristic${bar.attr('characteristic-id')}`).val()) || 0;
-    const skillValue = parseInt($(`#skillTotal${bar.attr('skill-id')}`).text()) || 0;
-    const evaluation = eval(bar.attr('operation').replace('{characteristic}', charValue).replace('{skill}', skillValue));
-    const energyBonus = bar.attr('name') === 'Energia' ?
-        parseInt($('#playerClass').attr('energy-bonus')) || 0 : 0;
-    const newExtra = Math.floor(energyBonus + evaluation);
+        if (oldExtra == newExtra) continue;
 
-    const cur = parseInt(bar.attr('current')) || 0;
-    const max = parseInt(bar.attr('max')) || 0;
-    let newCur = clamp(cur, 0, max + newExtra);
+        const cur = bar.data('current') || 0;
+        const max = bar.data('max') || 0;
+        const newCur = clamp(cur, 0, max + newExtra);
 
-    $.ajax('/sheet/player/attribute', {
-        method: 'POST',
-        data: { attributeID: attrID, extraValue: newExtra, value: newCur },
-        success: () => resolveAttributeBarUI(bar, { newExtra, newCur }),
-        error: showFailureToastMessage
-    });
+        $.ajax('/sheet/player/attribute', {
+            method: 'POST',
+            data: { attributeID: attrID, extraValue: newExtra, value: newCur },
+            success: () => resolveAttributeBarUI(bar, { newExtra, newCur }),
+            error: showFailureToastMessage
+        });
+    }
 }
 
-function updateSkill(skills) {
+function updateSkill(skills, updateBar = false) {
     const classExtras = $('#playerClass').data('skills') || [];
     for (let i = 0; i < skills.length; i++) {
         const skill = skills.eq(i);
         const skillID = skill.data('skill-id');
         const extra = classExtras.includes(skillID) ? 4 : 0;
-        const charValue = parseInt($(`#characteristic${skill.attr('characteristic-id')}`).val()) || 0;
+        const charValue = parseInt($(`#characteristic${skill.data('characteristic-id')}`).val()) || 0;
         const skillValue = parseInt(skill.parents('.skill-container').find('.skill-field').val()) || 0;
 
         const extraValue = charValue + extra;
@@ -874,6 +852,7 @@ function updateSkill(skills) {
             data: { skillID, value: skillValue, extra_value: extraValue },
             error: showFailureToastMessage
         });
-    }
 
+        if (updateBar) updateAttributeBarExtra($(`.attribute-bar[data-skill-id="${skillID}"]`));
+    }
 }

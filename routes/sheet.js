@@ -166,7 +166,7 @@ router.get('/1', async (req, res) => {
         //Player Class
         (async () => {
             const _class = await con('player').select('player.class_id', 'class.ability_title',
-                'class.ability_description', 'class.energy_bonus')
+                'class.ability_description', 'class.attribute_id', 'class.bonus')
                 .join('class', 'class.class_id', 'player.class_id')
                 .where('player_id', playerID)
                 .first();
@@ -305,9 +305,9 @@ router.get('/admin/1', async (req, res) => {
 
         const results = await Promise.all([
             //Admin Notes: 0
-            con.select('admin_id', 'value')
-                .from('admin_note')
-                .where('admin_id', playerID)
+            con.select('value')
+                .from('player_note')
+                .where('player_id', playerID)
                 .first(),
         ]);
 
@@ -969,9 +969,7 @@ router.post('/admin/note', urlParser, async (req, res) => {
     let value = req.body.value;
 
     try {
-        await con('admin_note')
-            .update('value', value)
-            .where('admin_id', playerID);
+        await con('player_note').update('value', value).where('player_id', playerID);
         res.end();
     }
     catch (err) {

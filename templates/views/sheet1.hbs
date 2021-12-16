@@ -75,11 +75,11 @@
                                     </option>
                                     {{#each classes}}
                                     {{#with this}}
-                                    <option value="{{class_id}}" ability-title="{{ability_title}}"
-                                        ability-description="{{ability_description}}"
+                                    <option value="{{class_id}}" data-ability-title="{{ability_title}}"
+                                        data-ability-description="{{ability_description}}"
                                         title="{{ability_title}}: {{ability_description}}" data-skills="{{skills}}"
-                                        energy-bonus="{{energy_bonus}}" {{#ifEquals ../playerClass.class_id
-                                        class_id}}selected{{/ifEquals}}>
+                                        data-attribute-id="{{attribute_id}}" data-bonus="{{bonus}}" {{#ifEquals
+                                        ../playerClass.class_id class_id}}selected{{/ifEquals}}>
                                         {{name}}
                                     </option>
                                     {{/with}}
@@ -90,8 +90,8 @@
                     </div>
                 </div>
                 <div class="row my-4">
-                    <div class="col" id="playerClass" energy-bonus="{{playerClass.energy_bonus}}"
-                        data-skills="{{playerClass.skills}}">
+                    <div class="col" id="playerClass" data-bonus="{{playerClass.bonus}}"
+                        data-attribute-id="{{attribute_id}}" data-skills="{{playerClass.skills}}">
                         <span id="playerClassTitle" style="color: red;">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>
                         <span id="playerClassDescription">{{playerClass.ability_description}}</span>
@@ -124,12 +124,12 @@
                                     <div class="col">
                                         <div class="progress" style="background-color: #{{bg_color}};">
                                             <div id="attributeBar{{attribute_id}}" class="progress-bar attribute-bar"
-                                                attribute-id="{{attribute_id}}" skill-id="{{skill_id}}"
-                                                characteristic-id="{{characteristic_id}}" name="{{name}}"
-                                                operation="{{operation}}" role="progressbar"
+                                                data-attribute-id="{{attribute_id}}" data-skill-id="{{skill_id}}"
+                                                data-characteristic-id="{{characteristic_id}}" name="{{name}}"
+                                                data-operation="{{operation}}" role="progressbar"
                                                 style="background-color: #{{fill_color}}; width: {{coefficient}}%;"
-                                                current="{{value}}" max="{{max_value}}" extra="{{extra_value}}"
-                                                total="{{total_value}}">
+                                                data-current="{{value}}" data-max="{{max_value}}"
+                                                data-extra="{{extra_value}}" data-total="{{total_value}}">
                                             </div>
                                         </div>
                                     </div>
@@ -172,7 +172,8 @@
                             {{#with this}}
                             <div class="col form-check">
                                 <input class="form-check-input attribute-status-field" type="checkbox"
-                                    attribute-status-id="{{attribute_status_id}}" id="status{{attribute_status_id}}"
+                                    data-attribute-status-id="{{attribute_status_id}}"
+                                    id="status{{attribute_status_id}}"
                                     onchange="attributeStatusChange(event, {{attribute_status_id}})" {{#if
                                     checked}}checked{{/if}}>
                                 <label class="form-check-label" for="status{{attribute_status_id}}">{{name}}</label>
@@ -229,8 +230,9 @@
                             <div class="col"><label for="characteristic{{characteristic_id}}">{{name}}</label></div>
                         </div>
                         <div class="row">
-                            <div class="col"><input class="acds-element" type="text" maxlength="3"
-                                    id="characteristic{{characteristic_id}}" value="{{value}}"
+                            <div class="col">
+                                <input class="acds-element" type="text" maxlength="3"
+                                    id="characteristic{{characteristic_id}}" value="{{value}}" data-last-value="{{value}}"
                                     style="outline: 0; border-width: 0 0 1px; text-align: center; max-width: 120px; font-size: 25px;"
                                     onchange="characteristicChange(event, {{characteristic_id}})" autocomplete="off">
                             </div>
@@ -387,7 +389,7 @@
                                             {{#if name}}{{name}}{{else}}Padrão{{/if}}</label>
                                         <input id="avatar{{@index}}" type="text"
                                             class="acds-element form-control avatar-field" autocomplete="off"
-                                            avatar-id="{{attribute_status_id}}" value="{{link}}"
+                                            data-avatar-id="{{attribute_status_id}}" value="{{link}}"
                                             style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
                                     </div>
                                 </div>

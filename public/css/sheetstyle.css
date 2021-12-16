@@ -12,6 +12,7 @@
 body {
     background-color: black !important;
     color: white !important;
+    font-family: 'Cinzel', serif;
 }
 
 .acds-element {
@@ -91,9 +92,5 @@ body {
 }
 
 .unconscious {
-    filter: brightness(8%);
-}
-
-* {
-    font-family: 'Cinzel', serif;
+    filter: brightness(10%);
 }

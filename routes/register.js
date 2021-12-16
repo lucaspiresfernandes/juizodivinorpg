@@ -2,10 +2,8 @@ const encrypter = require('../utils/encrypter');
 const con = require('../utils/connection');
 const express = require('express');
 const router = express.Router();
-var urlParser = express.urlencoded(
-    {
-        extended: false
-    });
+const urlParser = express.urlencoded({ extended: false });
+const config = require('../config.json');
 
 router.get('/', (req, res) => {
     res.render('register');
@@ -24,32 +22,26 @@ router.post('/admin', urlParser, registerPost);
 
 async function registerPost(req, res) {
     try {
-        let username = req.body.username;
-        let password = req.body.password;
+        const username = req.body.username;
+        const password = req.body.password;
 
-        if (!username || !password)
-            return res.status(400).end();
+        if (!username || !password) return res.status(400).end();
 
-        let adminKey = parseInt(req.body.adminKey);
+        const usernameExists = await con.select('username')
+            .from('player').where('username', username).first();
 
-        let results = await con.select('username').from('player').where('username', username).first();
-
-        if (results)
+        if (usernameExists)
             return res.status(401).send('Username already exists.');
 
         let admin = false;
 
-        if (!(isNaN(adminKey))) {
-            results = await con.select().from('admin_key').first();
-            let originalAdminKey = parseInt(results.key);
-
-            if (originalAdminKey === adminKey)
-                admin = true;
-            else
-                return res.status(401).send('Admin key is incorrect.');
+        const bodyAdminKey = req.body.adminKey;
+        if (bodyAdminKey) {
+            if (config.admin_key === bodyAdminKey) admin = true;
+            else return res.status(401).send('Admin key is incorrect.');
         }
 
-        let hash = await encrypter.encrypt(password);
+        const hash = await encrypter.encrypt(password);
 
         const playerID = (await con('player').insert({
             username: username,
@@ -57,10 +49,8 @@ async function registerPost(req, res) {
             admin: admin
         }))[0];
 
-        if (admin)
-            await registerAdminData(playerID);
-        else
-            await registerPlayerData(playerID);
+        if (admin) await registerAdminData(playerID);
+        else await registerPlayerData(playerID);
 
         req.session.playerID = playerID;
         req.session.isAdmin = admin;
@@ -68,7 +58,6 @@ async function registerPost(req, res) {
         res.send();
     }
     catch (err) {
-        console.error('A' * 100000);
         console.error(err);
         res.status(500).send('500: Fatal Error');
     }
@@ -84,7 +73,7 @@ async function registerPlayerData(playerID) {
         con.select('info_id').from('info'),
         con.select('extra_info_id').from('extra_info'),
     ]);
-    
+
     await con('player_avatar').insert([{
         player_id: playerID,
         attribute_status_id: null
@@ -169,7 +158,7 @@ async function registerPlayerData(playerID) {
 }
 
 function registerAdminData(playerID) {
-    return con.insert({ 'admin_id': playerID, 'value': '' }).into('admin_note').then(() => { });
+    return con.insert({ 'player_id': playerID, 'value': '' }).into('player_note').then(() => { });
 }
 
 module.exports = router;

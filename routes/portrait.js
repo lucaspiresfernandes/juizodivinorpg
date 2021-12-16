@@ -21,7 +21,7 @@ router.get('/:id', async (req, res) => {
             .orderBy('attribute_status_id')
     ]);
 
-    if (!results[0]) return res.send();
+    if (!results[0]) return res.status(404).send();
 
     let name = results[0].name.toUpperCase();
     if (!name) name = 'DESCONHECIDO';
