@@ -44,8 +44,8 @@ function rollDices(dices) {
     $.ajax('/dice', {
         data: { dices },
         success: data => {
-            let results = data.results.map(res => res.roll);
-            let sum = results.reduce((a, b) => a + b);
+            const results = data.results.map(res => res.roll);
+            const sum = results.reduce((a, b) => a + b, 0);
             loading.hide();
             diceResultContent.text(sum).fadeIn('slow', () => {
                 if (results.length <= 1)
@@ -128,6 +128,30 @@ function onChangeEnvironment(ev) {
     });
 }
 
+function playerLineageChange(ev) {
+    const lineageID = $(ev.target).val();
+    const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
+    $.ajax('/sheet/player/lineage', {
+        method: 'POST',
+        data: { lineageID, playerID },
+        error: showFailureToastMessage
+    });
+}
+
+function onPlayerScoreChanged(ev) {
+    let value = $(ev.target).val();
+    if (value < 0) {
+        value = 0;
+        $(ev.target).val(value);
+    }
+    const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
+    $.ajax('/sheet/player/score', {
+        method: 'POST',
+        data: { value, playerID },
+        error: showFailureToastMessage
+    });
+}
+
 socket.on('info changed', content => {
     let playerID = content.playerID;
     let infoID = content.infoID;
@@ -142,27 +166,11 @@ socket.on('attribute changed', content => {
     let playerID = content.playerID;
     let attrID = content.attributeID;
     let newValue = content.value;
-    let newMaxValue = content.maxValue;
+    let newTotalValue = content.totalValue;
 
     let element = $(`#attribute${playerID}${attrID}`);
-    const split = element.text().split('/');
 
-    const value = split[0];
-    const maxValue = split[1];
-
-    let newText = '';
-
-    if (newValue)
-        newText += `${newValue}/`;
-    else
-        newText += `${value}/`;
-
-    if (newMaxValue)
-        newText += `${newMaxValue}`;
-    else
-        newText += `${maxValue}`;
-
-    element.text(newText);
+    element.text(`${newValue}/${newTotalValue}`);
 });
 
 socket.on('spec changed', content => {
@@ -306,9 +314,25 @@ socket.on('dice result', content => {
     <span style='color:lightgreen;'>${results.join(', ')}</span>.`;
 
     if (results.length > 1) html += ` Soma: 
-    <span style='color:lightgreen;'>${results.reduce((a, b) => a + b)}</span>.`;
+    <span style='color:lightgreen;'>${results.reduce((a, b) => a + b, 0)}</span>.`;
 
     html += '</li>';
 
     diceList.prepend($(html));
 });
+
+socket.on('class change', content => {
+    const playerID = content.playerID;
+    const className = content.className;
+
+    const container = $(`.acds-player-container[data-player-id="${playerID}"`);
+    container.find('.class-name').text(className);
+})
+
+socket.on('score change', content => {
+    const playerID = content.playerID;
+    const newScore = content.newScore;
+
+    const container = $(`.acds-player-container[data-player-id="${playerID}"`);
+    container.find('.player-score').val(newScore);
+})

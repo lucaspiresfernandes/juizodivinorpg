@@ -61,7 +61,7 @@ function rollDices(dices) {
         data: { dices },
         success: data => {
             const results = data.results.map(res => res.roll);
-            const sum = results.reduce((a, b) => a + b);
+            const sum = results.reduce((a, b) => a + b, 0);
 
             loading.hide();
             diceResultContent.text(sum)
@@ -232,13 +232,19 @@ function findAvatar() {
     const field = $('.attribute-status-field:checked').first();
     let id = field.length === 0 ? 0 : field.data('attribute-status-id');
 
+    avatarImage.removeClass('unconscious');
     switch (id) {
-        case 3:
+        case 1:
             id = 0;
             avatarImage.addClass('unconscious');
             break;
-        default:
-            avatarImage.removeClass('unconscious');
+        case 2:
+            id = 0;
+            avatarImage.addClass('unconscious');
+            break;
+        case 3:
+            id = 0;
+            avatarImage.addClass('unconscious');
             break;
     }
 

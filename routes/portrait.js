@@ -18,7 +18,10 @@ router.get('/:id', async (req, res) => {
             .orderBy('attribute_id'),
         con('player_attribute_status').select('attribute_status_id', 'value')
             .where('player_id', playerID)
-            .orderBy('attribute_status_id')
+            .orderBy('attribute_status_id'),
+        con('player').select('player.lineage_id').max('player_lineage_node.index as index')
+            .join('player_lineage_node', 'player_lineage_node.player_id', 'player.player_id')
+            .where('player.player_id', playerID).first(),
     ]);
 
     if (!results[0]) return res.status(404).send();
@@ -36,6 +39,7 @@ router.get('/:id', async (req, res) => {
         name,
         attributes: results[1],
         attribute_status,
+        player: results[3]
     });
 });
 

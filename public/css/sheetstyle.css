@@ -74,12 +74,6 @@ body {
     height: 40px;
 }
 
-#avatarContainer {
-    border: solid 2px white;
-    background-color: rgb(15, 15, 15);
-    max-width: 250px;
-}
-
 #avatar {
     max-height: 375px;
     min-width: 100px;

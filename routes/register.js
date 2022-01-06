@@ -37,7 +37,7 @@ async function registerPost(req, res) {
 
         const bodyAdminKey = req.body.adminKey;
         if (bodyAdminKey) {
-            if (config.admin_key === bodyAdminKey) admin = true;
+            if (config.admin_key == bodyAdminKey) admin = true;
             else return res.status(401).send('Admin key is incorrect.');
         }
 
@@ -77,14 +77,6 @@ async function registerPlayerData(playerID) {
     await con('player_avatar').insert([{
         player_id: playerID,
         attribute_status_id: null
-    },
-    {
-        player_id: playerID,
-        attribute_status_id: 1
-    },
-    {
-        player_id: playerID,
-        attribute_status_id: 2
     },
     {
         player_id: playerID,

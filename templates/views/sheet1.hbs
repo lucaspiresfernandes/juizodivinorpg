@@ -25,13 +25,13 @@
 
 <body>
     <div class="container">
-        <div class="row">
-            <div class="col mt-2 text-start">
+        <div class="row mt-2">
+            <div class="col text-start">
                 <form action="/sheet/leave">
                     <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
                 </form>
             </div>
-            <div class="col mt-2 text-end align-self-center">
+            <div class="col text-end align-self-center">
                 <a href="/sheet/2" style="font-size: 21px;">Acessar 2° Página</a>
             </div>
         </div>
@@ -40,7 +40,7 @@
         </div>
         <div class="row my-3">
             <div class="col acds-container d-flex flex-column h-100">
-                <div class="row mt-3 text-center">
+                <div class="row mt-2 text-center">
                     <div class="col h2">Detalhes Pessoais</div>
                     <hr>
                 </div>
@@ -101,10 +101,8 @@
             <div class="col mt-3">
                 <div class="row mb-3">
                     <div class="col d-flex justify-content-center">
-                        <div id="avatarContainer" class="rounded-circle">
-                            <img id="avatar" class="img-fluid acds-clickable" data-bs-toggle="modal"
-                                data-bs-target="#uploadAvatar">
-                        </div>
+                        <img id="avatar" class="img-fluid acds-clickable" data-bs-toggle="modal"
+                            data-bs-target="#uploadAvatar">
                     </div>
                     <div class="col-auto align-self-center">
                         <img class="img-fluid acds-clickable" src="/assets/dice.png" data-bs-toggle="modal"
@@ -210,7 +208,7 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col px-4">
-                <div class="row mt-3 text-center">
+                <div class="row mt-2 text-center">
                     <div class="col h2">Atributos</div>
                     <hr>
                 </div>
@@ -232,7 +230,8 @@
                         <div class="row">
                             <div class="col">
                                 <input class="acds-element" type="text" maxlength="3"
-                                    id="characteristic{{characteristic_id}}" value="{{value}}" data-last-value="{{value}}"
+                                    id="characteristic{{characteristic_id}}" value="{{value}}"
+                                    data-last-value="{{value}}"
                                     style="outline: 0; border-width: 0 0 1px; text-align: center; max-width: 120px; font-size: 25px;"
                                     onchange="characteristicChange(event, {{characteristic_id}})" autocomplete="off">
                             </div>
@@ -245,11 +244,11 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col px-4">
-                <div class="row mt-3">
+                <div class="row mt-2">
                     <div class="col offset-1 h2 text-center">Combate</div>
                     <div class="col-1 text-end">
                         <input type="button" value="+" class="acds-element"
-                            style="border: solid 1px; position: relative; right: 20px;" data-bs-toggle="modal"
+                            style="border: solid 1px; position: relative; right: 20px; top: 5px;" data-bs-toggle="modal"
                             data-bs-target="#addEquipment">
                     </div>
                     <hr>
@@ -284,11 +283,11 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col px-4">
-                <div class="row mt-3">
+                <div class="row mt-2">
                     <div class="col offset-1 h2 text-center">Perícias</div>
                     <div class="col-1 text-end">
                         <input type="button" value="+" class="acds-element"
-                            style="border: solid 1px; position: relative; right: 20px;" data-bs-toggle="modal"
+                            style="border: solid 1px; position: relative; right: 20px; top: 5px;" data-bs-toggle="modal"
                             data-bs-target="#addSkill" />
                     </div>
                     <hr>
@@ -308,11 +307,11 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col px-4">
-                <div class="row mt-3">
+                <div class="row mt-2">
                     <div class="col offset-1 h2 text-center">Inventário</div>
                     <div class="col-1 text-end">
                         <input type="button" value="+" class="acds-element"
-                            style="border: solid 1px; position: relative; right: 20px;" data-bs-toggle="modal"
+                            style="border: solid 1px; position: relative; right: 20px; top: 5px;" data-bs-toggle="modal"
                             data-bs-target="#addItem">
                     </div>
                     <hr>

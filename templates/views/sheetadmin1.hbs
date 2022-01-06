@@ -61,7 +61,8 @@
             {{#if characters}}
             {{#each characters}}
             {{#with this}}
-            <div class="col mb-2 mx-2 text-center acds-player-container" style="max-width: 650px;">
+            <div class="col mb-2 mx-2 text-center acds-player-container" style="max-width: 650px;"
+                data-player-id="{{playerID}}">
                 <div class="row my-3">
                     <div class="col">
                         <img id="avatar{{playerID}}" class="img-fluid rounded-circle avatar"
@@ -74,6 +75,33 @@
                         {{name.value}}
                     </div>
                 </div>
+                <div class="row my-1">
+                    <div class="col">
+                        Classe: <span style="color: red;" class="class-name">{{#if player.class_name}}{{player.class_name}}{{else}}Nenhuma{{/if}}</span>
+                    </div>
+                </div>
+                <div class="row my-1">
+                    <div class="col d-flex justify-content-center">
+                        <label for="playerLineage{{@index}}"><span
+                                class="mx-2 align-self-center">Linhagem:</span></label>
+                        <select id="playerLineage{{@index}}" class="acds-bottom-text acds-element text-center w-25"
+                            onchange="playerLineageChange(event);">
+                            <option value="0" {{#unless player}}selected{{/unless}}>Nenhuma</option>
+                            {{#each lineage}}
+                            {{#with this}}
+                            <option value="{{lineage_id}}" {{#ifEquals ../player.lineage_id
+                                lineage_id}}selected{{/ifEquals}}>{{name}}</option>
+                            {{/with}}
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+                <div class="row my-1">
+                    <div class="col">
+                        Pontos de Linhagem: <input class="acds-bottom-text acds-element player-score" style="width: 10%;"
+                            type="number" value="{{player.score}}" onchange="onPlayerScoreChanged(event);">
+                    </div>
+                </div>
                 <hr>
                 <div class="row my-3">
                     {{#each attributes}}
@@ -82,7 +110,7 @@
                         <div class="row">
                             <div id="attribute{{../playerID}}{{attribute_id}}" class="col data"
                                 style="color: #{{fill_color}};">
-                                {{value}}/{{max_value}}
+                                {{value}}/{{total_value}}
                             </div>
                         </div>
                         <div class="row">

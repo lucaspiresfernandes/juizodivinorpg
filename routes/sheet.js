@@ -217,12 +217,55 @@ router.get('/2', async (req, res) => {
     if (isAdmin) return res.redirect('/sheet/admin/2');
 
     try {
-        const extraInfo = await con.select('extra_info.*', 'player_extra_info.value')
-            .from('extra_info')
-            .join('player_extra_info', 'extra_info.extra_info_id', 'player_extra_info.extra_info_id')
-            .where('player_extra_info.player_id', playerID);
+        const playerLineageID = (await con('player').select('lineage_id').where('player_id', playerID).first())?.lineage_id || null;
+        const results = await Promise.all([
+            con('extra_info').select('extra_info.*', 'player_extra_info.value')
+                .join('player_extra_info', 'extra_info.extra_info_id', 'player_extra_info.extra_info_id')
+                .where('player_extra_info.player_id', playerID),
+            (async () => {
+                const nodes = await con('lineage_node').select()
+                    .where('lineage_id', playerLineageID)
+                    .orderBy('index');
 
-        res.render('sheet2', { playerID, extraInfo });
+                const conqueredNodes = (await con('player_lineage_node').select('index').where('player_id', playerID))
+                    .map(c => c.index);
+
+                const rows = [[], [], [], [], [], []];
+
+                await Promise.all(nodes.map(async node => {
+                    const level = parseInt(node.level);
+                    rows[5 - level].push(node);
+
+                    //All of the nodes connected to the current node.
+                    const connections = await con('lineage_node_connection').select('index')
+                        .where('lineage_id', playerLineageID)
+                        .andWhere('next_index', node.index);
+
+                    node.conquered = conqueredNodes.includes(node.index);
+                    //A node is available if all of its previous connected nodes are conquered.
+                    let available = true;
+                    for (const connection of connections) {
+                        if (!conqueredNodes.includes(connection.index)) {
+                            available = false;
+                            break;
+                        }
+                    }
+                    if (!available) available = node.level === 0 || connections.length === 0;
+                    node.available = available;
+                }));
+                return rows;
+            })(),
+
+            con('player').select('score').where('player_id', playerID).first()
+        ]);
+
+        res.render('sheet2', {
+            playerID,
+            extraInfo: results[0],
+            nodeRows: results[1],
+            playerLineage: playerLineageID,
+            playerScore: results[2]?.score || 0
+        });
     }
     catch (err) {
         console.error(err);
@@ -291,7 +334,16 @@ router.get('/admin/1', async (req, res) => {
                     .from('item')
                     .join('player_item', 'item.item_id', 'player_item.item_id')
                     .where('player_item.player_id', playerID),
+
+                //Lineages: 6
+                con('lineage').select(),
+
+                //Player Lineage, Score and class name: 7
+                con('player').select('player.lineage_id', 'player.score', 'class.name as class_name')
+                    .leftJoin('class', 'class.class_id', 'player.class_id')
+                    .where('player.player_id', playerID).first(),
             ]);
+
             characters.push({
                 playerID: playerID,
                 name: results[0],
@@ -300,6 +352,8 @@ router.get('/admin/1', async (req, res) => {
                 characteristics: results[3],
                 equipments: results[4],
                 items: results[5],
+                lineage: results[6],
+                player: results[7],
             });
         }
 
@@ -375,6 +429,7 @@ router.get('/admin/2', async (req, res) => {
 //#endregion
 
 //#region CRUDs
+
 router.post('/player/info', urlParser, async (req, res) => {
     let playerID = req.session.playerID;
 
@@ -389,10 +444,9 @@ router.post('/player/info', urlParser, async (req, res) => {
             .update('value', value)
             .where('player_id', playerID)
             .andWhere('info_id', infoID);
-
+        res.end();
         io.to('admin').emit('info changed', { playerID, infoID, value });
         io.to(`portrait${playerID}`).emit('info changed', { infoID, value });
-        res.end();
     }
     catch (err) {
         console.error(err);
@@ -401,14 +455,14 @@ router.post('/player/info', urlParser, async (req, res) => {
 });
 
 router.post('/player/attribute', urlParser, async (req, res) => {
-    let playerID = req.session.playerID;
+    const playerID = req.session.playerID;
 
     if (!playerID)
         return res.status(401).end();
 
-    let attrID = req.body.attributeID;
-    let value = req.body.value;
-    let maxValue = req.body.maxValue;
+    const attributeID = req.body.attributeID;
+    const value = req.body.value;
+    const maxValue = req.body.maxValue;
     const extraValue = req.body.extraValue;
 
     try {
@@ -416,17 +470,18 @@ router.post('/player/attribute', urlParser, async (req, res) => {
             'value': value,
             'max_value': maxValue,
             'extra_value': extraValue
-        }).where('player_id', playerID).andWhere('attribute_id', attrID);
-        io.to('admin').emit('attribute changed', { playerID, attributeID: attrID, value, maxValue });
+        }).where('player_id', playerID).andWhere('attribute_id', attributeID);
         res.send();
 
         const result = await con('player_attribute').select('value', 'total_value')
-            .where('player_id', playerID).andWhere('attribute_id', attrID).first();
+            .where('player_id', playerID).andWhere('attribute_id', attributeID).first();
         const data = {
-            attrID,
+            attrID: attributeID,
             totalValue: result.total_value,
             value: result.value,
         };
+
+        io.to('admin').emit('attribute changed', { playerID, attributeID, value: data.value, totalValue: data.totalValue });
         io.to(`portrait${playerID}`).emit('attribute changed', data);
     }
     catch (err) {
@@ -1003,11 +1058,91 @@ router.post('/player/class', urlParser, async (req, res) => {
         return res.status(401).end();
 
     try {
-        let class_id = req.body.id;
-        if (class_id < 1) class_id = null;
+        const class_id = parseInt(req.body.id) || null;
 
         await con('player').update('class_id', class_id).where('player_id', playerID);
         res.send();
+
+        const className = (await con('class').select('name').where('class_id', class_id).first())?.name || 'Nenhuma';
+        io.to('admin').emit('class change', { playerID, className });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.post('/player/score', urlParser, async (req, res) => {
+    const score = parseInt(req.body.value) || 0;
+    const playerID = req.body.playerID;
+
+    try {
+        await con('player').update('score', score).where('player_id', playerID);
+        res.send();
+        io.to(`player${playerID}`).emit('score change', { score });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.post('/player/lineage', urlParser, async (req, res) => {
+    const lineageID = parseInt(req.body.lineageID) || null;
+    const playerID = parseInt(req.body.playerID);
+    try {
+        await Promise.all([
+            con('player').update('lineage_id', lineageID).where('player_id', playerID),
+            con('player_lineage_node').where('player_id', playerID).del(),
+        ]);
+        await con('player_lineage_node').insert({ player_id: playerID, index: 1 });
+        res.send();
+        io.to(`player${playerID}`).emit('lineage change', { lineageID });
+        io.to(`portrait${playerID}`).emit('lineage change', { lineageID });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.post('/player/lineage/node', urlParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const index = parseInt(req.body.index);
+    const newScore = parseInt(req.body.newScore);
+    const newNodes = [];
+    try {
+        await con('player_lineage_node').insert({ player_id: playerID, index }),
+            await Promise.all([
+                con('player').where('player_id', playerID).update('score', newScore),
+                (async () => {
+                    const lineageID = (await con('player').select('lineage_id').where('player_id', playerID).first()).lineage_id;
+
+                    const conqueredNodes = (await con('player_lineage_node').select('index').where('player_id', playerID)).map(node => node.index);
+                    const newlyConqueredSubsequentsNode = await con('lineage_node_connection').select()
+                        .where('lineage_node_connection.lineage_id', lineageID).andWhere('lineage_node_connection.index', index)
+                        .join('lineage_node', function () {
+                            this.on('lineage_node.lineage_id', 'lineage_node_connection.lineage_id');
+                            this.andOn('lineage_node.index', 'lineage_node_connection.next_index');
+                        });
+
+                    for (const node of newlyConqueredSubsequentsNode) {
+                        const connectedNodes = await con('lineage_node_connection').select('index').where('lineage_id', lineageID)
+                            .andWhere('next_index', node.index);
+                        let available = true;
+                        for (const connection of connectedNodes) {
+                            if (!conqueredNodes.includes(connection.index)) {
+                                available = false;
+                                break;
+                            }
+                        }
+                        if (available) newNodes.push(node);
+                    }
+                })()
+            ]);
+        res.send({ newNodes });
+        io.to('admin').emit('score change', { playerID, newScore });
+        io.to(`portrait${playerID}`).emit('lineage node change', { index });
     }
     catch (err) {
         console.error(err);

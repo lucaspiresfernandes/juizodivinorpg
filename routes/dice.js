@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
             }
 
             return nextInt(numDices, numDices * diceNumber, 1).then(result => {
-                const roll = result.data.reduce((a, b) => a + b);
+                const roll = result.data.reduce((a, b) => a + b, 0);
                 results[i] = { roll };
                 const num = dices[i].num;
                 if (num) {

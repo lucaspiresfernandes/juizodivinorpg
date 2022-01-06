@@ -16,29 +16,122 @@
         rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="/css/sheetstyle.css">
+    <script src="/js/sheet2.js" defer></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>const socket = io(); socket.emit('room:join', 'player' + {{ playerID }});</script>
+
+    <style>
+        #lineageGraph {
+            background-image: url('/assets/lineages/bg_tree.jpg');
+            background-size: 100% 100%;
+        }
+
+        #lineageGraph img {
+            user-drag: none;
+            -webkit-user-drag: none;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .unconquered {
+            filter: brightness(40%);
+        }
+
+        .unavailable {
+            filter: brightness(25%);
+        }
+
+        .lineage-node .acds-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background: #111;
+            border-radius: 8px;
+            position: fixed;
+            right: 50px;
+            bottom: 50px;
+            z-index: 3;
+            max-width: 250px;
+            transition: all 0.15s ease-in;
+        }
+
+        .lineage-node img:hover+.acds-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transition: all 0.3s 0.3s ease-out;
+        }
+    </style>
 
     <title>{{rpgname}}</title>
 </head>
 
 <body>
     <div class="container">
-        <div class="row">
-            <div class="col mt-2 text-start">
+        <div class="row mt-2">
+            <div class="col text-start">
                 <form action="/sheet/leave">
                     <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
                 </form>
             </div>
-            <div class="col mt-2 text-end align-self-center">
+            <div class="col text-end align-self-center">
                 <a href="/sheet/1" style="font-size: 21px;">Acessar 1° Página</a>
             </div>
         </div>
-        <div class="row h1 text-center justify-content-center">
-            <div class="col mt-2">Perfil de {{playerrole}}</div>
+        <div class="row h1 text-center">
+            <div class="col">Perfil de {{playerrole}}</div>
         </div>
-        <div class="row">
-            <div class="col" style="border-style: solid; border-width: 1px; border-color: gray; border-radius: 20px;">
-                <div class="row h2 mt-4">
-                    <div class="col justify-content-center">Detalhes Pessoais</div>
+
+        <div class="row my-3" {{#unless playerLineage}}hidden{{/unless}} id="lineageContainer">
+            <div class="col">
+                <div class="row mt-2 text-center">
+                    <div class="col h2">Linhagem</div>
+                    <hr>
+                </div>
+                <div class="row">
+                    <div class="col h4">
+                        Pontos de Linhagem: <span style="color: red;" id="playerScore"
+                            data-score="{{playerScore}}">{{playerScore}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col text-center" id="lineageGraph">
+                        {{#each nodeRows}}
+                        <div class="row my-5 py-5 px-1">
+                            {{#each this}}
+                            <div class="col lineage-node d-flex justify-content-center" data-index="{{this.index}}"
+                                data-conquered="{{conquered}}" data-available="{{available}}" data-cost="{{cost}}">
+                                <img src="/assets/lineages/frame/{{../../playerLineage}}/{{this.index}}.png"
+                                    onclick="onLineageNodeClick(event);"
+                                    class="img-fluid {{#unless available}}unavailable{{else}}acds-clickable{{/unless}} {{#unless conquered}}unconquered{{/unless}}">
+                                <div class="acds-tooltip p-3">
+                                    <p><span class="title text-center h3">{{#unless
+                                            available}}????????????{{else}}{{this.name}}{{/unless}}</span></p>
+                                    <p><span class="cost">{{#unless
+                                            available}}?{{else}}{{this.cost}}{{/unless}}</span></p>
+                                    <p><span class="description h6" style="color: #999;">{{#unless
+                                            available}}????????????{{else}}{{this.description}}{{/unless}}</span></p>
+                                    <p><span class="footer"
+                                            style="color: {{#unless available}}red{{else}}{{#if conquered}}green{{else}}yellow{{/if}}{{/unless}}">{{#unless
+                                            available}}Você não possui os requerimentos para essa
+                                            habilidade.{{else}}{{#if conquered}}Você possui essa habilidade.{{else}}Você
+                                            ainda não possui essa habilidade.{{/if}}{{/unless}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col acds-container">
+                <div class="row mt-2 text-center">
+                    <div class="col h2">Detalhes Pessoais</div>
+                    <hr>
                 </div>
                 {{#each extraInfo}}
                 {{#with this}}
@@ -74,8 +167,6 @@
 
         <!--Toasts and Modals-->
         {{> failuretoast}}
-
-        <script src="/js/sheet2.js"></script>
     </div>
 </body>
 

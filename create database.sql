@@ -257,14 +257,409 @@ VALUES
     (6, 7),
     (6, 19);
 
+CREATE TABLE `lineage` (
+    `lineage_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`lineage_id`)
+);
+
+INSERT INTO
+    `lineage` (`name`)
+VALUES
+    ('Amarelo'),
+    ('Azul'),
+    ('Verde'),
+    ('Vermelho');
+
+CREATE TABLE `lineage_node` (
+    `lineage_id` INT UNSIGNED NOT NULL,
+    `index` INT UNSIGNED NOT NULL,
+    `level` INT UNSIGNED NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `description` TEXT NOT NULL,
+    `cost` DECIMAL (15, 2) NOT NULL,
+    PRIMARY KEY (`lineage_id`, `index`),
+    CONSTRAINT `fk_lineage_node_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO
+    `lineage_node` (
+        `lineage_id`,
+        `index`,
+        `level`,
+        `name`,
+        `description`,
+        `cost`
+    )
+VALUES
+    (
+        1,
+        1,
+        0,
+        'Amarelinha',
+        'Permite voar.',
+        0
+    ),
+    (
+        1,
+        2,
+        1,
+        'Amarelo elo',
+        'Sim. Elo.',
+        1
+    ),
+    (
+        1,
+        3,
+        2,
+        'Relomarelo',
+        'Lingua travada?',
+        1
+    ),
+    (
+        1,
+        4,
+        2,
+        'lero lero',
+        'Ié ié!',
+        1
+    ),
+    (
+        1,
+        5,
+        3,
+        'Amarelo',
+        'Tá ficando sério.',
+        1
+    ),
+    (
+        1,
+        6,
+        3,
+        'Amar. Elo. Amarelo',
+        'Poético...',
+        1
+    ),
+    (
+        1,
+        7,
+        3,
+        'Amarelado',
+        'Adjetivos, muito bom.',
+        1
+    ),
+    (
+        1,
+        8,
+        4,
+        'Amarelão',
+        'Caralho, um amarelo muito grande.',
+        1
+    ),
+    (
+        1,
+        9,
+        5,
+        'Amarelo Deus',
+        'Você é o Deus do amarelo',
+        1
+    ),
+    (
+        2,
+        1,
+        0,
+        'Azulzinho',
+        'Bem piquititinho.',
+        0
+    ),
+    (
+        2,
+        2,
+        1,
+        'Azulejo',
+        'Do seu banheiro.',
+        1
+    ),
+    (
+        2,
+        3,
+        2,
+        'Azulado',
+        'Adjetivo de estado. :)',
+        1
+    ),
+    (
+        2,
+        4,
+        2,
+        'Azulto',
+        'Um adulto azul.',
+        1
+    ),
+    (
+        2,
+        5,
+        3,
+        'Luza',
+        '?meb odut áT',
+        1
+    ),
+    (
+        2,
+        6,
+        3,
+        'Azul',
+        'Tá ficando sério...',
+        1
+    ),
+    (
+        2,
+        7,
+        3,
+        'Baleia Azul',
+        'PrOOocuRANDO O NEEEeeeemO',
+        1
+    ),
+    (
+        2,
+        8,
+        4,
+        'Azulzão',
+        'Caralho, muito azul.',
+        1
+    ),
+    (
+        2,
+        9,
+        5,
+        'Azul Deus',
+        'Você é o deus do azul.',
+        1
+    ),
+    (
+        3,
+        1,
+        0,
+        'Verdinha',
+        'Hmm... Sus...',
+        0
+    ),
+    (
+        3,
+        2,
+        1,
+        'Verdejante',
+        'Sinceramente, eu nem sei exatamente o que isso significa.',
+        1
+    ),
+    (
+        3,
+        3,
+        2,
+        'Verdana',
+        'Entendeu? rsrsrsrs',
+        1
+    ),
+    (
+        3,
+        4,
+        2,
+        'Verdedito',
+        'Um veredito verde. Parece ser bom.',
+        1
+    ),
+    (
+        3,
+        5,
+        3,
+        'Verde',
+        'ok, verde.',
+        1
+    ),
+    (
+        3,
+        6,
+        3,
+        'Verdura',
+        'Tem que comer!',
+        1
+    ),
+    (
+        3,
+        7,
+        3,
+        'Verme- Verde!',
+        'ERROU!',
+        1
+    ),
+    (
+        3,
+        8,
+        4,
+        'Verdão',
+        'Muito verde!',
+        1
+    ),
+    (
+        3,
+        9,
+        5,
+        'Deus do verde',
+        'Você é o deus do verde',
+        1
+    ),
+    (
+        4,
+        1,
+        0,
+        'Vermelhinho',
+        'Tá doendo?',
+        0
+    ),
+    (
+        4,
+        2,
+        1,
+        'Avermelhado',
+        'É como o seu sorriso me deixa... uWu',
+        1
+    ),
+    (
+        4,
+        3,
+        2,
+        'Vermédio',
+        'Pra quando vc tá mal.',
+        1
+    ),
+    (
+        4,
+        4,
+        2,
+        'Verme...lho',
+        'Muito nojento!',
+        1
+    ),
+    (
+        4,
+        5,
+        3,
+        'Vermelho',
+        'OoO',
+        1
+    ),
+    (
+        4,
+        6,
+        3,
+        'Vermelha',
+        'Tipo... o feminino de vermelho...',
+        1
+    ),
+    (
+        4,
+        7,
+        3,
+        'Vermeja',
+        'Pra limpar a cozinha.',
+        1
+    ),
+    (
+        4,
+        8,
+        4,
+        'Vermelhão',
+        'Meu Deus tá doendo muito!',
+        1
+    ),
+    (
+        4,
+        9,
+        5,
+        'Deus do Vermelho',
+        'Você é o deus do Vermelho',
+        1
+    );
+
+CREATE TABLE `lineage_node_connection` (
+    `lineage_id` INT UNSIGNED NOT NULL,
+    `index` INT UNSIGNED NOT NULL,
+    `next_index` INT UNSIGNED NOT NULL,
+    CONSTRAINT `fk_lineage_node_connection_lineage_id_index` FOREIGN KEY (`lineage_id`, `index`) REFERENCES `lineage_node`(`lineage_id`, `index`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_lineage_node_connection_lineage_id_next_index` FOREIGN KEY (`lineage_id`, `next_index`) REFERENCES `lineage_node`(`lineage_id`, `index`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO
+    `lineage_node_connection` (`lineage_id`, `index`, `next_index`)
+VALUES
+    (1, 1, 2),
+    (1, 2, 3),
+    (1, 2, 4),
+    (1, 2, 6),
+    (1, 3, 5),
+    (1, 3, 6),
+    (1, 4, 6),
+    (1, 4, 7),
+    (1, 5, 9),
+    (1, 6, 8),
+    (1, 7, 9),
+    (1, 8, 9),
+    (2, 1, 2),
+    (2, 2, 3),
+    (2, 2, 4),
+    (2, 2, 6),
+    (2, 3, 5),
+    (2, 3, 6),
+    (2, 4, 6),
+    (2, 4, 7),
+    (2, 5, 9),
+    (2, 6, 8),
+    (2, 7, 9),
+    (2, 8, 9),
+    (3, 1, 2),
+    (3, 2, 3),
+    (3, 2, 4),
+    (3, 2, 6),
+    (3, 3, 5),
+    (3, 3, 6),
+    (3, 4, 6),
+    (3, 4, 7),
+    (3, 5, 9),
+    (3, 6, 8),
+    (3, 7, 9),
+    (3, 8, 9),
+    (4, 1, 2),
+    (4, 2, 3),
+    (4, 2, 4),
+    (4, 2, 6),
+    (4, 3, 5),
+    (4, 3, 6),
+    (4, 4, 6),
+    (4, 4, 7),
+    (4, 5, 9),
+    (4, 6, 8),
+    (4, 7, 9),
+    (4, 8, 9);
+
 CREATE TABLE `player` (
     `player_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `class_id` INT UNSIGNED NULL DEFAULT NULL,
     `admin` BOOLEAN NOT NULL,
+    `class_id` INT UNSIGNED NULL DEFAULT NULL,
+    `lineage_id` INT UNSIGNED NULL DEFAULT NULL,
+    `score` DECIMAL (15, 2) NOT NULL DEFAULT 0,
     PRIMARY KEY (`player_id`),
-    CONSTRAINT `fk_player_class_id` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT `fk_player_class_id` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_player_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Represent a lineage node conquered by a player.
+CREATE TABLE `player_lineage_node` (
+    `player_id` INT UNSIGNED NOT NULL,
+    `index` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`player_id`, `index`),
+    CONSTRAINT `fk_player_lineage_node_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_characteristic` (
@@ -505,5 +900,3 @@ CREATE TABLE `player_session` (
     PRIMARY KEY (`sid`),
     INDEX `player_session_expired_index` (`expired`)
 );
-
--- TODO: lineage

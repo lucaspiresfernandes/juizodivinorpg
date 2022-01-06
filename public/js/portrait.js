@@ -53,6 +53,7 @@ const $result = $('.dice .result');
 const $description = $('.dice .description');
 
 const $avatar = $('#avatar');
+const $background = $('#background');
 const $mainContainer = $('#mainContainer');
 
 const queue = [];
@@ -134,6 +135,7 @@ function hideDiceResult(onHiddenCallback) {
     });
 }
 
+let currentID = 0;
 function findAvatar() {
     for (const state of statusState) {
         const id = state.id;
@@ -145,18 +147,45 @@ function findAvatar() {
 findAvatar();
 
 function updateAvatar(id = 0) {
-    $avatar.fadeOut('fast', () => {
-        switch (id) {
-            case 3:
-                id = 0;
-                $avatar.addClass('unconscious');
-                break;
-            default:
-                $avatar.removeClass('unconscious');
-                break;
-        }
-        $avatar.attr('src', `/avatar/${id}?playerID=${playerID}&v=${Date.now()}`);
-    });
+    currentID = id;
+    $avatar.fadeOut('fast', () =>
+        $avatar.attr('src', `/avatar/${id}?playerID=${playerID}&v=${Date.now()}`));
 }
 
-$avatar.on('load', () => $avatar.fadeIn('fast'));
+$avatar.on('load', () => {
+    $background.removeClass('dying weakening');
+    $avatar.removeClass('unconscious');
+    switch (currentID) {
+        case 1:
+            id = 0;
+            $background.addClass('dying');
+            $avatar.addClass('unconscious');
+            break;
+        case 2:
+            id = 0;
+            $background.addClass('weakening');
+            $avatar.addClass('unconscious');
+            break;
+        case 3:
+            id = 0;
+            $avatar.addClass('unconscious');
+            break;
+    }
+    $avatar.fadeIn('fast');
+});
+
+socket.on('lineage change', content => {
+    const lineageID = content.lineageID;
+    const img = $('#lineage');
+    img.data('lineage', lineageID);
+    img.prop('hidden', !lineageID);
+
+    img.attr('src', `/assets/lineages/frameless/${lineageID}/1.png`);
+});
+
+socket.on('lineage node change', content => {
+    const index = content.index;
+    const img = $('#lineage');
+    const lineageID = img.data('lineage');
+    img.attr('src', `/assets/lineages/frameless/${lineageID}/${index}.png`);
+});

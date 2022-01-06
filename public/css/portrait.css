@@ -45,11 +45,11 @@ img {
 }
 
 .top {
-    z-index: -998;
+    z-index: 0;
 }
 
 .middle {
-    z-index: -999;
+    z-index: -500;
 }
 
 .bottom {
@@ -128,6 +128,27 @@ img {
     text-shadow: 0 0 10px #DD0F0F, 0 0 30px #DD0F0F, 0 0 50px #DD0F0F !important;
 }
 
-.unconscious {
+#background {
     filter: brightness(10%);
+}
+
+#background.weakening {
+    filter: saturate(100000%) hue-rotate(243deg) brightness(25%);
+}
+
+#background.dying {
+    filter: saturate(100000%) hue-rotate(172deg) brightness(25%);
+}
+
+#avatar.unconscious {
+    filter: brightness(10%);
+}
+
+#lineage {
+    position: absolute;
+    top: 65%;
+    left: 80%;
+    transform: rotate(30deg) translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
 }
