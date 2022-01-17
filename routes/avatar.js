@@ -54,34 +54,27 @@ router.get('/admin/:playerID', (req, res) => {
 
 router.post('/', jsonParser, async (req, res) => {
     const playerID = req.session.playerID;
-    const data = req.body;
+    const data = req.body.avatars;
 
-    if (!playerID)
-        return res.status(401).send();
-
-    const avatars = await con.select('attribute_status_id')
-        .from('player_avatar').where('player_id', playerID);
-
-    let queries = [];
-    for (const avatar of avatars) {
-        const id = avatar.attribute_status_id;
-
-        const obj = data.find(av => av.attribute_status_id == id);
-
-        if (!obj)
-            return res.status(400).send();
-
-        let link = obj.link || null;
-
-        queries.push(con('player_avatar')
-            .update({ 'link': link })
-            .where('attribute_status_id', id)
-            .andWhere('player_id', playerID));
-    }
+    if (!playerID || !data) return res.status(401).send();
 
     try {
-        await Promise.all(queries);
-        res.send();
+        const avatars = await con.select('attribute_status_id')
+            .from('player_avatar').where('player_id', playerID);
+
+        await Promise.all(avatars.map(avatar => {
+            const id = avatar.attribute_status_id;
+            const obj = data.find(av => av.attribute_status_id == id);
+
+            if (!id || !obj) throw new Error();
+
+            const link = obj.link || null;
+
+            return con('player_avatar')
+                .update({ 'link': link })
+                .where('attribute_status_id', id)
+                .andWhere('player_id', playerID);
+        }));
     }
     catch (err) {
         console.error(err);

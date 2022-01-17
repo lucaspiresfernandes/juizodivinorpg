@@ -1,0 +1,19 @@
+<div class="col m-4 acds-clickable skill-container d-flex flex-column" data-skill-id="{{skill_id}}"
+    data-extra="{{extra_value}}" data-characteristic-id="{{characteristic_id}}">
+    <div class="row">
+        <div class="col">
+            <input class="acds-element acds-bottom-text text-center skill-field" type="text" value="{{value}}"
+                maxlength="3" onchange="skillChange(event)" data-last-value="{{value}}">
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col" onclick="skillDiceClick(event)">
+            <small class="total h5">{{total_value}}</small>
+        </div>
+    </div>
+    <div class="row h-100">
+        <div class="col name" onclick="skillDiceClick(event)">
+            {{name}}
+        </div>
+    </div>
+</div>

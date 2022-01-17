@@ -4,6 +4,7 @@ const RandomOrg = require('random-org');
 const apiKey = process.env.RANDOM_ORG_KEY || 'unkown';
 const random = new RandomOrg({ apiKey: apiKey });
 const io = require('../server').io;
+const jsonParser = express.json();
 
 async function nextInt(min, max, n) {
     try { return (await random.generateIntegers({ min, max, n })).random; }
@@ -20,11 +21,11 @@ async function nextInt(min, max, n) {
     return { data };
 }
 
-router.get('/', async (req, res) => {
+router.post('/', jsonParser, async (req, res) => {
     const playerID = req.session.playerID;
     const isAdmin = req.session.isAdmin;
-    const dices = req.query.dices;
-    const resolverKey = req.query.resolverKey;
+    const dices = req.body.dices;
+    const resolverKey = req.body.resolverKey;
 
     if (!playerID || !dices) return res.status(401).send();
 
@@ -84,18 +85,18 @@ const resolveSuccessType = {
         const f10_20 = Math.floor((number - 20) / 10);
 
         if (roll > 20 - f10_20) return { description: 'Extremo', isCritical: true };
-        else if (roll > 20 - f10_10) return { description: 'Bom', isCritical: true };
-        else if (roll > 20 - f10) return { description: 'Normal', isCritical: true };
-        else if (roll > 20 - f5) return { description: 'Extremo' };
-        else if (roll > 20 - f2) return { description: 'Bom' };
-        else if (roll > 20 - number) return { description: 'Normal' };
-        else if (roll == 1) return { description: 'Desastre' };
-        else return { description: 'Fracasso' };
+        if (roll > 20 - f10_10) return { description: 'Bom', isCritical: true };
+        if (roll > 20 - f10) return { description: 'Normal', isCritical: true };
+        if (roll > 20 - f5) return { description: 'Extremo' };
+        if (roll > 20 - f2) return { description: 'Bom' };
+        if (roll > 20 - number) return { description: 'Normal' };
+        if (roll == 1) return { description: 'Desastre' };
+        return { description: 'Fracasso' };
     },
 
     '100nobranch': function (number, roll) {
         if (roll <= number) return { description: 'Sucesso' };
-        else return { description: 'Fracasso' };
+        return { description: 'Fracasso' };
     }
 }
 

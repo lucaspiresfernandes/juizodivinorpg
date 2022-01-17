@@ -1,0 +1,122 @@
+.skill-container {
+    background-color: black;
+    border-radius: 20px;
+    max-width: 250px;
+}
+
+.skill-container:hover {
+    background-color: white;
+}
+
+.skill-container:hover .acds-element {
+    background-color: white !important;
+    color: black !important;
+}
+
+.skill-container .name {
+    color: white;
+}
+
+.skill-container .total {
+    color: lightgray;
+}
+
+.skill-container:hover .name,
+.skill-container:hover .total {
+    color: black;
+}
+
+.progress {
+    height: 40px;
+}
+
+#avatar {
+    max-height: 375px;
+    min-width: 100px;
+    min-height: 100px;
+}
+
+.critical {
+    color: #cc6060 !important;
+    text-shadow: 0 0 10px #DD0F0F, 0 0 30px #DD0F0F, 0 0 50px #DD0F0F !important;
+}
+
+.unconscious {
+    filter: brightness(10%);
+}
+
+.characteristic-container img {
+    max-height: 50px;
+}
+
+.characteristic-container[data-rollable="0"] img {
+    visibility: hidden;
+}
+
+.equipment-row img {
+    max-height: 1.75rem;
+}
+
+.equipment-row .current-ammo {
+    max-width: 3rem;
+}
+
+.table-dark {
+    --bs-table-bg: black;
+}
+
+.avatar-field {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.avatar-container .dice {
+    max-height: 75px;
+}
+
+.attribute-container .dice {
+    max-height: 40px;
+}
+
+.item-row td .quantity {
+    max-width: 4rem;
+}
+
+#lineageGraph {
+    background-image: url('/assets/lineages/bg_tree.jpg');
+    background-size: 100% 100%;
+}
+
+#lineageGraph img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.unconquered {
+    filter: brightness(40%);
+}
+
+.unavailable {
+    filter: brightness(25%);
+}
+
+.lineage-node .acds-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    background: #111;
+    border-radius: 8px;
+    position: fixed;
+    right: 50px;
+    bottom: 50px;
+    z-index: 3;
+    max-width: 250px;
+    transition: all 0.15s ease-in;
+}
+
+.lineage-node img:hover+.acds-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.3s 0.3s ease-out;
+}

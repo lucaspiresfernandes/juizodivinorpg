@@ -2,28 +2,66 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>{{rpgname}}</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    {{> head ignore_socketio=1}}
 </head>
 
 <body>
-    <h1>Registrar</h1>
-    <form id="registerForm">
-        <p>
-            <input type="text" placeholder="Login" name="username" id="username" required />
-            <input type="password" placeholder="Senha" name="password" id="password" required />
-            <input type="password" placeholder="Confirmar Senha" id="confirmpassword" required />
-            {{#if admin}}
-            <input type="password" placeholder="Chave do Administrador" name="adminKey" id="adminKey" required />
-            {{/if}}
-        </p>
-        <p>
-            <input type="submit" value="Registrar" />
-        </p>
-    </form>
+    <div class="container text-center">
+        <div class="row my-4">
+            <div class="col">
+                <h1>Registrar</h1>
+                <form id="registerForm">
+                    <div class="row my-3">
+                        <div class="col-6 offset-3">
+                            <input class="form-control acds-element text-center" type="text" placeholder="Login"
+                                name="username" id="username" required>
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col-6 offset-3">
+                            <input class="form-control acds-element text-center" type="password" placeholder="Senha"
+                                name="password" id="password" required>
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col-6 offset-3">
+                            <input class="form-control acds-element text-center" type="password"
+                                placeholder="Confirmar Senha" id="confirmpassword" required>
+                        </div>
+                    </div>
+                    {{#if admin}}
+                    <div class="row my-3">
+                        <div class="col-6 offset-3">
+                            <input class="form-control acds-element text-center" type="password"
+                                placeholder="Chave do Administrador" name="adminKey" id="adminKey" required />
+                        </div>
+                    </div>
+                    {{/if}}
+                    <div class="row my-3">
+                        <div class="col">
+                            <input class="btn btn-primary" type="submit" value="Registrar">
+                        </div>
+                    </div>
+                </form>
 
-    <p>Já possui cadastro? <a href="/login">Conectar-se</a></p>
+                <div class="row my-3">
+                    <div class="col">
+                        Já possui cadastro? <a class="h5" href="/login">Conectar-se</a>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col">
+                        <a class="h5" href="/">Voltar</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col return">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const pass = $('#password');
@@ -32,39 +70,32 @@
 
         function validatePassword() {
             if (pass.val() != confirmPass.val())
-                confirmPass[ 0 ].setCustomValidity("As senhas não coincidem.");
+                confirmPass[0].setCustomValidity("As senhas não coincidem.");
             else
-                confirmPass[ 0 ].setCustomValidity('');
+                confirmPass[0].setCustomValidity('');
         }
 
-        pass[ 0 ].onchange = validatePassword;
-        confirmPass[ 0 ].onkeyup = validatePassword;
+        pass[0].onchange = validatePassword;
+        confirmPass[0].onkeyup = validatePassword;
 
         function onRegisterSuccess() {
-            const success = $(document.createElement('p'));
-            success.css({ color: 'green', fontSize: '24' })
-                .text(`Cadastro realizado com sucesso! - Redirecionando para a ficha...`);
-
-            $('body').append(success);
+            const success = $(`<p style="color: red;" class="h4">Cadastro realizado com sucesso! - Redirecionando para a ficha...</p>`);
+            $('.col.return').append(success);
 
             setTimeout(() => {
                 location.replace('/sheet/1');
-            }, 2000);
+            }, 1000);
         }
 
         function onRegisterFail(err) {
-            const error = $(document.createElement('p'));
-            error.css({ color: 'red', fontSize: '24' })
-                .text(`Erro: ${err.responseText}`);
-
-            $('body').append(error);
+            const error = $(`<p style="color: red;" class="h4">Erro: ${err.responseText}</p>`);
+            $('.col.return').append(error);
 
             setTimeout(() => {
                 error.fadeOut(2000, () => error.remove());
             }, 500);
 
             console.error(`Server: ${err}`);
-
             registerForm.show();
         }
 
@@ -88,7 +119,7 @@
                     error: onRegisterFail
                 });
         });
-        
+
     </script>
 </body>
 

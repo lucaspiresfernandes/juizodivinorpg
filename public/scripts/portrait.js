@@ -20,12 +20,12 @@ socket.on('environment change', data => {
 });
 
 socket.on('attribute changed', content => {
-    let attrID = content.attrID;
+    let attributeID = content.attributeID;
     let newValue = content.value;
     let newTotalValue = content.totalValue;
     let newText = `${newValue}`;
-    if (attrID !== '3') newText += `/${newTotalValue}`;
-    attributes[attrID].text(newText);
+    if (attributeID !== '3') newText += `/${newTotalValue}`;
+    attributes[attributeID].text(newText);
 });
 
 socket.on('attribute status changed', content => {
@@ -33,9 +33,9 @@ socket.on('attribute status changed', content => {
     const state = statusState.find(state => state.id == id);
     if (state) {
         state.value = content.value;
-        findAvatar();
+        return findAvatar();
     }
-    else updateAvatar(parseInt(id));
+    updateAvatar(parseInt(id));
 });
 
 socket.on('info changed', content => {

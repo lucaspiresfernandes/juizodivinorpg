@@ -2,56 +2,56 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>{{rpgname}}</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    {{> head ignore_socketio=1}}
 </head>
 
 <body>
-    <h1>Logar</h1>
-    <form id="loginForm">
-        <p>
-            <input type="text" placeholder="Login" id="username" name="username" required />
-            <input type="password" placeholder="Senha" id="password" name="password" required />
-        </p>
-        <p><input type="submit" value="Entrar" /></p>
-    </form>
+    <div class="container text-center">
+        <div class="row my-4">
+            <div class="col">
+                <h1>Entrar</h1>
+                <form id="loginForm">
+                    <div class="row my-3">
+                        <div class="col-6 offset-3">
+                            <input class="form-control acds-element text-center" type="text" placeholder="Login"
+                                id="username" name="username" required>
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col-6 offset-3">
+                            <input class="form-control acds-element text-center" type="password" placeholder="Senha"
+                                id="password" name="password" required>
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col">
+                            <input class="btn btn-primary" type="submit" value="Entrar" />
+                        </div>
+                    </div>
+                </form>
+                <div class="row my-3">
+                    <div class="col">
+                        Não possui cadastro? <a class="h5" href="/register">Registrar-se</a>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col">
+                        <a class="h5" href="/">Voltar</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col return">
 
-    <p>Não possui cadastro? <a href="/register">Registrar-se</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         const loginForm = $('#loginForm');
-
-        function onLoginSuccess(data) {
-            let admin = data.admin;
-
-            const success = $(document.createElement('p'));
-            success.css({ color: 'green', fontSize: '24' })
-                .text(`Logado com sucesso! Redirecionando para a ficha...`);
-            $('body').append(success);
-
-            let url = admin ? '/sheet/admin/1' : '/sheet/1';
-            location.replace(url);
-        }
-
-        function onLoginFail(err) {
-            const error = $(document.createElement('p'));
-
-            error.css({ color: 'red', fontSize: '24' })
-                .text(`Erro: ${err.responseText}`);
-
-            $('body').append(error);
-
-            setTimeout(() => {
-                error.fadeOut(2000, () => error.remove());
-            }, 500);
-
-            console.error(err);
-
-            loginForm.show();
-        }
-
-        loginForm.submit(ev => {
+        loginForm.submit(async ev => {
             ev.preventDefault();
 
             loginForm.hide();
@@ -62,13 +62,28 @@
             const password = pass.val();
             pass.val('');
 
-            $.ajax('/login',
-                {
-                    method: 'POST',
-                    data: { username, password },
-                    success: onLoginSuccess,
-                    error: onLoginFail
-                });
+            let responseElement;
+            try {
+                const response = await axios.post('/login', { username, password });
+                
+                responseElement = $('<p style="color: green;" class="h4">Logado com sucesso! ' +
+                    'Redirecionando para a ficha...</p>');
+
+                setTimeout(() => {
+                    let url = response.data.admin ? '/sheet/admin/1' : '/sheet/1';
+                    location.replace(url);
+                }, 1000);
+            }
+            catch (err) {
+                responseElement = $(`<p style="color: red;" class="h4">Erro: ${err.message} - ${err.response.data}</p>`);
+
+                setTimeout(() => {
+                    error.fadeOut(2000, () => error.remove());
+                }, 500);
+                console.error(err);
+            }
+            loginForm.show();
+            $('.col.return').append(responseElement);
         });
 
     </script>

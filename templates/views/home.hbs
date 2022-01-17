@@ -2,14 +2,32 @@
 <html>
 
 <head>
+    {{> head ignore_jquery=1 ignore_socketio=1 ignore_axios=1}}
     <meta charset="utf-8">
-    <title>{{rpgname}}</title>
 </head>
 
 <body>
-    <h1>{{rpgname}} RPG</h1>
-    <p><a href="/login">Entrar</a></p>
-    <p><a href="/register">Registrar</a></p>
+    <div class="container text-center">
+        <div class="row my-4">
+            <div class="col">
+                <div class="row mb-5">
+                    <div class="col h1">
+                        {{rpgname}} RPG
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col h4">
+                        <a href="/login">Entrar</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col h4">
+                        <a href="/register">Registrar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

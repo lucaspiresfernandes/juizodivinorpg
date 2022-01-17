@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const con = require('../utils/connection');
-const urlParser = express.urlencoded({ extended: false });
+const jsonParser = express.json();
 const io = require('../server').io;
 
 router.get('/:id', async (req, res) => {
@@ -43,7 +43,7 @@ router.get('/:id', async (req, res) => {
     });
 });
 
-router.post('/environment', urlParser, async (req, res) => {
+router.post('/environment', jsonParser, async (req, res) => {
     const environment = req.body.combat === 'true' ? 'combat' : 'idle';
     let portraitRooms = io;
 

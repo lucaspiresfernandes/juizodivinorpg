@@ -2,46 +2,29 @@
 <html>
 
 <head>
-    <link rel="shortcut icon" href="/assets/favicon.ico">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Cinzel:wght@500&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/adminstyle.css">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
-        crossorigin="anonymous"></script>
+    {{> head include_jqueryui=1}}
+    <link rel="stylesheet" href="/styles/adminstyle.css">
+    <script src="/scripts/admin1.js" defer></script>
     <script>
         $(() => {
             $(".sortable").sortable();
             $(".sortable").disableSelection();
         });
+        socket.emit('room:join', 'admin');
+        const playerNames = new Map();
     </script>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script>const socket = io(); socket.emit('room:join', 'admin'); const playerNames = new Map();</script>
-
-    <title>{{rpgname}} - Administrador</title>
 </head>
 
 <body>
     <div class="container">
         <div class="row">
-            <div class="col mt-2 text-start">
+            <div class="col my-2 text-start">
                 <form action="/sheet/leave">
-                    <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
+                    <button type="submit" class="btn btn-link h4">Sair</button>
                 </form>
             </div>
             <div class="col mt-2 text-end">
-                <a href="/sheet/admin/2" style="font-size: 21px;">Acessar 2° Página</a>
+                <a href="/sheet/admin/2 h4">Acessar 2° Página</a>
             </div>
         </div>
         <div class="row h1 text-center">
@@ -58,11 +41,9 @@
             </div>
         </div>
         <div class="row justify-content-center">
-            {{#if characters}}
             {{#each characters}}
             {{#with this}}
-            <div class="col mb-2 mx-2 text-center acds-player-container" style="max-width: 650px;"
-                data-player-id="{{playerID}}">
+            <div class="col mb-2 mx-2 text-center acds-player-container" data-player-id="{{playerID}}">
                 <div class="row my-3">
                     <div class="col">
                         <img id="avatar{{playerID}}" class="img-fluid rounded-circle avatar"
@@ -71,20 +52,21 @@
                 </div>
                 <div class="row my-3">
                     <script>playerNames.set({{ playerID }}, '{{name.value}}')</script>
-                    <div id="info{{playerID}}{{name.info_id}}" class="col data" style="font-size: 24px;">
+                    <div id="info{{playerID}}{{name.info_id}}" class="col h4">
                         {{name.value}}
                     </div>
                 </div>
                 <div class="row my-1">
                     <div class="col">
-                        Classe: <span style="color: red;" class="class-name">{{#if player.class_name}}{{player.class_name}}{{else}}Nenhuma{{/if}}</span>
+                        Classe: <span class="class-name">{{#if
+                            player.class_name}}{{player.class_name}}{{else}}Nenhuma{{/if}}</span>
                     </div>
                 </div>
                 <div class="row my-1">
                     <div class="col d-flex justify-content-center">
                         <label for="playerLineage{{@index}}"><span
                                 class="mx-2 align-self-center">Linhagem:</span></label>
-                        <select id="playerLineage{{@index}}" class="acds-bottom-text acds-element text-center w-25"
+                        <select id="playerLineage{{@index}}" class="acds-element text-center w-25"
                             onchange="playerLineageChange(event);">
                             <option value="0" {{#unless player}}selected{{/unless}}>Nenhuma</option>
                             {{#each lineage}}
@@ -98,7 +80,7 @@
                 </div>
                 <div class="row my-1">
                     <div class="col">
-                        Pontos de Linhagem: <input class="acds-bottom-text acds-element player-score" style="width: 10%;"
+                        Pontos de Linhagem: <input class="acds-bottom-text acds-element player-score text-center"
                             type="number" value="{{player.score}}" onchange="onPlayerScoreChanged(event);">
                     </div>
                 </div>
@@ -108,7 +90,7 @@
                     {{#with this}}
                     <div class="col">
                         <div class="row">
-                            <div id="attribute{{../playerID}}{{attribute_id}}" class="col data"
+                            <div id="attribute{{../playerID}}{{attribute_id}}" class="col h4"
                                 style="color: #{{fill_color}};">
                                 {{value}}/{{total_value}}
                             </div>
@@ -128,7 +110,7 @@
                     {{#with this}}
                     <div class="col">
                         <div class="row">
-                            <div id="spec{{../playerID}}{{spec_id}}" class="col data">
+                            <div id="spec{{../playerID}}{{spec_id}}" class="col h4">
                                 {{value}}
                             </div>
                         </div>
@@ -147,7 +129,7 @@
                     {{#with this}}
                     <div class="col">
                         <div class="row">
-                            <div id="characteristic{{../playerID}}{{characteristic_id}}" class="col data">
+                            <div id="characteristic{{../playerID}}{{characteristic_id}}" class="col h4">
                                 {{value}}
                             </div>
                         </div>
@@ -164,7 +146,7 @@
                 <div class="row my-3">
                     <div class="col">
                         <div class="row">
-                            <div class="col data">
+                            <div class="col h4">
                                 Equipamentos
                             </div>
                         </div>
@@ -210,7 +192,7 @@
                 <div class="row my-3">
                     <div class="col">
                         <div class="row">
-                            <div class="col data">
+                            <div class="col h4">
                                 Inventário
                             </div>
                         </div>
@@ -237,12 +219,6 @@
             </div>
             {{/with}}
             {{/each}}
-            {{else}}
-            <div class=" col text-center" style="color: gray;">
-                Não há nenhum player cadastrado. Recarregue a página quando houver algum
-                cadastro.
-            </div>
-            {{/if}}
         </div>
         <div class="row my-3 text-center acds-container">
             <div class="col">
@@ -252,8 +228,8 @@
                 <hr>
                 <div class="row my-4 text-center">
                     <div class="col">
-                        <img class="img-fluid acds-clickable" src="/assets/dice.png" data-bs-toggle="modal"
-                            style="max-height: 75px;" data-bs-target="#generalDiceRoll">
+                        <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
+                            data-bs-target="#generalDiceRoll">
                     </div>
                 </div>
                 <div class="row my-4">
@@ -264,8 +240,8 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col mx-3 acds-container table-wrapper" style="max-height: 280px;">
-                                <ul id="diceList" class="dice-list" style="background-color: #111;">
+                            <div class="col mx-3 acds-container table-wrapper">
+                                <ul id="diceList" class="dice-list">
                                 </ul>
                             </div>
                             <div class="col">
@@ -273,7 +249,7 @@
                                     <div class="col">
                                         <input id="orderAddText" class="acds-element acds-bottom-text" type="text">
                                         <input class="acds-element" type="button" value="+"
-                                            onclick="orderAddButtonClick(event)" style="border: solid 1px;">
+                                            onclick="orderAddButtonClick(event)">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -317,13 +293,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="col mb-2 text-start">
+            <div class="col my-2 text-start">
                 <form action="/sheet/leave">
-                    <button type="submit" class="btn btn-link" style="font-size: 21px;">Sair</button>
+                    <button type="submit" class="btn btn-link h4">Sair</button>
                 </form>
             </div>
             <div class="col mb-2 text-end">
-                <a href="/sheet/admin/2" style="font-size: 21px;">Acessar 2° Página</a>
+                <a href="/sheet/admin/2 h4">Acessar 2° Página</a>
             </div>
         </div>
     </div>
@@ -333,8 +309,6 @@
         {{> generaldice}}
         {{> diceroll}}
     </div>
-
-    <script src="/js/admin1.js"></script>
 </body>
 
 </html>

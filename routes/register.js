@@ -2,23 +2,22 @@ const encrypter = require('../utils/encrypter');
 const con = require('../utils/connection');
 const express = require('express');
 const router = express.Router();
-const urlParser = express.urlencoded({ extended: false });
+const jsonParser = express.json();
 const config = require('../config.json');
 
 router.get('/', (req, res) => {
+    if (req.session.playerID) return res.redirect('/sheet/1');
     res.render('register');
 });
 
 router.get('/admin', (req, res) => {
-    res.render('register',
-        {
-            admin: true
-        });
+    if (req.session.playerID) return res.redirect('/sheet/1');
+    res.render('register', { admin: true });
 })
 
-router.post('/', urlParser, registerPost);
+router.post('/', jsonParser, registerPost);
 
-router.post('/admin', urlParser, registerPost);
+router.post('/admin', jsonParser, registerPost);
 
 async function registerPost(req, res) {
     try {
@@ -85,6 +84,10 @@ async function registerPlayerData(playerID) {
     {
         player_id: playerID,
         attribute_status_id: 5
+    },
+    {
+        player_id: playerID,
+        attribute_status_id: 6,
     }]);
 
     await Promise.all([

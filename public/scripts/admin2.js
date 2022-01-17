@@ -3,16 +3,6 @@ const createSkillModal = new bootstrap.Modal($('#createSkill')[0]);
 const createEquipmentModal = new bootstrap.Modal($('#createEquipment')[0]);
 const createItemModal = new bootstrap.Modal($('#createItem')[0]);
 
-const failureToast = new bootstrap.Toast($('#failureToast')[0], { delay: 4000 });
-const failureToastBody = $('#failureToast > .toast-body');
-
-//General
-function showFailureToastMessage(err) {
-    console.error(err);
-    failureToastBody.text(`Erro ao tentar aplicar mudança - ${err.text}`);
-    failureToast.show();
-}
-
 //Equipments
 const createEquipmentContainer = $('#createEquipmentContainer');
 const createEquipmentName = $('#createEquipmentName');

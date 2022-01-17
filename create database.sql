@@ -214,11 +214,9 @@ VALUES
     );
 
 CREATE TABLE `class_skill` (
-    `class_skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `class_id` INT UNSIGNED NOT NULL,
     `skill_id` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`class_skill_id`),
-    CONSTRAINT `uk_class_id_skill_id` UNIQUE (`class_id`, `skill_id`),
+    PRIMARY KEY (`class_id`, `skill_id`),
     CONSTRAINT `fk_class_skill_class_id` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_class_skill_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -260,16 +258,18 @@ VALUES
 CREATE TABLE `lineage` (
     `lineage_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
+    -- Divine lineages are special lineages which ablities can be replaced with another ability from another lineage.
+    `divine` BOOLEAN NOT NULL,
     PRIMARY KEY (`lineage_id`)
 );
 
 INSERT INTO
-    `lineage` (`name`)
+    `lineage` (`name`, `divine`)
 VALUES
-    ('Amarelo'),
-    ('Azul'),
-    ('Verde'),
-    ('Vermelho');
+    ('Amarelo', TRUE),
+    ('Azul', FALSE),
+    ('Verde', FALSE),
+    ('Vermelho', FALSE);
 
 CREATE TABLE `lineage_node` (
     `lineage_id` INT UNSIGNED NOT NULL,
@@ -663,24 +663,22 @@ CREATE TABLE `player_lineage_node` (
 );
 
 CREATE TABLE `player_characteristic` (
-    `player_characteristic_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `characteristic_id` INT UNSIGNED NOT NULL,
     `value` bigint NOT NULL,
-    PRIMARY KEY (`player_characteristic_id`),
+    PRIMARY KEY (`player_id`, `characteristic_id`),
     CONSTRAINT `uk_player_id_characteristic_id` UNIQUE (`player_id`, `characteristic_id`),
     CONSTRAINT `fk_player_characteristic_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_skill` (
-    `player_skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `skill_id` INT UNSIGNED NOT NULL,
     `value` INT UNSIGNED NOT NULL,
     `extra_value` INT UNSIGNED NOT NULL,
     `total_value` INT UNSIGNED GENERATED ALWAYS AS (`value` + `extra_value`) STORED,
-    PRIMARY KEY (`player_skill_id`),
+    PRIMARY KEY (`player_id`, `skill_id`),
     CONSTRAINT `uk_player_id_skill_id` UNIQUE (`player_id`, `skill_id`),
     CONSTRAINT `fk_player_skill_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_skill_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -701,10 +699,10 @@ VALUES
     ('Enfraquecendo', 1),
     ('Inconsciente', 1),
     ('Lesão Grave', 1),
-    ('Traumatizado', 2);
+    ('Traumatizado', 2),
+    ('Acessório', 3);
 
 CREATE TABLE `player_attribute` (
-    `player_attribute_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `attribute_id` INT UNSIGNED NOT NULL,
     `value` INT UNSIGNED NOT NULL,
@@ -712,18 +710,17 @@ CREATE TABLE `player_attribute` (
     `extra_value` INT UNSIGNED NOT NULL,
     `total_value` INT UNSIGNED GENERATED ALWAYS AS (`max_value` + `extra_value`) STORED,
     `coefficient` DECIMAL(15, 2) GENERATED ALWAYS AS (IFNULL((`value` / `total_value`) * 100, 0)) VIRTUAL,
-    PRIMARY KEY (`player_attribute_id`),
+    PRIMARY KEY (`player_id`, `attribute_id`),
     CONSTRAINT `uk_player_id_attribute_id` UNIQUE (`player_id`, `attribute_id`),
     CONSTRAINT `fk_player_attribute_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_attribute_attribute_id` FOREIGN KEY (`attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_attribute_status` (
-    `player_attribute_status_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `attribute_status_id` INT UNSIGNED NOT NULL,
     `value` BOOLEAN NOT NULL,
-    PRIMARY KEY (`player_attribute_status_id`),
+    PRIMARY KEY (`player_id`, `attribute_status_id`),
     CONSTRAINT `uk_player_id_attribute_status_id` UNIQUE (`player_id`, `attribute_status_id`),
     CONSTRAINT `fk_player_attribute_status_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_attribute_status_attribute_status_id` FOREIGN KEY (`attribute_status_id`) REFERENCES `attribute_status`(`attribute_status_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -768,12 +765,11 @@ VALUES
 
 -- TODO: insert equipments
 CREATE TABLE `player_equipment` (
-    `player_equipment_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `equipment_id` INT UNSIGNED NOT NULL,
     `current_ammo` varchar(255) NOT NULL,
     `using` BOOLEAN NOT NULL,
-    PRIMARY KEY (`player_equipment_id`),
+    PRIMARY KEY (`player_id`, `equipment_id`),
     CONSTRAINT `uk_player_id_equipment_id` UNIQUE (`player_id`, `equipment_id`),
     CONSTRAINT `fk_player_equipment_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_equipment_equipment_id` FOREIGN KEY (`equipment_id`) REFERENCES `equipment`(`equipment_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -792,11 +788,10 @@ VALUES
     ('Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
-    `player_spec_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `spec_id` INT UNSIGNED NOT NULL,
     `value` varchar(255) NOT NULL,
-    PRIMARY KEY (`player_spec_id`),
+    PRIMARY KEY (`player_id`, `spec_id`),
     CONSTRAINT `uk_player_id_spec_id` UNIQUE (`player_id`, `spec_id`),
     CONSTRAINT `fk_player_spec_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_spec_spec_id` FOREIGN KEY (`spec_id`) REFERENCES `spec`(`spec_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -812,12 +807,11 @@ CREATE TABLE `item` (
 
 -- TODO: insert items.
 CREATE TABLE `player_item` (
-    `player_item_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `item_id` INT UNSIGNED NOT NULL,
     `description` MEDIUMTEXT NOT NULL,
     `quantity` INT UNSIGNED NOT NULL DEFAULT 1,
-    PRIMARY KEY (`player_item_id`),
+    PRIMARY KEY (`player_id`, `item_id`),
     CONSTRAINT `uk_player_id_item_id` UNIQUE (`player_id`, `item_id`),
     CONSTRAINT `fk_player_item_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_item_item_id` FOREIGN KEY (`item_id`) REFERENCES `item`(`item_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -840,11 +834,10 @@ VALUES
     ('Altura');
 
 CREATE TABLE `player_info` (
-    `player_info_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `info_id` INT UNSIGNED NOT NULL,
     `value` MEDIUMTEXT NOT NULL,
-    PRIMARY KEY (`player_info_id`),
+    PRIMARY KEY (`player_id`, `info_id`),
     CONSTRAINT `uk_player_id_info_id` UNIQUE (`player_id`, `info_id`),
     CONSTRAINT `fk_player_info_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_info_info_id` FOREIGN KEY (`info_id`) REFERENCES `info`(`info_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -864,32 +857,29 @@ VALUES
     ('Fobias e Manias');
 
 CREATE TABLE `player_extra_info` (
-    `player_extra_info_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `extra_info_id` INT UNSIGNED NOT NULL,
     `value` MEDIUMTEXT NOT NULL,
-    PRIMARY KEY (`player_extra_info_id`),
+    PRIMARY KEY (`player_id`, `extra_info_id`),
     CONSTRAINT `uk_player_id_extra_info_id` UNIQUE (`player_id`, `extra_info_id`),
     CONSTRAINT `fk_player_extra_info_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_extra_info_extra_info_id` FOREIGN KEY (`extra_info_id`) REFERENCES `extra_info`(`extra_info_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_avatar` (
-    `player_avatar_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `attribute_status_id` INT UNSIGNED NULL,
     `link` MEDIUMTEXT NULL DEFAULT NULL,
-    PRIMARY KEY (`player_avatar_id`),
+    UNIQUE KEY (`player_id`, `attribute_status_id`),
     CONSTRAINT `uk_player_id_attribute_status_id` UNIQUE (`player_id`, `attribute_status_id`),
     CONSTRAINT `fk_player_avatar_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_avatar_attribute_status_id` FOREIGN KEY (`attribute_status_id`) REFERENCES `attribute_status`(`attribute_status_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_note` (
-    `player_note_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `player_id` INT UNSIGNED NOT NULL,
     `value` MEDIUMTEXT NOT NULL,
-    PRIMARY KEY (`player_note_id`),
+    PRIMARY KEY (`player_id`),
     CONSTRAINT `fk_player_note_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

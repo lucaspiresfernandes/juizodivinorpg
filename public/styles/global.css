@@ -1,0 +1,62 @@
+body {
+    background-color: black !important;
+    color: white !important;
+    font-family: 'Cinzel', serif;
+}
+
+.acds-container {
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    border-radius: 20px;
+}
+
+.acds-clickable:hover {
+    cursor: pointer;
+}
+
+.acds-element {
+    background-color: black !important;
+    color: white !important;
+}
+
+.acds-player-container {
+    background-color: rgb(53, 58, 64);
+}
+
+.acds-bottom-text {
+    outline: 0;
+    border-width: 0 0 1px;
+    width: 100%;
+}
+
+.modal-content {
+    background-color: black;
+}
+
+.modal-body {
+    background-color: black;
+}
+
+.modal-header {
+    border-bottom: 1px solid #222222;
+}
+
+.modal-footer {
+    border-top: 1px solid black;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #aa2121;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #aa2121;
+}
+
+.btn-link.h4 {
+    font-size: calc(1.275rem + .3vw);
+}
+
+.toast-header {
+    background-color: rgb(22, 22, 22);
+    color: lightgray;
+}

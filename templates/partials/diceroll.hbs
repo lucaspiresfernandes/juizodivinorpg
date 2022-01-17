@@ -26,3 +26,115 @@
         </div>
     </div>
 </div>
+
+<script>
+    const diceRoll = $('#diceRoll');
+    const diceRollModal = new bootstrap.Modal(diceRoll[0]);
+    const diceResultContent = $('#diceResultContent');
+    diceResultContent.hide();
+    const diceResultDescription = $('#diceResultDescription');
+    diceResultDescription.hide();
+
+    $('#diceRoll').on('hidden.bs.modal', ev => {
+        diceResultContent.text('').hide().removeClass('critical');
+        diceResultDescription.text('').hide().removeClass('critical');
+    });
+
+    async function rollDice(num, diceNum = 20, showBranches = true) {
+        diceRollModal.show();
+        const loading = diceRoll.find('.loading');
+        loading.show();
+
+        const resolverKey = showBranches ? `${diceNum}` : `${diceNum}nobranch`;
+
+        try {
+            const response = await axios.post('/dice', {
+                dices: [{ n: 1, roll: diceNum, num }],
+                resolverKey
+            });
+            const data = response.data;
+            const result = data.results[0];
+            const roll = result.roll;
+            const successType = result.successType;
+            loading.hide();
+            let prefix = '';
+            if (successType.isCritical) {
+                diceResultContent.addClass('critical');
+                diceResultDescription.addClass('critical');
+                prefix = 'Crítico ';
+            }
+            const description = prefix + successType.description;
+
+            diceResultContent.text(roll).fadeIn('slow', () =>
+                diceResultDescription.text(description).fadeIn('slow'));
+        }
+        catch (err) {
+            showFailureToastMessage(err);
+        }
+    }
+
+    async function rollDices(dices) {
+        diceRollModal.show();
+        const loading = diceRoll.find('.loading');
+        loading.show();
+        try {
+            const response = await axios.post('/dice', { dices });
+            const data = response.data;
+
+            const results = data.results.map(res => res.roll);
+            const sum = results.reduce((a, b) => a + b, 0);
+
+            loading.hide();
+            diceResultContent.text(sum).fadeIn('slow', () => {
+                if (results.length <= 1) return;
+                diceResultDescription.text(results.join(' + ')).fadeIn('slow');
+            });
+        }
+        catch (err) {
+            showFailureToastMessage(err);
+        }
+    }
+
+    function resolveDice(dice, arr) {
+        if (dice.includes('db/')) {
+            const div = parseInt(dice.split('/')[1]) || 1;
+
+            const db = $('.spec-container input[name="Dano Bônus"]').val();
+            const split = db.split('d');
+            const text = split.length === 1 ?
+                Math.round(parseInt(split[0]) / div).toString() :
+                `${split[0]}d${Math.round(parseInt(split[1]) / div)}`;
+            return resolveDice(text, arr);
+        }
+        if (dice.includes('db'))
+            return resolveDice($('.spec-container input[name="Dano Bônus"]').val(), arr);
+
+        const split = dice.split('d');
+
+        if (split.length === 1)
+            return arr.push({ n: 0, roll: dice });
+
+        const n = parseInt(split[0]) || 1;
+        const roll = parseInt(split[1]);
+        arr.push({ n, roll });
+    }
+
+    function resolveDices(str) {
+        const diceCollection = str.trim().toLowerCase();
+
+        const options = diceCollection.split('/');
+        if (options.length > 1) {
+            const selected = parseInt(prompt('Escolha dentre as opções de rolagem a seguir:\n' +
+                options.map((opt, i) => `${i + 1}: ${opt}`).join('\n')));
+
+            if (isNaN(selected) || selected < 1 || selected > options.length) return;
+
+            return resolveDices(options[selected - 1]);
+        }
+
+        const dices = diceCollection.split('+');
+        const arr = [];
+        for (let i = 0; i < dices.length; i++) resolveDice(dices[i], arr);
+        return arr;
+    }
+</script>

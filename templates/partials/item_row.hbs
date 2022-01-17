@@ -1,0 +1,14 @@
+<tr class="item-row" data-item-id="{{item_id}}">
+    <td>
+        <button class="acds-element" onclick="deleteItemClick(event)"><i class="bi bi-trash"></i></button>
+    </td>
+    <td class="name">{{name}}</td>
+    <td>
+        <input class="acds-element acds-bottom-text description" type="text" value="{{description}}"
+            onchange="itemDescriptionChange(event)">
+    </td>
+    <td>
+        <input class="acds-element acds-bottom-text text-center quantity" type="text" value="{{quantity}}"
+            onchange="itemQuantityChange(event)">
+    </td>
+</tr>

@@ -2,14 +2,8 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portrait</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    {{> head title="Portrait"}}
     <script>
-        const socket = io(); 
         socket.emit('room:join', 'portrait' + '{{playerID}}');
         const playerID = {{playerID}};
 
@@ -19,11 +13,11 @@
             {{/each}}
         ];
     </script>
-    <link rel="stylesheet" href="/css/portrait.css">
-    <script src="/js/portrait.js" defer></script>
+    <link rel="stylesheet" href="/styles/portrait.css">
+    <script src="/scripts/portrait.js" defer></script>
 </head>
 
-<body>
+<body style="background-color: transparent !important;">
     <div class="container">
         <div class="main shadow" id="mainContainer">
         <img id="background" src="/assets/avatar_bg.png" class="bottom">
@@ -36,11 +30,9 @@
             <img id="avatar" class="middle" style="display: none;">
 
             <img src="/assets/frame_bottom.png" class="top">
-            <div class="energy-container" style=" width: 250px; height: 400px;">
-                <img src="/assets/energy_placeholder.png" class="top" style="height: 400px; top: 75px; left: 25px;">
-                <div class="text">
-                    <div class="energy top">{{attributes.2.value}}</div>
-                </div>
+            <img src="/assets/energy_placeholder.png" class="top" style="height: 400px; top: 75px; left: 25px;">
+            <div class="text">
+                <div class="energy top">{{attributes.2.value}}</div>
             </div>
         </div>
     </div>

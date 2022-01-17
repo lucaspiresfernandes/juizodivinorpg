@@ -94,8 +94,8 @@ img {
 }
 
 .energy {
-    top: 100%;
-    left: 35%;
+    top: 402px;
+    left: 85px;
     transform: translate(-50%, -50%);
 
     color: #27ffbe;
@@ -146,9 +146,9 @@ img {
 
 #lineage {
     position: absolute;
-    top: 65%;
-    left: 80%;
-    transform: rotate(30deg) translate(-50%, -50%);
+    top: 90px;
+    left: 140px;
+    transform: rotate(35deg);
     width: 250px;
     height: 250px;
 }

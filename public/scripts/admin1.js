@@ -7,71 +7,9 @@ const loading = $('.loading');
 const generalDiceModal = new bootstrap.Modal($('#generalDiceRoll')[0]);
 const diceRollModal = new bootstrap.Modal($('#diceRoll')[0]);
 
-const failureToast = new bootstrap.Toast($('#failureToast')[0], { delay: 4000 });
-const failureToastBody = $('#failureToast > .toast-body');
-
 $('#generalDiceRoll').on('hidden.bs.modal', ev => $('.general-dice-roll').text('0'));
 
 //General
-function showFailureToastMessage(err) {
-    console.error(err);
-    failureToastBody.text(`Erro ao tentar aplicar mudança - ${err.text}`);
-    failureToast.show();
-}
-
-function generalDiceClick(event) {
-    generalDiceModal.hide();
-    const diceElements = $('.general-dice-roll');
-    const dicesArray = [];
-    for (const dice of diceElements) {
-        const el = $(dice);
-        const n = el.text().trim();
-
-        if (n === '0')
-            continue;
-
-        const num = el.attr('dice');
-        dicesArray.push(`${n}d${num}`);
-    }
-    const dicesText = dicesArray.join('+');
-    const dices = resolveDices(dicesText);
-    if (dices) rollDices(dices);
-}
-
-function rollDices(dices) {
-    loading.show();
-    diceRollModal.show();
-    $.ajax('/dice', {
-        data: { dices },
-        success: data => {
-            const results = data.results.map(res => res.roll);
-            const sum = results.reduce((a, b) => a + b, 0);
-            loading.hide();
-            diceResultContent.text(sum).fadeIn('slow', () => {
-                if (results.length <= 1)
-                    return;
-                diceResultDescription.text(results.join(' + '))
-                    .fadeIn('slow');
-            });
-        },
-        error: showFailureToastMessage
-    });
-}
-
-function resolveDices(str) {
-    let dices = str.replace(/\s+/g, '').toLowerCase().split('+');
-    let arr = [];
-    for (let i = 0; i < dices.length; i++) {
-        const dice = dices[i];
-        let split = dice.split('d');
-        if (split.length === 1) return arr.push({ n: 0, roll: dice });
-        const n = parseInt(split[0]) || 1;
-        const roll = parseInt(split[1]);
-        arr.push({ n, roll });
-    }
-    return arr;
-}
-
 $('#diceRoll').on('hidden.bs.modal', ev => {
     diceResultContent.text('')
         .hide();
@@ -110,12 +48,11 @@ function orderAddButtonClick(event) {
 function adminAnotationsChange(event) {
     const value = $(event.target).val();
 
-    $.ajax('/sheet/admin/note',
-        {
-            method: 'POST',
-            data: { value },
-            error: showFailureToastMessage
-        });
+    $.ajax('/sheet/player/note', {
+        method: 'POST',
+        data: { value },
+        error: showFailureToastMessage
+    });
 }
 
 function onChangeEnvironment(ev) {
@@ -195,7 +132,7 @@ socket.on('finance changed', content => {
     let value = content.value;
 
     $(`#finance${playerID}${financeID}`).text(value);
-})
+});
 
 socket.on('equipment changed', content => {
     let playerID = content.playerID;
@@ -290,9 +227,7 @@ socket.on('dice result', content => {
             const dice = auxDices[i];
             const n = dice.n;
             const roll = dice.roll;
-
-            if (n > 0) dices.push(`${n}d${roll}`);
-            else dices.push(roll);
+            dices.push(n > 0 ? `${n}d${roll}` : roll);
         }
     }
 
@@ -300,7 +235,7 @@ socket.on('dice result', content => {
         let roll = res.roll;
         let successType = res.successType?.description;
         if (successType) return `${roll} (${successType})`;
-        else return roll;
+        return roll;
     });
 
     const children = diceList.children();

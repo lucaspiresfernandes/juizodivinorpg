@@ -2,11 +2,14 @@ const encrypter = require('../utils/encrypter');
 const express = require('express');
 const router = express.Router();
 const con = require('../utils/connection');
-const urlParser = express.urlencoded({ extended: false });
+const jsonParser = express.json();
 
-router.get('/', (req, res) => res.render('login'));
+router.get('/', (req, res) => {
+    if (req.session.playerID) return res.redirect('/sheet/1');
+    res.render('login');
+});
 
-router.post('/', urlParser, async (req, res) => {
+router.post('/', jsonParser, async (req, res) => {
     try {
         let username = req.body.username;
         let password = req.body.password;

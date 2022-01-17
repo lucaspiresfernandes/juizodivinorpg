@@ -27,7 +27,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-4 my-2">
                             <div class="row mb-2">
                                 <div class="col-8 mx-auto">
@@ -136,9 +136,37 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button onclick="generalDiceClick(event)" class="btn btn-primary">Rolar</button>
+                <button id="generalDiceRollButton" class="btn btn-primary">Rolar</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    {
+        const generalDiceModal = new bootstrap.Modal($('#generalDiceRoll')[0]);
+
+        $('#generalDiceRoll').on('hidden.bs.modal', () => $(".general-dice-roll").text("0"));
+
+        $('#generalDiceRollButton').click(ev => {
+            generalDiceModal.hide();
+            const diceElements = $('.general-dice-roll');
+
+            const dicesArray = [];
+            for (const dice of diceElements) {
+                const el = $(dice);
+                const n = el.text().trim();
+
+                if (n === '0') continue;
+
+                const num = el.data('dice');
+                dicesArray.push(`${n}d${num}`);
+            }
+            const dicesText = dicesArray.join('+');
+
+            const dices = resolveDices(dicesText);
+            if (dices) rollDices(dices);
+        });
+    }
+</script>

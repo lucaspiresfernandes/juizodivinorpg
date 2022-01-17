@@ -1,11 +1,47 @@
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="failureToast" class="toast hide acds-element" role="alert">
+{{!Toast Container}}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+
+</div>
+
+<template id="failToastTemplate">
+    <div class="toast acds-element" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-            <span><i class="bi bi-x-circle" style="color: red;"></i></span>
-            <strong class="me-auto">Erro</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            {{!<img src="/images/mlike.png" class="rounded me-2" style="height: 20px;">}}
+            <span><i class="bi bi-x-circle align-self-center" style="color: red;"></i></span>
+            <strong class="me-auto ms-1">Erro</strong>
+            <small class="time">Agora</small>
+            <button type="button" class="btn-close btn-light" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
-        <div class="toast-body" style="color: rgb(255, 110, 110);">
+        <div class="toast-body">
+            Operação falhou! Mensagem:
+            <span style="color: red;">
+            </span>
         </div>
     </div>
-</div>
+</template>
+
+<script>
+    function showFailureToastMessage(err) {
+        const container = $('.toast-container');
+        const $toast = $($('#failToastTemplate').html());
+        const $span = $toast.find('.toast-body span');
+        $span.text(err.message);
+        if (err.response) $span.append(': ', err.response.data);
+        container.append($toast);
+        new bootstrap.Toast($toast[0]).show();
+        console.error(err);
+
+        const $time = $toast.find('.time');
+        const timeout = 2000;
+        let count = timeout * 0.001;
+        const interval = setInterval(() => {
+            $time.text(`Há ${count} segundos`);
+            count += timeout * 0.001;
+        }, timeout);
+
+        $toast.on('hidden.bs.toast', () => {
+            $toast.remove();
+            clearInterval(interval);
+        });
+    }
+</script>

@@ -1,0 +1,72 @@
+.avatar {
+    max-height: 250px;
+    border: solid 1px white;
+}
+
+.acds-player-container {
+    max-width: 650px;
+}
+
+.acds-container .dice {
+    max-height: 75px;
+}
+
+.table-borderless {
+    background-color: rgb(53, 58, 64);
+    color: white;
+}
+
+.table-wrapper {
+    overflow: auto;
+    display: inline-block;
+    max-height: 280px;
+}
+
+.table-wrapper .dice-list {
+    background-color: #111;
+}
+
+.sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+}
+
+.sortable li {
+    margin-top: 3rem !important;
+    margin-bottom: 3rem !important;
+    padding: 0.4em;
+    padding-left: 1.5em;
+    font-size: 1.4em;
+    height: 18px;
+    user-select: none;
+}
+
+.sortable li span {
+    position: absolute;
+    margin-left: -1.3em;
+}
+
+.dice-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dice-list>li {
+    padding: 0.5rem 1rem;
+}
+
+.dice-list>li:nth-child(odd) {
+    background: #222;
+}
+
+.class-name {
+    color: red;
+}
+
+.player-score {
+    width: 10%;
+    background-color: rgb(53, 58, 64) !important;
+}
