@@ -54,7 +54,6 @@ $("#playerClassSelect").change(async ev => {
 //Avatar
 {
     const uploadAvatarModal = new bootstrap.Modal($('#uploadAvatar')[0]);
-    const avatarImage = $('#avatar');
     const uploadAvatarContainer = $('#uploadAvatarContainer');
     const uploadAvatarButton = $('#uploadAvatarButton');
     const uploadAvatarCloseButton = $('#uploadAvatarCloseButton');
@@ -87,30 +86,30 @@ $("#playerClassSelect").change(async ev => {
         catch (err) { showFailureToastMessage(err) }
         uploadAvatarModal.hide();
     });
-
-    function findAvatar() {
-        const field = $('.attribute-status-container input:checked').first();
-        let id = field.length === 0 ? 0 : field.parents('.attribute-status-container').data('attribute-status-id');
-
-        avatarImage.removeClass('unconscious');
-        switch (id) {
-            case 1:
-                id = 0;
-                avatarImage.addClass('unconscious');
-                break;
-            case 2:
-                id = 0;
-                avatarImage.addClass('unconscious');
-                break;
-            case 3:
-                id = 0;
-                avatarImage.addClass('unconscious');
-                break;
-        }
-        avatarImage.attr('src', `/avatar/${id}?v=${Date.now()}`);
-    }
-    findAvatar();
 }
+function findAvatar() {
+    const avatarImage = $('#avatar');
+    const field = $('.attribute-status-container input:checked').first();
+    let id = field.length === 0 ? 0 : field.parents('.attribute-status-container').data('attribute-status-id');
+
+    avatarImage.removeClass('unconscious');
+    switch (id) {
+        case 1:
+            id = 0;
+            avatarImage.addClass('unconscious');
+            break;
+        case 2:
+            id = 0;
+            avatarImage.addClass('unconscious');
+            break;
+        case 3:
+            id = 0;
+            avatarImage.addClass('unconscious');
+            break;
+    }
+    avatarImage.attr('src', `/avatar/${id}?v=${Date.now()}`);
+}
+findAvatar();
 
 //Attributes
 {

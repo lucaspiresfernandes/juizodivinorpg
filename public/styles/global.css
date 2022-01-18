@@ -77,3 +77,16 @@ body {
     z-index: 1020;
 }
 
+a:link, .btn-link,
+a:visited, .btn-link:visited {
+    color: lightgray;
+    text-decoration: none;
+}
+
+a:hover, .btn-link:hover {
+    color: darkgray;
+}
+
+a:active, .btn-link:active {
+    color: gray;
+}
