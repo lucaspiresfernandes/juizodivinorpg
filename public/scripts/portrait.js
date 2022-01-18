@@ -1,3 +1,4 @@
+const playerID = $(document.body).data('player-id');
 const attributes = {
     '1': $('.health'),
     '2': $('.sanity'),
@@ -20,9 +21,9 @@ socket.on('environment change', data => {
 });
 
 socket.on('attribute changed', content => {
-    let attributeID = content.attributeID;
-    let newValue = content.value;
-    let newTotalValue = content.totalValue;
+    const attributeID = content.attributeID;
+    const newValue = content.value;
+    const newTotalValue = content.totalValue;
     let newText = `${newValue}`;
     if (attributeID !== '3') newText += `/${newTotalValue}`;
     attributes[attributeID].text(newText);
@@ -30,12 +31,14 @@ socket.on('attribute changed', content => {
 
 socket.on('attribute status changed', content => {
     const id = content.attrStatusID;
-    const state = statusState.find(state => state.id == id);
-    if (state) {
-        state.value = content.value;
-        return findAvatar();
-    }
-    updateAvatar(parseInt(id));
+
+    const stateArray = $('body').data('status-state');
+    const updatedAttrStatus = stateArray.find(attr => attr.attribute_status_id === id);
+    updatedAttrStatus.value = content.value;
+    $('body').data('attributes', stateArray);
+    for (const state of stateArray)
+        if (state.value) return showAvatar(state.attribute_status_id);
+    showAvatar();
 });
 
 socket.on('info changed', content => {
@@ -135,19 +138,29 @@ function hideDiceResult(onHiddenCallback) {
     });
 }
 
-let currentID = 0;
-function findAvatar() {
-    for (const state of statusState) {
-        const id = state.id;
-        const active = state.value;
-        if (active) return updateAvatar(id);
+let avatarStateChangeFunc;
+function showAvatar(id = 0) {
+    avatarStateChangeFunc = null;
+    switch (id) {
+        case 1:
+            id = 0;
+            avatarStateChangeFunc = () => {
+                $background.addClass('dying');
+                $avatar.addClass('unconscious');
+            };
+            break;
+        case 2:
+            id = 0;
+            avatarStateChangeFunc = () => {
+                $background.addClass('weakening');
+                $avatar.addClass('unconscious');
+            };
+            break;
+        case 3:
+            id = 0;
+            avatarStateChangeFunc = () => $avatar.addClass('unconscious');
+            break;
     }
-    updateAvatar();
-}
-findAvatar();
-
-function updateAvatar(id = 0) {
-    currentID = id;
     $avatar.fadeOut('fast', () =>
         $avatar.attr('src', `/avatar/${id}?playerID=${playerID}&v=${Date.now()}`));
 }
@@ -155,22 +168,7 @@ function updateAvatar(id = 0) {
 $avatar.on('load', () => {
     $background.removeClass('dying weakening');
     $avatar.removeClass('unconscious');
-    switch (currentID) {
-        case 1:
-            id = 0;
-            $background.addClass('dying');
-            $avatar.addClass('unconscious');
-            break;
-        case 2:
-            id = 0;
-            $background.addClass('weakening');
-            $avatar.addClass('unconscious');
-            break;
-        case 3:
-            id = 0;
-            $avatar.addClass('unconscious');
-            break;
-    }
+    if (avatarStateChangeFunc) avatarStateChangeFunc();
     $avatar.fadeIn('fast');
 });
 
@@ -189,3 +187,8 @@ socket.on('lineage node change', content => {
     const lineageID = img.data('lineage');
     img.attr('src', `/assets/lineages/frameless/${lineageID}/${index}.png`);
 });
+
+{
+    const array = $('body').data('status-state');
+    showAvatar(array.find(attr => attr.value)?.attribute_status_id || 0);
+}

@@ -338,6 +338,10 @@ router.get('/admin/1', async (req, res) => {
                 con('player').select('player.lineage_id', 'player.score', 'class.name as class_name')
                     .leftJoin('class', 'class.class_id', 'player.class_id')
                     .where('player.player_id', playerID).first(),
+
+                //Player Latest Status
+                con('player_attribute_status').select('attribute_status_id', 'value')
+                    .where('player_id', playerID)
             ]);
 
             return {
@@ -350,6 +354,7 @@ router.get('/admin/1', async (req, res) => {
                 items: results[5],
                 lineage: results[6],
                 player: results[7],
+                attributes: JSON.stringify(results[8])
             };
         }));
 
@@ -497,6 +502,7 @@ router.post('/player/attributestatus', jsonParser, async (req, res) => {
             .andWhere('attribute_status_id', attrStatusID);
 
         io.to(`portrait${playerID}`).emit('attribute status changed', { attrStatusID, value });
+        io.to('admin').emit('attribute status changed', { playerID, attrStatusID, value });
         res.send();
     }
     catch (err) {
@@ -946,7 +952,7 @@ router.post('/item', jsonParser, async (req, res) => {
     if (!req.session.isAdmin || !itemID) return res.status(401).send();
 
     try {
-    
+
         await con('item').update({
             name: req.body.name,
             description: req.body.description,

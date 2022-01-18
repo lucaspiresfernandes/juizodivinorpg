@@ -68,3 +68,8 @@ body {
 .table-dark {
     --bs-table-bg: black;
 }
+
+.unconscious {
+    filter: brightness(10%);
+}
+

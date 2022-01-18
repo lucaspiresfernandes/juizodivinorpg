@@ -148,8 +148,8 @@
                             <div class="col form-check attribute-status-container"
                                 data-attribute-status-id="{{attribute_status_id}}">
                                 <input class="form-check-input" type="checkbox" {{#if checked}}checked{{/if}}
-                                    id="status{{@index}}">
-                                <label class="form-check-label" for="status{{@index}}">{{name}}</label>
+                                    id="status{{@../index}}{{@index}}">
+                                <label class="form-check-label" for="status{{@../index}}{{@index}}">{{name}}</label>
                             </div>
                             {{/with}}
                             {{/each}}

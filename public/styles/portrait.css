@@ -133,15 +133,11 @@ img {
 }
 
 #background.weakening {
-    filter: saturate(100000%) hue-rotate(243deg) brightness(25%);
+    filter: saturate(100000%) hue-rotate(243deg) brightness(50%);
 }
 
 #background.dying {
-    filter: saturate(100000%) hue-rotate(172deg) brightness(25%);
-}
-
-#avatar.unconscious {
-    filter: brightness(10%);
+    filter: saturate(100000%) hue-rotate(172deg) brightness(50%);
 }
 
 #lineage {

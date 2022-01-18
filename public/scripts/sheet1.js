@@ -89,7 +89,7 @@ $("#playerClassSelect").change(async ev => {
 
     function findAvatar() {
         const field = $('.attribute-status-container input:checked').first();
-        const id = field.length === 0 ? 0 : field.parents('.attribute-status-container').data('attribute-status-id');
+        let id = field.length === 0 ? 0 : field.parents('.attribute-status-container').data('attribute-status-id');
 
         avatarImage.removeClass('unconscious');
         switch (id) {

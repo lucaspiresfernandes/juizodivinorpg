@@ -47,6 +47,19 @@ socket.on('attribute changed', content => {
     .player-attribute[data-attribute-id="${attrID}"]`).text(`${newValue}/${newTotalValue}`);
 });
 
+socket.on('attribute status changed', content => {
+    const container = $(`.acds-player-container[data-player-id="${content.playerID}"]`);
+    const array = container.data('attributes');
+
+    const updatedAttrStatus = array.find(attr => attr.attribute_status_id === content.attrStatusID);
+    updatedAttrStatus.value = content.value;
+    container.data('attributes', array);
+
+    for (const attr of array)
+        if (attr.value) return showAvatar(container, attr.attribute_status_id);
+    showAvatar(container);
+});
+
 socket.on('spec changed', content => {
     const playerID = content.playerID;
     const specID = content.specID;
@@ -169,4 +182,37 @@ socket.on('score change', content => {
 
     const container = $(`.acds-player-container[data-player-id="${playerID}"`);
     container.find('.player-score').val(newScore);
-})
+});
+
+function showAvatar(container, attrStatusID = 0) {
+    const avatarImage = container.find('.avatar');
+    const playerID = container.data('player-id');
+    avatarImage.removeClass('dying weakening unconscious');
+    switch (attrStatusID) {
+        case 1:
+            //Morrendo
+            attrStatusID = 0;
+            avatarImage.addClass('dying');
+            break;
+        case 2:
+            //Enfraquecendo
+            attrStatusID = 0;
+            avatarImage.addClass('weakening');
+            break;
+        case 3:
+            //Inconsciente
+            attrStatusID = 0;
+            avatarImage.addClass('unconscious');
+            break;
+    }
+    avatarImage.attr('src', `/avatar/${attrStatusID}?playerID=${playerID}&v=${Date.now()}`);
+}
+
+{
+    const containers = $('.acds-player-container');
+    for (let i = 0; i < containers.length; i++) {
+        const container = containers.eq(i);
+        const attr = container.data('attributes').find(attr => attr.value === 1);
+        showAvatar(container, attr?.attribute_status_id || 0);
+    }
+}

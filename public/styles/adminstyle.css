@@ -1,6 +1,10 @@
+.avatar-container {
+    border: solid 1px white;
+    border-radius: 50%;
+}
+
 .avatar {
     max-height: 250px;
-    border: solid 1px white;
 }
 
 .acds-container .dice {
@@ -10,10 +14,6 @@
 .table-borderless {
     background-color: rgb(53, 58, 64);
     color: white;
-}
-
-.table-dark {
-    --bs-table-bg: rgb(63, 68, 74);
 }
 
 .table-wrapper {

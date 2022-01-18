@@ -4,6 +4,16 @@ const con = require('../utils/connection');
 const jsonParser = express.json();
 const io = require('../server').io;
 
+router.get('/', async (req, res) => {
+    const players = await con('player_info').select('player_info.value',
+        'player_info.player_id')
+        .where('player_info.info_id', 1);
+    for (const player of players) {
+        if (!player.value) player.value = 'Desconhecido';
+    }
+    res.render('portrait_selection', { players });
+});
+
 router.get('/:id', async (req, res) => {
     const playerID = req.params.id;
 
@@ -25,23 +35,13 @@ router.get('/:id', async (req, res) => {
         con('config').select('value').where('key', 'portrait_environment').first()
     ]);
 
-    if (!results[0]) return res.status(404).send();
-
-    let name = results[0].name.toUpperCase();
-    if (!name) name = 'DESCONHECIDO';
-
-    const attribute_status = results[2];
-    for (const attribute of attribute_status) {
-        attribute.value = attribute.value === 0 ? false : true;
-    }
-
     res.render('portrait', {
         playerID,
-        name,
+        name: results[0].name.toUpperCase() || 'DESCONHECIDO',
         attributes: results[1],
-        attribute_status,
+        statusState: JSON.stringify(results[2]),
         player: results[3],
-        environmentState: results[4]
+        onCombat: results[4].value === 'combat'
     });
 });
 
@@ -57,7 +57,7 @@ router.post('/environment', jsonParser, async (req, res) => {
             portraitRooms = portraitRooms.to(`portrait${id}`);
         }
         await con('config').update('value', environment)
-        .where('key', 'portrait_environment');
+            .where('key', 'portrait_environment');
 
         portraitRooms.emit('environment change', { mode: environment });
         res.send();

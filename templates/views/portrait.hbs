@@ -3,29 +3,21 @@
 
 <head>
     {{> head title="Portrait"}}
-    <script>
-        socket.emit('room:join', 'portrait' + '{{playerID}}');
-        const playerID = {{playerID}};
-
-        const statusState = [
-            {{#each attribute_status}}
-            { id: {{attribute_status_id}}, value: {{value}} },
-            {{/each}}
-        ];
-    </script>
+    <script>socket.emit('room:join', 'portrait' + '{{playerID}}');</script>
     <link rel="stylesheet" href="/styles/portrait.css">
     <script src="/scripts/portrait.js" defer></script>
 </head>
 
-<body style="background-color: transparent !important;">
+<body style="background-color: transparent !important;" data-status-state="{{statusState}}"
+    data-player-id="{{playerID}}">
     <div class="container">
         <div class="main shadow" id="mainContainer">
-        <img id="background" src="/assets/avatar_bg.png" class="bottom">
+            <img id="background" src="/assets/avatar_bg.png" class="bottom">
 
             <img src="/assets/frame_upside.png" class="bottom">
 
-            <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="bottom" data-lineage="{{player.lineage_id}}"
-                {{#unless player.lineage_id}}hidden{{/unless}}>
+            <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="bottom"
+                data-lineage="{{player.lineage_id}}" {{#unless player.lineage_id}}hidden{{/unless}}>
 
             <img id="avatar" class="middle" style="display: none;">
 
@@ -38,10 +30,10 @@
     </div>
 
     <div class="container switchable">
-        <div id="idleText" class="text" style="display: none;">
+        <div id="idleText" class="text" {{#if onCombat}}style="display: none;" {{/if}}>
             <div class="name top">{{name}}</div>
         </div>
-        <div id="combatText" class="text">
+        <div id="combatText" class="text" {{#unless onCombat}}style="display: none;" {{/unless}}>
             <div class="health top">{{attributes.0.value}}/{{attributes.0.total_value}}</div>
             <div class="sanity top">{{attributes.1.value}}/{{attributes.1.total_value}}</div>
         </div>

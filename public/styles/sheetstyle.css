@@ -41,10 +41,6 @@
     text-shadow: 0 0 10px #DD0F0F, 0 0 30px #DD0F0F, 0 0 50px #DD0F0F !important;
 }
 
-.unconscious {
-    filter: brightness(10%);
-}
-
 .characteristic-container img {
     max-height: 50px;
 }

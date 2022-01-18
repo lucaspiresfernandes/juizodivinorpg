@@ -6,8 +6,7 @@ const axios = require('axios');
 const path = require('path');
 
 async function sendAvatar(playerID, attrStatusID, res) {
-    const link = (await con.select('link')
-        .from('player_avatar')
+    const link = (await con('player_avatar').select('link')
         .where('attribute_status_id', attrStatusID)
         .andWhere('player_id', playerID).first())?.link;
 
@@ -17,7 +16,7 @@ async function sendAvatar(playerID, attrStatusID, res) {
     res.end(response.data, 'binary');
 }
 
-router.get('/:attrStatusID', (req, res) => {
+router.get('/:attrStatusID', async (req, res) => {
     const playerID = req.query.playerID || req.session.playerID;
     let attrStatusID = req.params.attrStatusID;
     if (attrStatusID < 1 || isNaN(attrStatusID)) attrStatusID = null;
@@ -26,21 +25,6 @@ router.get('/:attrStatusID', (req, res) => {
 
     try {
         sendAvatar(playerID, attrStatusID, res);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send();
-    }
-});
-
-router.get('/admin/:playerID', (req, res) => {
-    const playerID = req.params.playerID;
-    const isAdmin = req.session.isAdmin;
-
-    if (!playerID || !isAdmin) return res.status(401).send();
-
-    try {
-        sendAvatar(playerID, null, res);
     }
     catch (err) {
         console.error(err);
