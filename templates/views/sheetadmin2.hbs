@@ -15,8 +15,8 @@
                     <button type="submit" class="btn btn-link h4">Sair</button>
                 </form>
             </div>
-            <div class="col mt-2 text-end">
-                <a href="/sheet/admin/1" style="font-size: 21px;">Acessar 1° Página</a>
+            <div class="col mt-2 text-end align-self-center">
+                <a href="/sheet/admin/1" class="h4">Acessar 1° Página</a>
             </div>
         </div>
         <div class="row h1 text-center">
@@ -25,17 +25,16 @@
         <div class="row my-3 acds-container">
             <div class="col">
                 <div class="row mt-3 text-center">
-                    <div class="col offset-1 h2 text-center">Equipamentos</div>
-                    <div class="col-1 text-end">
-                        <input type="button" value="+" class="acds-element" data-bs-toggle="modal"
-                            data-bs-target="#createEquipment"
-                            style="border: solid 1px; position: relative; right: 20px;">
+                    <div class="col offset-2 h2 text-center">Equipamentos</div>
+                    <div class="col-2">
+                        <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
+                            data-bs-target="#createEquipment">
                     </div>
                 </div>
                 <hr>
                 <div class="row mx-1">
-                    <div class="col table-responsive table-wrapper" style="height: 500px;">
-                        <table class="table table-dark" style="--bs-table-bg: black">
+                    <div class="col">
+                        <table class="table table-dark">
                             <thead>
                                 <th scope="col"></th>
                                 <th scope="col">Nome</th>
@@ -49,62 +48,7 @@
                             </thead>
                             <tbody id="equipmentListTable">
                                 {{#each equipmentsList}}
-                                {{#with this}}
-                                <tr id="equipmentRow{{equipment_id}}">
-                                    <td>
-                                        <button class="acds-element"
-                                            onclick="equipmentDeleteClick(event, {{equipment_id}})"><i
-                                                class="bi bi-trash"></i></button>
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white;" class="acds-bottom-text"
-                                            type="text" value="{{name}}"
-                                            onchange="equipmentNameChange(event, {{equipment_id}})">
-                                    </td>
-                                    <td>
-                                        <select style="background-color: black; color: white;"
-                                            onchange="equipmentSkillChange(event, {{equipment_id}})">
-                                            {{#each ../combatSpecializations}}
-                                            {{#with this}}
-                                            <option value="{{skill_id}}" {{#ifEquals skill_id ../skill_id}} selected
-                                                {{/ifEquals}}>
-                                                {{name}}</option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white; max-width: 200px;"
-                                            class="acds-bottom-text" type="text" value="{{type}}"
-                                            onchange="equipmentTypeChange(event, {{equipment_id}})">
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white; max-width: 150px;"
-                                            class="acds-bottom-text" type="text" value="{{damage}}"
-                                            onchange="equipmentDamageChange(event, {{equipment_id}})">
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white; max-width: 120px;"
-                                            class="acds-bottom-text" type="text" value="{{range}}"
-                                            onchange="equipmentRangeChange(event, {{equipment_id}})">
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white; max-width: 40px;"
-                                            class="acds-bottom-text" type="text" value="{{attacks}}"
-                                            onchange="equipmentAttacksChange(event, {{equipment_id}})">
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white; max-width: 40px;"
-                                            class="acds-bottom-text" type="text" value="{{ammo}}"
-                                            onchange="equipmentAmmoChange(event, {{equipment_id}})">
-                                    </td>
-                                    <td>
-                                        <input class="form-check-input" type="checkbox"
-                                            onchange="equipmentVisibleChange(event, {{equipment_id}})" {{#if
-                                            visible}}checked{{/if}}>
-                                    </td>
-                                </tr>
-                                {{/with}}
+                                {{> admin2_equipment_row this combatSpecializations=../combatSpecializations}}
                                 {{/each}}
                             </tbody>
                         </table>
@@ -115,16 +59,16 @@
         <div class="row my-3 acds-container">
             <div class="col">
                 <div class="row mt-3 text-center">
-                    <div class="col offset-1 h2 text-center">Perícias</div>
-                    <div class="col-1 text-end">
-                        <input type="button" value="+" class="acds-element" data-bs-toggle="modal"
-                            data-bs-target="#createSkill" style="border: solid 1px; position: relative; right: 20px;">
+                    <div class="col offset-2 h2 text-center">Perícias</div>
+                    <div class="col-2">
+                        <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
+                            data-bs-target="#createEquipment">
                     </div>
                 </div>
                 <hr>
                 <div class="row mx-1">
-                    <div class="col table-responsive table-wrapper" style="height: 500px;">
-                        <table class="table table-dark" style="--bs-table-bg: black">
+                    <div class="col">
+                        <table class="table table-dark">
                             <thead>
                                 <th scope="col"></th>
                                 <th scope="col">Nome</th>
@@ -134,50 +78,8 @@
                             </thead>
                             <tbody id="skillListTable">
                                 {{#each skillsList}}
-                                {{#with this}}
-                                <tr id="skillRow{{skill_id}}">
-                                    <td>
-                                        <button class="acds-element" onclick="skillDeleteClick(event, {{skill_id}})"><i
-                                                class="bi bi-trash"></i></button>
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white;" class="acds-bottom-text"
-                                            type="text" value="{{name}}"
-                                            onchange="skillNameChange(event, {{skill_id}})">
-                                    </td>
-                                    <td>
-                                        <select style="background-color: black; color: white;"
-                                            onchange="skillSpecializationChange(event, {{skill_id}})">
-                                            <option value="0" {{#unless specialization_id}}selected{{/unless}}>Nenhuma
-                                            </option>
-                                            {{#each ../specializations}}
-                                            {{#with this}}
-                                            <option value="{{specialization_id}}" {{#ifEquals specialization_id
-                                                ../specialization_id}} selected {{/ifEquals}}>
-                                                {{name}}</option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select style="background-color: black; color: white;"
-                                            onchange="skillCharacteristicChange(event, {{skill_id}})">
-                                            {{#each ../characteristics}}
-                                            {{#with this}}
-                                            <option value="{{characteristic_id}}" {{#ifEquals characteristic_id
-                                                ../characteristic_id}} selected {{/ifEquals}}>
-                                                {{name}}</option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input class="form-check-input" type="checkbox"
-                                            onchange="skillMandatoryChange(event, {{skill_id}})" {{#if
-                                            mandatory}}checked{{/if}}>
-                                    </td>
-                                </tr>
-                                {{/with}}
+                                {{> admin2_skill_row this specializations=../specializations
+                                characteristics=../characteristics}}
                                 {{/each}}
                             </tbody>
                         </table>
@@ -188,16 +90,16 @@
         <div class="row my-3 acds-container">
             <div class="col">
                 <div class="row mt-3 text-center">
-                    <div class="col offset-1 h2 text-center">Itens</div>
-                    <div class="col-1 text-end">
-                        <input type="button" value="+" class="acds-element" data-bs-toggle="modal"
-                            data-bs-target="#createItem" style="border: solid 1px; position: relative; right: 20px;">
+                    <div class="col offset-2 h2 text-center">Itens</div>
+                    <div class="col-2">
+                        <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
+                            data-bs-target="#createEquipment">
                     </div>
                 </div>
                 <hr>
                 <div class="row mx-1">
-                    <div class="col table-responsive table-wrapper" style="height: 500px;">
-                        <table class="table table-dark" style="--bs-table-bg: black">
+                    <div class="col">
+                        <table class="table table-dark">
                             <thead>
                                 <th scope="col"></th>
                                 <th scope="col">Nome</th>
@@ -206,28 +108,7 @@
                             </thead>
                             <tbody id="itemListTable">
                                 {{#each itemsList}}
-                                {{#with this}}
-                                <tr id="itemRow{{item_id}}">
-                                    <td>
-                                        <button class="acds-element" onclick="itemDeleteClick(event, {{item_id}})"><i
-                                                class="bi bi-trash"></i></button>
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white;" class="acds-bottom-text"
-                                            type="text" value="{{name}}" onchange="itemNameChange(event, {{item_id}})">
-                                    </td>
-                                    <td>
-                                        <input style="background-color: black; color: white;" class="acds-bottom-text"
-                                            type="text" value="{{description}}"
-                                            onchange="itemDescriptionChange(event, {{item_id}})">
-                                    </td>
-                                    <td>
-                                        <input class="form-check-input" type="checkbox"
-                                            onchange="itemVisibleChange(event, {{item_id}})" {{#if
-                                            visible}}checked{{/if}}>
-                                    </td>
-                                </tr>
-                                {{/with}}
+                                {{>admin2_item_row this}}
                                 {{/each}}
                             </tbody>
                         </table>
@@ -241,186 +122,194 @@
                     <button type="submit" class="btn btn-link h4">Sair</button>
                 </form>
             </div>
-            <div class="col mb-2 text-end">
-                <a href="/sheet/admin/1" style="font-size: 21px;">Acessar 1° Página</a>
+            <div class="col mb-2 text-end align-self-center">
+                <a href="/sheet/admin/1" class="h4">Acessar 1° Página</a>
             </div>
         </div>
     </div>
 
-    <div>
-        {{!Modals}}
-        {{> failuretoast}}
-        <div class="modal fade" id="createEquipment" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form autocomplete="off"
-                        onsubmit="event.preventDefault(); createEquipmentClick(event); this.reset();">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Criar Equipamento</h5>
-                        </div>
-                        <div class="modal-body text-center">
-                            {{> loading}}
-                            <div id="createEquipmentContainer" class="container-fluid">
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <input id="createEquipmentName" type="text" placeholder="Nome" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <input id="createEquipmentType" type="text" placeholder="Tipo" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <input id="createEquipmentDamage" type="text" placeholder="Dano" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <input id="createEquipmentRange" type="text" placeholder="Alcance" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <input id="createEquipmentAttacks" type="text" placeholder="Ataques" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <input id="createEquipmentAmmo" type="text" placeholder="Munição" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col my-2">
-                                        <label for="combatSpecializationList">Perícia</label>
-                                        <select id="combatSpecializationList" class="form-select acds-element my-2">
-                                            {{#each combatSpecializations}}
-                                            {{#with this}}
-                                            <option value="{{skill_id}}">{{name}}</option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
+    {{!Templates}}
+    <template id="equipmentRowTemplate">
+        {{> admin2_equipment_row}}
+    </template>
+    <template id="skillRowTemplate">
+        {{> admin2_skill_row}}
+    </template>
+    <template id="itemRowTemplate">
+        {{> admin2_item_row}}
+    </template>
+
+    {{> failuretoast}}
+
+    {{!Modals}}
+    <div class="modal fade" id="createEquipment" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Criar Equipamento</h5>
+                    </div>
+                    <div class="modal-body text-center" id="createEquipmentContainer">
+                        {{> loading}}
+                        <div class="container-fluid">
                             <div class="row">
-                                <div class="col align-self-center">
-                                    <button id="createEquipmentButton" type="submit"
-                                        class="btn btn-primary">Criar</button>
+                                <div class="col my-2">
+                                    <input id="createEquipmentName" type="text" placeholder="Nome" required>
                                 </div>
-                                <div class="col align-self-center">
-                                    <button id="createEquipmentCloseButton" type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                            <div class="row">
+                                <div class="col my-2">
+                                    <input id="createEquipmentType" type="text" placeholder="Tipo" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col my-2">
+                                    <input id="createEquipmentDamage" type="text" placeholder="Dano" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col my-2">
+                                    <input id="createEquipmentRange" type="text" placeholder="Alcance" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col my-2">
+                                    <input id="createEquipmentAttacks" type="text" placeholder="Ataques" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col my-2">
+                                    <input id="createEquipmentAmmo" type="text" placeholder="Munição" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col my-2">
+                                    <label for="combatSpecializationList">Perícia</label>
+                                    <select id="combatSpecializationList" class="form-select acds-element my-2">
+                                        {{#each combatSpecializations}}
+                                        {{#with this}}
+                                        <option value="{{skill_id}}">{{name}}</option>
+                                        {{/with}}
+                                        {{/each}}
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col align-self-center">
+                                <button id="createEquipmentButton" type="submit" class="btn btn-primary">Criar</button>
+                            </div>
+                            <div class="col align-self-center">
+                                <button id="createEquipmentCloseButton" type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div class="modal fade" id="createSkill" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form autocomplete="off" onsubmit="event.preventDefault(); createSkillClick(event); this.reset();">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Criar Perícia</h5>
-                        </div>
-                        <div class="modal-body text-center">
-                            {{> loading}}
-                            <div id="createSkillContainer" class="container-fluid">
-                                <div class="row">
-                                    <div class="col">
-                                        <input id="createSkillName" type="text" placeholder="Nome da Perícia"
-                                            class="my-2" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <label for="createSkillSpecialization">Especialização</label>
-                                        <select id="createSkillSpecialization" class="form-select acds-element my-2">
-                                            <option value="0" selected>Nenhuma</option>
-                                            {{#each specializations}}
-                                            {{#with this}}
-                                            <option id="createSkillSpecializationOption{{specialization_id}}"
-                                                value="{{specialization_id}}">
-                                                {{name}}</option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <label for="createSkillCharacteristic">Atributo</label>
-                                        <select id="createSkillCharacteristic" class="form-select acds-element my-2">
-                                            {{#each characteristics}}
-                                            {{#with this}}
-                                            <option id="createSkillCharacteristicOption{{characteristic_id}}"
-                                                value="{{characteristic_id}}">
-                                                {{name}}</option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
+    <div class="modal fade" id="createSkill" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Criar Perícia</h5>
+                    </div>
+                    <div class="modal-body text-center" id="createSkillContainer">
+                        {{> loading}}
+                        <div class="container-fluid">
                             <div class="row">
-                                <div class="col align-self-center">
-                                    <button id="createSkillButton" type="submit" class="btn btn-primary">Criar</button>
+                                <div class="col">
+                                    <input id="createSkillName" type="text" placeholder="Nome da Perícia" class="my-2"
+                                        required>
                                 </div>
-                                <div class="col align-self-center">
-                                    <button id="createSkillCloseButton" type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="createSkillSpecialization">Especialização</label>
+                                    <select id="createSkillSpecialization" class="form-select acds-element my-2">
+                                        <option value="0" selected>Nenhuma</option>
+                                        {{#each specializations}}
+                                        {{#with this}}
+                                        <option id="createSkillSpecializationOption{{specialization_id}}"
+                                            value="{{specialization_id}}">
+                                            {{name}}</option>
+                                        {{/with}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="createSkillCharacteristic">Atributo</label>
+                                    <select id="createSkillCharacteristic" class="form-select acds-element my-2">
+                                        {{#each characteristics}}
+                                        {{#with this}}
+                                        <option id="createSkillCharacteristicOption{{characteristic_id}}"
+                                            value="{{characteristic_id}}">
+                                            {{name}}</option>
+                                        {{/with}}
+                                        {{/each}}
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col align-self-center">
+                                <button id="createSkillButton" type="submit" class="btn btn-primary">Criar</button>
+                            </div>
+                            <div class="col align-self-center">
+                                <button id="createSkillCloseButton" type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div class="modal fade" id="createItem" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form autocomplete="off" onsubmit="event.preventDefault(); createItemClick(event); this.reset();">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Criar Item</h5>
-                        </div>
-                        <div class="modal-body text-center">
-                            {{> loading}}
-                            <div id="createItemContainer" class="container-fluid">
-                                <div class="row">
-                                    <div class="col">
-                                        <input id="createItemName" type="text" placeholder="Nome" class="my-2" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <textarea class="form-control" id="createItemDescription"
-                                            placeholder="Descrição Inicial" rows="3" required></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
+    <div class="modal fade" id="createItem" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Criar Item</h5>
+                    </div>
+                    <div class="modal-body text-center" id="createItemContainer">
+                        {{> loading}}
+                        <div class="container-fluid">
                             <div class="row">
-                                <div class="col align-self-center">
-                                    <button type="submit" id="createItemButton" class="btn btn-primary">Criar</button>
+                                <div class="col">
+                                    <input id="createItemName" type="text" placeholder="Nome" class="my-2" required>
                                 </div>
-                                <div class="col align-self-center">
-                                    <button id="createItemCloseButton" type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <textarea class="form-control" id="createItemDescription"
+                                        placeholder="Descrição Inicial" rows="3" required></textarea>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col align-self-center">
+                                <button type="submit" id="createItemButton" class="btn btn-primary">Criar</button>
+                            </div>
+                            <div class="col align-self-center">
+                                <button id="createItemCloseButton" type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

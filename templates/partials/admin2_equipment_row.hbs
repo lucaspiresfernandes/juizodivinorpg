@@ -1,0 +1,43 @@
+<tr data-equipment-id="{{equipment_id}}">
+    <td>
+        <button class="trash acds-element" onclick="equipmentDeleteClick(event)"><i class="bi bi-trash"></i></button>
+    </td>
+    <td>
+        <input class="name acds-element acds-bottom-text" type="text" value="{{name}}"
+            onchange="equipmentChange(event);" data-key="name">
+    </td>
+    <td>
+        <select class="specialization acds-element" onchange="equipmentChange(event);" data-key="skillID">
+            {{#each combatSpecializations}}
+            {{#with this}}
+            <option value="{{skill_id}}" {{#ifEquals skill_id ../skill_id}} selected {{/ifEquals}}>
+                {{name}}</option>
+            {{/with}}
+            {{/each}}
+        </select>
+    </td>
+    <td>
+        <input class="type acds-element acds-bottom-text" type="text" value="{{type}}"
+            onchange="equipmentChange(event);" data-key="type">
+    </td>
+    <td>
+        <input class="damage acds-element acds-bottom-text" type="text" value="{{damage}}"
+            onchange="equipmentChange(event);" data-key="damage">
+    </td>
+    <td>
+        <input class="range acds-element acds-bottom-text" type="text" value="{{range}}"
+            onchange="equipmentChange(event);" data-key="range">
+    </td>
+    <td>
+        <input class="attacks acds-element acds-bottom-text" type="text" value="{{attacks}}"
+            onchange="equipmentChange(event);" data-key="attacks">
+    </td>
+    <td>
+        <input class="ammo acds-element acds-bottom-text" type="text" value="{{ammo}}"
+            onchange="equipmentChange(event);" data-key="ammo">
+    </td>
+    <td>
+        <input class="visible form-check-input" type="checkbox" onchange="equipmentVisibleChange(event)" {{#if
+            visible}}checked{{/if}}>
+    </td>
+</tr>

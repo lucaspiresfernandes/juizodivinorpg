@@ -56,7 +56,7 @@ router.post('/', jsonParser, async (req, res) => {
                 const roll = result.data.reduce((a, b) => a + b, 0);
                 results[i] = { roll };
                 const num = dices[i].num;
-                if (num) {
+                if (num !== undefined) {
                     const resolver = resolveSuccessType[resolverKey];
                     if (resolver) results[i].successType = resolver(num, roll);
                 }

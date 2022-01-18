@@ -22,6 +22,7 @@ router.get('/:id', async (req, res) => {
         con('player').select('player.lineage_id').max('player_lineage_node.index as index')
             .join('player_lineage_node', 'player_lineage_node.player_id', 'player.player_id')
             .where('player.player_id', playerID).first(),
+        con('config').select('value').where('key', 'portrait_environment').first()
     ]);
 
     if (!results[0]) return res.status(404).send();
@@ -39,23 +40,32 @@ router.get('/:id', async (req, res) => {
         name,
         attributes: results[1],
         attribute_status,
-        player: results[3]
+        player: results[3],
+        environmentState: results[4]
     });
 });
 
 router.post('/environment', jsonParser, async (req, res) => {
-    const environment = req.body.combat === 'true' ? 'combat' : 'idle';
+    const environment = req.body.combat ? 'combat' : 'idle';
     let portraitRooms = io;
 
-    const players = await con('player').select('player_id');
+    try {
+        const players = await con('player').select('player_id');
 
-    for (let i = 0; i < players.length; i++) {
-        const id = players[i].player_id;
-        portraitRooms = portraitRooms.to(`portrait${id}`);
+        for (let i = 0; i < players.length; i++) {
+            const id = players[i].player_id;
+            portraitRooms = portraitRooms.to(`portrait${id}`);
+        }
+        await con('config').update('value', environment)
+        .where('key', 'portrait_environment');
+
+        portraitRooms.emit('environment change', { mode: environment });
+        res.send();
     }
-
-    portraitRooms.emit('environment change', { mode: environment });
-    res.send();
+    catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
 });
 
 module.exports = router;

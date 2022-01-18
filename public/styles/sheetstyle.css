@@ -61,10 +61,6 @@
     max-width: 3rem;
 }
 
-.table-dark {
-    --bs-table-bg: black;
-}
-
 .avatar-field {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }

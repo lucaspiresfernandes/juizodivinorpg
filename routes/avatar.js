@@ -20,12 +20,9 @@ async function sendAvatar(playerID, attrStatusID, res) {
 router.get('/:attrStatusID', (req, res) => {
     const playerID = req.query.playerID || req.session.playerID;
     let attrStatusID = req.params.attrStatusID;
+    if (attrStatusID < 1 || isNaN(attrStatusID)) attrStatusID = null;
 
-    if (attrStatusID < 1 || isNaN(attrStatusID))
-        attrStatusID = null;
-
-    if (!playerID)
-        return res.status(401).send();
+    if (!playerID) return res.status(401).send();
 
     try {
         sendAvatar(playerID, attrStatusID, res);
@@ -40,8 +37,7 @@ router.get('/admin/:playerID', (req, res) => {
     const playerID = req.params.playerID;
     const isAdmin = req.session.isAdmin;
 
-    if (!playerID || !isAdmin)
-        return res.status(401).send();
+    if (!playerID || !isAdmin) return res.status(401).send();
 
     try {
         sendAvatar(playerID, null, res);

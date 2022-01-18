@@ -23,7 +23,7 @@
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
         <div class="row my-3">
-            <div class="col acds-container px-3 d-flex flex-column h-100">
+            <div class="col acds-container d-flex flex-column h-100">
                 <div class="row mt-2 text-center">
                     <div class="col h2">Detalhes Pessoais</div>
                     <hr>
@@ -180,7 +180,7 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3 acds-container px-3">
+        <div class="row my-3 acds-container">
             <div class="col px-4">
                 <div class="row mt-2 text-center">
                     <div class="col h2">Atributos</div>
@@ -212,7 +212,7 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3 acds-container px-3">
+        <div class="row my-3 acds-container">
             <div class="col px-4">
                 <div class="row mt-2">
                     <div class="col offset-2 h2 text-center">Combate</div>
@@ -250,7 +250,7 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3 acds-container px-3">
+        <div class="row my-3 acds-container">
             <div class="col px-4">
                 <div class="row mt-2">
                     <div class="col offset-2 h2 text-center">Perícias</div>
@@ -273,7 +273,7 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3 acds-container px-3">
+        <div class="row my-3 acds-container">
             <div class="col px-4">
                 <div class="row mt-2">
                     <div class="col offset-2 h2 text-center">Inventário</div>
@@ -304,27 +304,54 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3 acds-container px-3">
+        <div class="row my-3">
+            <div class="col acds-container">
+                <div class="row mt-2 text-center">
+                    <div class="col h2">Detalhes Pessoais</div>
+                    <hr>
+                </div>
+                {{#each extraInfo}}
+                {{#with this}}
+                <div class="row my-4 extra-info-container" data-extra-info-id="{{extra_info_id}}">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col h4">
+                                <label for="extraInfo{{@index}}">{{name}}</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <textarea class="form-control acds-element" id="extraInfo{{@index}}"
+                                    rows="10">{{value}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/with}}
+                {{/each}}
+            </div>
+        </div>
+        <div class="row my-3 acds-container">
             <div class="col">
                 <div class="row mt-3">
-                    <div class="col h2 text-center">Anotações</div>
+                    <div class="col h2 text-center"><label for="playerAnotations">Anotações</label></div>
                     <hr>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <textarea id="playerAnotations" class="form-control acds-element"
-                            onchange="playerAnotationsChange(event)" rows="10">{{playerNotes.value}}</textarea>
+                            rows="10">{{playerNotes.value}}</textarea>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col my-2 text-start">
+        <div class="row my-2">
+            <div class="col text-start">
                 <form action="/sheet/leave">
                     <button type="submit" class="btn btn-link h4">Sair</button>
                 </form>
             </div>
-            <div class="col mb-2 text-end align-self-center">
+            <div class="col text-end align-self-center">
                 <a href="/sheet/2" class="h4">Acessar 2° Página</a>
             </div>
         </div>

@@ -1,0 +1,37 @@
+<tr data-skill-id="{{skill_id}}">
+    <td>
+        <button class="trash acds-element" onclick="skillDeleteClick(event)"><i class="bi bi-trash"></i></button>
+    </td>
+    <td>
+        <input class="name acds-element acds-bottom-text" type="text" value="{{name}}" onchange="skillChange(event)"
+            data-key="name">
+    </td>
+    <td>
+        <select onchange="skillChange(event)" class="specialization acds-element" data-key="specialization_id">
+            <option value="0" {{#unless specialization_id}}selected{{/unless}}>Nenhuma
+            </option>
+            {{#each specializations}}
+            {{#with this}}
+            <option value="{{specialization_id}}" {{#ifEquals specialization_id ../specialization_id}} selected
+                {{/ifEquals}}>
+                {{name}}</option>
+            {{/with}}
+            {{/each}}
+        </select>
+    </td>
+    <td>
+        <select onchange="skillChange(event)" class="characteristic acds-element" data-key="characteristic_id">
+            {{#each characteristics}}
+            {{#with this}}
+            <option value="{{characteristic_id}}" {{#ifEquals characteristic_id ../characteristic_id}} selected
+                {{/ifEquals}}>
+                {{name}}</option>
+            {{/with}}
+            {{/each}}
+        </select>
+    </td>
+    <td>
+        <input class="mandatory form-check-input" type="checkbox" onchange="skillMandatoryChange(event)" {{#if
+            mandatory}}checked{{/if}}>
+    </td>
+</tr>

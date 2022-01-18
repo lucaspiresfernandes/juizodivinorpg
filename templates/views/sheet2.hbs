@@ -17,7 +17,7 @@
                 </form>
             </div>
             <div class="col text-end align-self-center">
-                <a href="/sheet/1" style="font-size: 21px;">Acessar 1° Página</a>
+                <a href="/sheet/1" class="h4">Acessar 1° Página</a>
             </div>
         </div>
         <div class="row h1 text-center">
@@ -67,33 +67,6 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3">
-            <div class="col acds-container">
-                <div class="row mt-2 text-center">
-                    <div class="col h2">Detalhes Pessoais</div>
-                    <hr>
-                </div>
-                {{#each extraInfo}}
-                {{#with this}}
-                <div class="row my-4 extra-info-container">
-                    <div class="col">
-                        <div class="row">
-                            <div class="col h4">
-                                <label for="info{{@index}}">{{name}}</label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <textarea class="form-control acds-element" id="info{{@index}}"
-                                    rows="10">{{value}}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{/with}}
-                {{/each}}
-            </div>
-        </div>
         <div class="row my-2">
             <div class="col text-start">
                 <form action="/sheet/leave">
@@ -101,7 +74,7 @@
                 </form>
             </div>
             <div class="col text-end align-self-center">
-                <a href="/sheet/1" style="font-size: 21px;">Acessar 1° Página</a>
+                <a href="/sheet/1" class="h4">Acessar 1° Página</a>
             </div>
         </div>
 

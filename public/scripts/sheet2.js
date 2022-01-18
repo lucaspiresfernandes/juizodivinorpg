@@ -10,13 +10,6 @@
     }
 }
 
-$('.extra-info-container textarea').change(async ev => {
-    const extraInfoID = $(ev.target).parents('.extra-info-container').data('extra-info-id');
-    const value = $(ev.target).val();
-    try { await axios.post('/sheet/player/extrainfo', { extraInfoID, value }) }
-    catch (err) { showFailureToastMessage(err) }
-});
-
 $('.lineage-node img').click(async ev => {
     const parent = $(ev.target).parents('.lineage-node');
     const index = parent.data('index');

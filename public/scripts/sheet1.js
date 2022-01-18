@@ -653,12 +653,20 @@ async function itemQuantityChange(ev) {
     catch (err) { showFailureToastMessage(err) }
 }
 
+//Extra Info
+$('.extra-info-container textarea').change(async ev => {
+    const extraInfoID = $(ev.target).parents('.extra-info-container').data('extra-info-id');
+    const value = $(ev.target).val();
+    try { await axios.post('/sheet/player/extrainfo', { extraInfoID, value }) }
+    catch (err) { showFailureToastMessage(err) }
+});
+
 //Notes
-async function playerAnotationsChange(event) {
-    const value = $(event.target).val();
+$('#playerAnotations').change(async ev => {
+    const value = $(ev.target).val();
     try { await axios.post('/sheet/player/note', { value }) }
     catch (err) { showFailureToastMessage(err) }
-}
+});
 
 function updateSkillAndBar(data) {
     const updatedSkills = data.updatedSkills || [];

@@ -1,414 +1,262 @@
-const loading = $('.loading');
-const createSkillModal = new bootstrap.Modal($('#createSkill')[0]);
-const createEquipmentModal = new bootstrap.Modal($('#createEquipment')[0]);
-const createItemModal = new bootstrap.Modal($('#createItem')[0]);
-
 //Equipments
-const createEquipmentContainer = $('#createEquipmentContainer');
-const createEquipmentName = $('#createEquipmentName');
-const createEquipmentType = $('#createEquipmentType');
-const createEquipmentDamage = $('#createEquipmentDamage');
-const createEquipmentRange = $('#createEquipmentRange');
-const createEquipmentAttacks = $('#createEquipmentAttacks');
-const createEquipmentAmmo = $('#createEquipmentAmmo');
-const createEquipmentSpecialization = $('#combatSpecializationList');
-const createEquipmentButton = $('#createEquipmentButton');
-const createEquipmentCloseButton = $('#createEquipmentCloseButton');
+{
+    const createEquipmentModal = new bootstrap.Modal($('#createEquipment')[0]);
+    const createEquipmentContainer = $('#createEquipmentContainer');
+    const createEquipmentButton = $('#createEquipmentButton');
+    const createEquipmentCloseButton = $('#createEquipmentCloseButton');
+    const equipmentLoading = createEquipmentContainer.find('.loading');
 
-$('#createEquipment').on('hidden.bs.modal', () => {
-    createEquipmentButton.prop('disabled', false);
-    createEquipmentCloseButton.prop('disabled', false);
-    createEquipmentContainer.show();
-    loading.hide();
-});
+    $('#createEquipment').on('hidden.bs.modal', () => {
+        createEquipmentButton.prop('disabled', false);
+        createEquipmentCloseButton.prop('disabled', false);
+        createEquipmentContainer.show();
+        equipmentLoading.hide();
+    });
 
-function createEquipmentClick(event) {
-    const name = createEquipmentName.val();
-    const skillID = createEquipmentSpecialization.val();
-    const type = createEquipmentType.val();
-    const damage = createEquipmentDamage.val();
-    const range = createEquipmentRange.val();
-    const attacks = createEquipmentAttacks.val();
-    const ammo = createEquipmentAmmo.val();
+    createEquipmentButton.click(async () => {
+        const name = $('#createEquipmentName').val();
+        const skillID = parseInt($('#combatSpecializationList').val());
+        const type = $('#createEquipmentType').val();
+        const damage = $('#createEquipmentDamage').val();
+        const range = $('#createEquipmentRange').val();
+        const attacks = $('#createEquipmentAttacks').val();
+        const ammo = $('#createEquipmentAmmo').val();
 
-    createEquipmentButton.prop('disabled', true);
-    createEquipmentCloseButton.prop('disabled', true);
-    createEquipmentContainer.hide();
-    loading.show();
+        createEquipmentButton.prop('disabled', true);
+        createEquipmentCloseButton.prop('disabled', true);
+        createEquipmentContainer.hide();
+        equipmentLoading.show();
 
-    $.ajax('/sheet/equipment', {
-        method: 'PUT',
-        data: { name, type, skillID, damage, range, attacks, ammo },
-        success: (data) => {
-            const id = data.equipmentID;
-            const tr = $(document.createElement('tr'));
+        try {
+            const response = await axios.put('/sheet/equipment', {
+                name,
+                type,
+                skillID,
+                damage,
+                range,
+                attacks,
+                ammo,
+                visible: false
+            });
+            const id = response.data.equipmentID;
 
-            tr.attr('id', `equipmentRow${id}`).html(`
-            <td>
-                <button class="acds-element"
-                    onclick="equipmentDeleteClick(event, ${id})"><i
-                        class="bi bi-trash"></i></button>
-            </td>
-            <td>
-                <input style="background-color: black; color: white;" class="acds-bottom-text"
-                    type="text" value="${name}"
-                    onchange="equipmentNameChange(event, ${id})">
-            </td>
-            <td>
-                <input style="background-color: black; color: white;" class="acds-bottom-text"
-                    type="text" value="${type}"
-                    onchange="equipmentNameChange(event, ${id})">
-            </td>
-            <td>
-                <select style="background-color: black; color: gray;">
-                    <option value="${skillID}" selected>Recarregue a página</option>
-                </select>
-            </td>
-            <td>
-                <input style="background-color: black; color: white;" class="acds-bottom-text"
-                    type="text" value="${damage}"
-                    onchange="equipmentDamageChange(event, ${id})">
-            </td>
-            <td>
-                <input style="background-color: black; color: white; max-width: 120px;"
-                    class="acds-bottom-text" type="text" value="${range}"
-                    onchange="equipmentRangeChange(event, ${id})">
-            </td>
-            <td>
-                <input style="background-color: black; color: white; max-width: 120px;"
-                    class="acds-bottom-text" type="text" value="${attacks}"
-                    onchange="equipmentAttacksChange(event, ${id})">
-            </td>
-            <td>
-                <input style="background-color: black; color: white; max-width: 40px;"
-                    class="acds-bottom-text" type="text" value="${ammo}"
-                    onchange="equipmentAmmoChange(event, ${id})">
-            </td>
-            <td>
-                <input class="form-check-input" type="checkbox"
-                    onchange="equipmentVisibleChange(event, ${id})">
-            </td>`);
-            $('#equipmentListTable').append(tr);
-
-            createEquipmentModal.hide();
-        },
-        error: (err) => {
-            createEquipmentModal.hide();
-            showFailureToastMessage(err)
+            addEquipment({
+                id,
+                name,
+                type,
+                skillID,
+                damage,
+                range,
+                attacks,
+                ammo,
+                visible: false
+            });
         }
+        catch (err) { showFailureToastMessage(err) }
+        createEquipmentModal.hide();
     });
 }
 
-function equipmentDeleteClick(event, id) {
+async function equipmentDeleteClick(ev) {
     if (!confirm("Você realmente quer remover esse equipamento?"))
         return;
 
-    $.ajax('/sheet/equipment',
-        {
-            method: 'DELETE',
-            data: { equipmentID: id },
-            success: () => $(`#equipmentRow${id}`).remove(),
-            error: showFailureToastMessage
-        })
+    const row = $(ev.target).parents('tr');
+    const equipmentID = row.data('equipment-id');
+
+    try {
+        await axios.delete('/sheet/equipment', { data: { equipmentID } });
+        row.remove();
+    }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function equipmentNameChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, name: value },
-        error: showFailureToastMessage
-    });
+async function equipmentChange(ev) {
+    const key = $(ev.target).data('key');
+    const value = $(ev.target).val();
+    const equipmentID = $(ev.target).parents('tr').data('equipment-id')
+    const data = {};
+    data[key] = value;
+    data.equipmentID = equipmentID;
+    try { await axios.post('/sheet/equipment', data) }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function equipmentTypeChange(event, id) {
-    const value = $(event.target).val();
+async function equipmentVisibleChange(ev) {
+    const value = $(ev.target).prop('checked');
+    const equipmentID = $(ev.target).parents('tr').data('equipment-id')
 
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, type: value },
-        error: showFailureToastMessage
-    });
-}
-
-function equipmentSkillChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, skillID: value },
-        error: showFailureToastMessage
-    });
-}
-
-function equipmentDamageChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, damage: value },
-        error: showFailureToastMessage
-    });
-}
-
-function equipmentRangeChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, range: value },
-        error: showFailureToastMessage
-    });
-}
-
-function equipmentAttacksChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, attacks: value },
-        error: showFailureToastMessage
-    });
-}
-
-function equipmentAmmoChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, ammo: value },
-        error: showFailureToastMessage
-    });
-}
-
-function equipmentVisibleChange(event, id) {
-    const value = $(event.target).prop('checked');
-
-    $.ajax('/sheet/equipment', {
-        method: 'POST',
-        data: { equipmentID: id, visible: value },
-        error: showFailureToastMessage
-    });
+    try { await axios.post('/sheet/equipment', { equipmentID, visible: value }) }
+    catch (err) { showFailureToastMessage(err) }
 }
 
 //Skills
-const createSkillContainer = $('#createSkillContainer');
-const createSkillButton = $('#createSkillButton');
-const createSkillCloseButton = $('#createSkillCloseButton');
-const createSkillName = $('#createSkillName');
-const createSkillSpecialization = $('#createSkillSpecialization');
-const createSkillCharacteristic = $('#createSkillCharacteristic');
+{
+    const createSkillModal = new bootstrap.Modal($('#createSkill')[0]);
+    const createSkillContainer = $('#createSkillContainer');
+    const createSkillButton = $('#createSkillButton');
+    const createSkillCloseButton = $('#createSkillCloseButton');
 
-$('#createSkill').on('hidden.bs.modal', () => {
-    createSkillButton.prop('disabled', false);
-    createSkillCloseButton.prop('disabled', false);
-    createSkillContainer.show();
-    loading.hide();
-});
+    const skillLoading = createSkillContainer.find('.loading');
 
-function createSkillClick(event) {
-    createSkillContainer.hide();
-    createSkillButton.prop('disabled', true);
-    createSkillCloseButton.prop('disabled', true);
-    loading.show();
-
-    const specializationID = createSkillSpecialization.val();
-    const characteristicID = createSkillCharacteristic.val();
-    const name = createSkillName.val();
-
-    $.ajax('/sheet/skill', {
-        method: 'PUT',
-        data: { name, specializationID, characteristicID },
-        success: (data) => {
-            createSkillModal.hide();
-            const id = data.skillID;
-            const tr = $(document.createElement('tr'));
-
-            tr.attr('id', `skillRow${id}`)
-                .html(`
-            <td>
-            <button class="acds-element" onclick="skillDeleteClick(event, ${id})"><i
-                    class="bi bi-trash"></i></button>
-            </td>
-            <td>
-                <input style="background-color: black; color: white;" class="acds-bottom-text"
-                    type="text" value="${name}"
-                    onchange="skillNameChange(event, ${id})">
-            </td>
-            <td>
-                <select style="background-color: black; color: gray;">
-                    <option value="${specializationID}" selected>Recarregue a página</option>
-                </select>
-            </td>
-            <td>
-                <select style="background-color: black; color: gray;">
-                    <option value="${characteristicID}" selected>Recarregue a página</option>
-                </select>
-            </td>
-            <td>
-                <input class="form-check-input" type="checkbox"
-                    onchange="skillMandatoryChange(event, ${id})">
-            </td>
-            `);
-            $('#skillListTable').append(tr);
-        },
-        error: (err) => {
-            createSkillModal.hide();
-            showFailureToastMessage(err)
-        }
+    $('#createSkill').on('hidden.bs.modal', () => {
+        createSkillButton.prop('disabled', false);
+        createSkillCloseButton.prop('disabled', false);
+        createSkillContainer.show();
+        skillLoading.hide();
     });
+
+    createSkillButton.click(async () => {
+        createSkillContainer.hide();
+        createSkillButton.prop('disabled', true);
+        createSkillCloseButton.prop('disabled', true);
+        skillLoading.show();
+
+        const name = $('#createSkillName').val();
+        const specializationID = $('#createSkillSpecialization').val();
+        const characteristicID = $('#createSkillCharacteristic').val();
+
+        try {
+            const response = await axios.put('/sheet/skill', { data: { name, specializationID, characteristicID } });
+            const id = response.data.skillID;
+            addSkill({ id, name, specializationID, characteristicID, mandatory: false });
+        }
+        catch (err) { showFailureToastMessage(err) }
+        createSkillModal.hide();
+    });
+
 }
 
-function skillDeleteClick(event, id) {
+async function skillDeleteClick(ev) {
     if (!confirm("Você realmente quer remover essa perícia?"))
         return;
 
-    $.ajax('/sheet/skill', {
-        method: 'DELETE',
-        data: { skillID: id },
-        success: () => $(`#skillRow${id}`).remove(),
-        error: showFailureToastMessage
-    })
+    const row = $(ev.target).parents('tr');
+    const skillID = row.data('skill-id');
+    try {
+        await axios.delete('/sheet/skill', { data: { skillID } });
+        row.remove();
+    }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function skillNameChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/skill', {
-        method: 'POST',
-        data: { skillID: id, name: value },
-        error: showFailureToastMessage
-    });
+async function skillChange(ev) {
+    const key = $(ev.target).data('key');
+    const value = $(ev.target).val();
+    const skillID = $(ev.target).parents('tr').data('skill-id');
+    const data = {};
+    data[key] = value;
+    data.skillID = skillID;
+    try { await axios.post('/sheet/skill', data) }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function skillSpecializationChange(event, id) {
-    const value = $(event.target).val();
+async function skillMandatoryChange(ev, id) {
+    const value = $(ev.target).prop('checked');
+    const skillID = $(ev.target).parents('tr').data('skill-id');
 
-    $.ajax('/sheet/skill', {
-        method: 'POST',
-        data: { skillID: id, specializationID: value },
-        error: showFailureToastMessage
-    });
-}
-
-function skillCharacteristicChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/skill', {
-        method: 'POST',
-        data: { skillID: id, characteristicID: value },
-        error: showFailureToastMessage
-    });
-}
-
-function skillMandatoryChange(event, id) {
-    const value = $(event.target).prop('checked');
-
-    $.ajax('/sheet/skill', {
-        method: 'POST',
-        data: { skillID: id, mandatory: value },
-        error: showFailureToastMessage
-    });
+    try { await axios.post('/sheet/skill', { skillID, mandatory: value }) }
+    catch (err) { showFailureToastMessage(err) }
 }
 
 //Item
-const createItemContainer = $('#createItemContainer');
-const createItemButton = $('#createItemButton');
-const createItemCloseButton = $('#createItemCloseButton');
-const createItemName = $('#createItemName');
-const createItemDescription = $('#createItemDescription');
+{
+    const createItemModal = new bootstrap.Modal($('#createItem')[0]);
+    const createItemContainer = $('#createItemContainer');
+    const createItemButton = $('#createItemButton');
+    const createItemCloseButton = $('#createItemCloseButton');
 
-$('#createItem').on('hidden.bs.modal', () => {
-    createItemButton.prop('disabled', false);
-    createItemCloseButton.prop('disabled', false);
-    createItemContainer.show();
-    loading.hide();
-});
+    const itemLoading = createItemContainer.find('.loading');
 
-function createItemClick(ev) {
-    createItemContainer.hide();
-    createItemButton.prop('disabled', true);
-    createItemCloseButton.prop('disabled', true);
-    loading.show();
+    $('#createItem').on('hidden.bs.modal', () => {
+        createItemButton.prop('disabled', false);
+        createItemCloseButton.prop('disabled', false);
+        createItemContainer.show();
+        itemLoading.hide();
+    });
 
-    const name = createItemName.val();
-    const description = createItemDescription.val();
+    createItemButton.click(async () => {
+        createItemContainer.hide();
+        createItemButton.prop('disabled', true);
+        createItemCloseButton.prop('disabled', true);
+        itemLoading.show();
 
-    $.ajax('/sheet/item', {
-        method: 'PUT',
-        data: { name, description },
-        success: (data) => {
-            createItemModal.hide();
-            const id = data.itemID;
+        const name = $('#createItemName').val();
+        const description = $('#createItemDescription').val();
 
-            const tr = $(document.createElement('tr'));
-            tr.attr('id', `itemRow${id}`)
-                .html(`
-            <td>
-                <button class="acds-element" onclick="itemDeleteClick(event, ${id})"><i
-                        class="bi bi-trash"></i></button>
-            </td>
-            <td>
-                <input style="background-color: black; color: white;" class="acds-bottom-text"
-                    type="text" value="${name}" onchange="itemNameChange(event, ${id})">
-            </td>
-            <td>
-                <input style="background-color: black; color: white;" class="acds-bottom-text"
-                type="text" value="${description}"
-                onchange="itemDescriptionChange(event, ${id})">
-            </td>
-            <td>
-                <input class="form-check-input" type="checkbox"
-                    onchange="itemVisibleChange(event, ${id})">
-            </td>`);
-            $('#itemListTable').append(tr);
-        },
-        error: (err) => {
-            createItemModal.hide();
-            showFailureToastMessage(err);
+        try {
+            const response = await axios.put('/sheet/item', { name, description, visible: false });
+            const id = response.data.itemID;
+            addItem({ id, name, description, visible: false });
         }
+        catch (err) { showFailureToastMessage(err) }
+        createItemModal.hide();
     });
 }
 
-function itemDeleteClick(event, id) {
+async function itemDeleteClick(ev) {
     if (!confirm("Você realmente quer remover esse item?"))
         return;
 
-    $.ajax('/sheet/item', {
-        method: 'DELETE',
-        data: { itemID: id },
-        success: () => $(`#itemRow${id}`).remove(),
-        error: showFailureToastMessage
-    })
+    const row = $(ev.target).parents('tr');
+    const itemID = row.data('item-id');
+    try {
+        await axios.delete('/sheet/item', { data: { itemID } });
+        row.remove();
+    }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function itemNameChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/item', {
-        method: 'POST',
-        data: { itemID: id, name: value },
-        error: showFailureToastMessage
-    });
+async function itemChange(ev) {
+    const key = $(ev.target).data('key');
+    const value = $(ev.target).val();
+    const itemID = $(ev.target).parents('tr').data('item-id');
+    const data = {};
+    data[key] = value;
+    data.itemID = itemID;
+    try { await axios.post('/sheet/item', data) }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function itemDescriptionChange(event, id) {
-    const value = $(event.target).val();
-
-    $.ajax('/sheet/item', {
-        method: 'POST',
-        data: { itemID: id, description: value },
-        error: showFailureToastMessage
-    });
+async function itemVisibleChange(ev) {
+    const value = $(ev.target).prop('checked');
+    const itemID = $(ev.target).parents('tr').data('item-id');
+    try { await axios.post('/sheet/item', { itemID, visible: value }) }
+    catch (err) { showFailureToastMessage(err) }
 }
 
-function itemVisibleChange(event, id) {
-    const value = $(event.target).prop('visible');
+function addEquipment(equipment) {
+    const row = $($('#equipmentRowTemplate').html());
+    row.data('equipment-id', equipment.id);
+    row.find('.name').val(equipment.name);
+    row.find('.specialization').val(equipment.skillID);
+    row.find('.type').val(equipment.type);
+    row.find('.damage').val(equipment.damage);
+    row.find('.range').val(equipment.range);
+    row.find('.attacks').val(equipment.attacks);
+    row.find('.ammo').val(equipment.ammo);
+    row.find('.visible').prop('checked', equipment.visible);
 
-    $.ajax('/sheet/item', {
-        method: 'POST',
-        data: { itemID: id, visible: value },
-        error: showFailureToastMessage
-    });
+    $('#equipmentListTable').append(row);
+}
+
+function addSkill(skill) {
+    const row = $($('#skillRowTemplate').html());
+    row.data('skill-id', skill.id);
+    row.find('.name').val(skill.name);
+    row.find('.specialization').val(skill.specializationID);
+    row.find('.characteristic').val(skill.characteristicID);
+    row.find('.mandatory').prop('checked', skill.mandatory);
+
+    $('#skillListTable').append(row);
+}
+
+function addItem(item) {
+    const row = $($('#itemRowTemplate').html());
+    row.data('item-id', item.id);
+    row.find('.name').val(item.name);
+    row.find('.description').val(item.description);
+    row.find('.visible').prop('checked', item.visible);
+
+    $('#itemListTable').append(row);
 }

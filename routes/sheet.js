@@ -177,29 +177,34 @@ router.get('/1', async (req, res) => {
             }
             return _class;
         })(),
+
+        //Player Info: 17
+        con('extra_info').select('extra_info.*', 'player_extra_info.value')
+            .join('player_extra_info', 'extra_info.extra_info_id', 'player_extra_info.extra_info_id')
+            .where('player_extra_info.player_id', playerID)
     ];
 
     try {
         const results = await Promise.all(queries);
-        res.render('sheet1',
-            {
-                info: results[0],
-                avatars: results[1],
-                attributes: results[2],
-                specs: results[3],
-                characteristics: results[4],
-                equipments: results[5],
-                availableEquipments: results[6],
-                skills: results[7],
-                availableSkills: results[8],
-                items: results[9],
-                availableItems: results[10],
-                specializations: results[11],
-                combatSpecializations: results[12],
-                playerNotes: results[13],
-                classes: results[14],
-                playerClass: results[15]
-            });
+        res.render('sheet1', {
+            info: results[0],
+            avatars: results[1],
+            attributes: results[2],
+            specs: results[3],
+            characteristics: results[4],
+            equipments: results[5],
+            availableEquipments: results[6],
+            skills: results[7],
+            availableSkills: results[8],
+            items: results[9],
+            availableItems: results[10],
+            specializations: results[11],
+            combatSpecializations: results[12],
+            playerNotes: results[13],
+            classes: results[14],
+            playerClass: results[15],
+            extraInfo: results[16],
+        });
     }
     catch (err) {
         console.error(err);
@@ -217,9 +222,6 @@ router.get('/2', async (req, res) => {
     try {
         const playerLineageID = (await con('player').select('lineage_id').where('player_id', playerID).first())?.lineage_id || null;
         const results = await Promise.all([
-            con('extra_info').select('extra_info.*', 'player_extra_info.value')
-                .join('player_extra_info', 'extra_info.extra_info_id', 'player_extra_info.extra_info_id')
-                .where('player_extra_info.player_id', playerID),
             (async () => {
                 const nodes = await con('lineage_node').select()
                     .where('lineage_id', playerLineageID)
@@ -259,10 +261,9 @@ router.get('/2', async (req, res) => {
 
         res.render('sheet2', {
             playerID,
-            extraInfo: results[0],
-            nodeRows: results[1],
+            nodeRows: results[0],
             playerLineage: playerLineageID,
-            playerScore: results[2]?.score || 0
+            playerScore: results[1]?.score || 0
         });
     }
     catch (err) {
@@ -278,16 +279,14 @@ router.get('/admin/1', async (req, res) => {
     if (!playerID) return res.redirect('/');
     if (!isAdmin) return res.redirect('/sheet/1');
 
-    const charIDs = await con.select('player_id').from('player').where('admin', false);
-    const characters = [];
-
     try {
-        for (let i = 0; i < charIDs.length; i++) {
-            let playerID = charIDs[i].player_id;
+        const charIDs = await con.select('player_id').from('player').where('admin', false);
+        const characters = await Promise.all(charIDs.map(async charID => {
+            const playerID = charID.player_id;
             const results = await Promise.all([
                 //Info: 0
                 (async () => {
-                    const info = await con.select('info.info_id', 'player_info.value')
+                    const info = await con.select('info.info_id', 'player_info.value', 'info.name')
                         .from('info')
                         .join('player_info', 'info.info_id', 'player_info.info_id')
                         .where('player_id', playerID)
@@ -341,7 +340,7 @@ router.get('/admin/1', async (req, res) => {
                     .where('player.player_id', playerID).first(),
             ]);
 
-            characters.push({
+            return {
                 playerID: playerID,
                 name: results[0],
                 attributes: results[1],
@@ -351,8 +350,8 @@ router.get('/admin/1', async (req, res) => {
                 items: results[5],
                 lineage: results[6],
                 player: results[7],
-            });
-        }
+            };
+        }));
 
         const results = await Promise.all([
             //Admin Notes: 0
@@ -360,11 +359,14 @@ router.get('/admin/1', async (req, res) => {
                 .from('player_note')
                 .where('player_id', playerID)
                 .first(),
+            //Portrait Environment: 1
+            con('config').select('value').where('key', 'portrait_environment').first()
         ]);
 
         res.render('sheetadmin1', {
             characters,
-            adminNotes: results[0]
+            adminNotes: results[0],
+            environmentState: results[1].value
         });
     }
     catch (err) {
@@ -406,7 +408,6 @@ router.get('/admin/2', async (req, res) => {
 
     try {
         const results = await Promise.all(queries);
-
         res.render('sheetadmin2', {
             equipmentsList: results[0],
             skillsList: results[1],
@@ -552,7 +553,8 @@ router.post('/player/characteristic', jsonParser, async (req, res) => {
         const updatedSkillsIDs = updatedSkills.map(skill => skill.skill_id);
 
         const attributes = await con('attribute').select('attribute.attribute_id',
-            'attribute.characteristic_id', 'attribute.skill_id', 'attribute.operation', 'player_attribute.max_value')
+            'attribute.characteristic_id', 'attribute.skill_id', 'attribute.operation',
+            'player_attribute.value', 'player_attribute.total_value', 'player_attribute.max_value')
             .join('player_attribute', 'player_attribute.attribute_id', 'attribute.attribute_id')
             .where(function () {
                 this.whereIn('attribute.characteristic_id', [oldCharID, charID])
@@ -656,8 +658,9 @@ router.put('/equipment', jsonParser, async (req, res) => {
     const ammo = req.body.ammo;
     const visible = req.body.visible;
 
-    if (!name || !type || !skill_id || !damage || !range ||
-        !attacks || !ammo || !visible) return res.status(401).send();
+    if (name === undefined || type === undefined || skill_id === undefined ||
+        damage === undefined || range === undefined || attacks === undefined ||
+        ammo === undefined || visible === undefined) return res.status(401).send();
 
     try {
         const equipmentID = (await con('equipment').insert({
@@ -784,7 +787,7 @@ router.put('/skill', jsonParser, async (req, res) => {
     const characteristic_id = req.body.characteristicID;
     const name = req.body.name;
 
-    if (!characteristic_id || !name) return res.status(401).send();
+    if (characteristic_id === undefined || name === undefined) return res.status(401).send();
 
     try {
         const skillID = (await con('skill').insert({
@@ -920,7 +923,8 @@ router.put('/item', jsonParser, async (req, res) => {
     const description = req.body.description;
     const visible = req.body.visible;
 
-    if (!name || !description || !visible) return res.status(401).send();
+    if (name === undefined || description === undefined ||
+        visible === undefined) return res.status(401).send();
     try {
         const itemID = (await con('item').insert({
             name,
@@ -942,6 +946,7 @@ router.post('/item', jsonParser, async (req, res) => {
     if (!req.session.isAdmin || !itemID) return res.status(401).send();
 
     try {
+    
         await con('item').update({
             name: req.body.name,
             description: req.body.description,
@@ -1045,17 +1050,6 @@ router.post('/player/class', jsonParser, async (req, res) => {
 
         const className = (await con('class').select('name').where('class_id', newClassID).first())?.name || 'Nenhuma';
         io.to('admin').emit('class change', { playerID, className });
-
-        for (const attribute of updatedAttributes) {
-            const attributeID = attribute.attributeID;
-            const data = {
-                attrID: attributeID,
-                totalValue: attribute.max_value + attribute.extra_value,
-                value: attribute.value,
-            };
-            io.to('admin').emit('attribute changed', { playerID, attributeID, value: data.value, totalValue: data.totalValue });
-            io.to(`portrait${playerID}`).emit('attribute changed', data);
-        }
     }
     catch (err) {
         console.error(err);
@@ -1182,16 +1176,29 @@ async function updateAttributes(playerID, classID, attributes) {
         const extra_value = evaluation + bonus;
 
         attr.extra_value = extra_value;
+        attr.total_value = attr.value + extra_value;
 
         await con('player_attribute').update('extra_value', extra_value)
             .where('player_id', playerID)
             .andWhere('attribute_id', attribute_id);
+
+        io.to('admin').emit('attribute changed', {
+            playerID, attributeID: attribute_id,
+            value: attr.value,
+            totalValue: attr.total_value
+        });
+        io.to(`portrait${playerID}`).emit('attribute changed', {
+            attributeID: attribute_id,
+            value: attr.value,
+            totalValue: attr.total_value
+        });
 
         return {
             attribute_id,
             extra_value
         };
     }));
+
 }
 
 async function updateSkills(playerID, classID, skills) {
@@ -1216,6 +1223,7 @@ async function updateSkills(playerID, classID, skills) {
         skill.total_value = total_value;
         return { skill_id: skill.skill_id, total_value, extra_value };
     }));
+
 }
 
 //#endregion

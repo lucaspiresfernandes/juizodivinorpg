@@ -890,3 +890,14 @@ CREATE TABLE `player_session` (
     PRIMARY KEY (`sid`),
     INDEX `player_session_expired_index` (`expired`)
 );
+
+CREATE TABLE `config` (
+    `key` VARCHAR(255) NOT NULL,
+    `value` VARCHAR(255) NULL,
+    PRIMARY KEY (`key`)
+);
+
+INSERT INTO
+    `config` (`key`, `value`)
+VALUES
+    ('portrait_environment', 'idle');
