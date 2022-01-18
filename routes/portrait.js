@@ -8,16 +8,15 @@ router.get('/', async (req, res) => {
     const players = await con('player_info').select('player_info.value',
         'player_info.player_id')
         .where('player_info.info_id', 1);
-    for (const player of players) {
+
+    for (const player of players)
         if (!player.value) player.value = 'Desconhecido';
-    }
+
     res.render('portrait_selection', { players });
 });
 
 router.get('/:id', async (req, res) => {
     const playerID = req.params.id;
-
-    if (!playerID) return res.status(401).send();
 
     const results = await Promise.all([
         con('player_info').select('value as name')
@@ -29,9 +28,15 @@ router.get('/:id', async (req, res) => {
         con('player_attribute_status').select('attribute_status_id', 'value')
             .where('player_id', playerID)
             .orderBy('attribute_status_id'),
-        con('player').select('player.lineage_id').max('player_lineage_node.index as index')
-            .join('player_lineage_node', 'player_lineage_node.player_id', 'player.player_id')
-            .where('player.player_id', playerID).first(),
+        con('player_lineage_node').select('player.lineage_id', 'lineage_node.index', 'lineage_node.level')
+            .join('player', 'player_lineage_node.player_id', 'player.player_id')
+            .join('lineage_node', function () {
+                this.on('lineage_node.lineage_id', 'player.lineage_id')
+                    .on('lineage_node.index', 'player_lineage_node.index');
+            })
+            .where('player.player_id', playerID)
+            .orderBy('lineage_node.level', 'DESC')
+            .orderBy('date_conquered', 'DESC').first(),
         con('config').select('value').where('key', 'portrait_environment').first()
     ]);
 
@@ -52,10 +57,9 @@ router.post('/environment', jsonParser, async (req, res) => {
     try {
         const players = await con('player').select('player_id');
 
-        for (let i = 0; i < players.length; i++) {
-            const id = players[i].player_id;
-            portraitRooms = portraitRooms.to(`portrait${id}`);
-        }
+        for (let i = 0; i < players.length; i++)
+            portraitRooms = portraitRooms.to(`portrait${players[i].player_id}`);
+            
         await con('config').update('value', environment)
             .where('key', 'portrait_environment');
 

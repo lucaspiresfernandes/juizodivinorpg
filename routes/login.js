@@ -11,27 +11,23 @@ router.get('/', (req, res) => {
 
 router.post('/', jsonParser, async (req, res) => {
     try {
-        let username = req.body.username;
-        let password = req.body.password;
+        const username = req.body.username;
+        const password = req.body.password;
 
         if (!username || !password)
             return res.status(400).end();
 
-        let result = await con.select('player.player_id', 'player.password', 'player.admin')
-            .from('player')
-            .where('username', username)
-            .first();
+        const result = await con('player').select('player.player_id', 'player.password', 'player.admin')
+            .where('username', username).first();
 
-        if (!result)
-            return res.status(403).send('Usuário ou senha incorretos.');
+        if (!result) return res.status(403).send('Usuário ou senha incorretos.');
 
-        let hashword = result.password;
-        let id = result.player_id;
-        let admin = result.admin;
-        let exists = await encrypter.compare(password, hashword);
+        const hashword = result.password;
+        const id = result.player_id;
+        const admin = result.admin;
+        const exists = await encrypter.compare(password, hashword);
 
-        if (!exists)
-            return res.status(403).send('Usuário ou senha incorretos.');
+        if (!exists) return res.status(403).send('Usuário ou senha incorretos.');
 
         req.session.playerID = id;
         req.session.isAdmin = admin;

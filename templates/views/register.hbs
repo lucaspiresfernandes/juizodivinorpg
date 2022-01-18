@@ -49,6 +49,19 @@
                         Já possui cadastro? <a class="h5" href="/login">Conectar-se</a>
                     </div>
                 </div>
+                {{#if admin}}
+                <div class="row my-3">
+                    <div class="col">
+                        É um jogador? <a class="h5" href="/register">Registre-se como Jogador</a>
+                    </div>
+                </div>
+                {{else}}
+                <div class="row my-3">
+                    <div class="col">
+                        É um administrador? <a class="h5" href="/register/admin">Registre-se como Administrador</a>
+                    </div>
+                </div>
+                {{/if}}
                 <div class="row my-3">
                     <div class="col">
                         <a class="h5" href="/">Voltar</a>
@@ -91,7 +104,7 @@
 
             try {
                 const response = await axios.post('/register', { username, password, adminKey });
-                const success = $(`<p style="color: red;" class="h4">
+                const success = $(`<p style="color: green;" class="h4">
                     Cadastro realizado com sucesso! - Redirecionando para a ficha...</p>`);
                 $('.col.return').append(success);
 

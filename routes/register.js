@@ -26,11 +26,10 @@ async function registerPost(req, res) {
 
         if (!username || !password) return res.status(400).end();
 
-        const usernameExists = await con.select('username')
-            .from('player').where('username', username).first();
+        const usernameExists = await con('player').select('username')
+            .where('username', username).first();
 
-        if (usernameExists)
-            return res.status(401).send('Username already exists.');
+        if (usernameExists) return res.status(401).send('Username already exists.');
 
         let admin = false;
 
@@ -64,33 +63,21 @@ async function registerPost(req, res) {
 
 async function registerPlayerData(playerID) {
     const results = await Promise.all([
-        con.select('characteristic_id').from('characteristic'),
-        con.select('attribute_id').from('attribute'),
-        con.select('attribute_status_id').from('attribute_status'),
-        con.select('skill_id', 'mandatory').from('skill'),
-        con.select('spec_id').from('spec'),
-        con.select('info_id').from('info'),
-        con.select('extra_info_id').from('extra_info'),
+        con('characteristic').select('characteristic_id'),
+        con('attribute').select('attribute_id'),
+        con('attribute_status').select('attribute_status_id'),
+        con('skill').select('skill_id', 'mandatory'),
+        con('spec').select('spec_id'),
+        con('info').select('info_id'),
+        con('extra_info').select('extra_info_id'),
     ]);
 
-    await con('player_avatar').insert([{
-        player_id: playerID,
-        attribute_status_id: null
-    },
-    {
-        player_id: playerID,
-        attribute_status_id: 4
-    },
-    {
-        player_id: playerID,
-        attribute_status_id: 5
-    },
-    {
-        player_id: playerID,
-        attribute_status_id: 6,
-    }]);
-
     await Promise.all([
+        con('player_avatar').insert([{ player_id: playerID, attribute_status_id: null },
+        { player_id: playerID, attribute_status_id: 4 },
+        { player_id: playerID, attribute_status_id: 5 },
+        { player_id: playerID, attribute_status_id: 6 }]),
+
         ...results[0].map(char => con('player_characteristic').insert({
             player_id: playerID,
             characteristic_id: char.characteristic_id,
@@ -153,7 +140,7 @@ async function registerPlayerData(playerID) {
 }
 
 function registerAdminData(playerID) {
-    return con.insert({ 'player_id': playerID, 'value': '' }).into('player_note').then(() => { });
+    return con('player_note').insert({ 'player_id': playerID, 'value': '' }).then(() => { });
 }
 
 module.exports = router;

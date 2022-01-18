@@ -74,8 +74,6 @@ router.post('/', jsonParser, async (req, res) => {
     }
 });
 
-const goodRate = 0.5, extremeRate = 0.2;
-
 const resolveSuccessType = {
     '20': function (number, roll) {
         const f2 = Math.floor(number / 2);

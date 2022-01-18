@@ -182,10 +182,18 @@ socket.on('lineage change', content => {
 });
 
 socket.on('lineage node change', content => {
-    const index = content.index;
+    const newIndex = content.index;
+    const newLevel = content.level;
+
     const img = $('#lineage');
+
     const lineageID = img.data('lineage');
-    img.attr('src', `/assets/lineages/frameless/${lineageID}/${index}.png`);
+    const oldLevel = img.data('level');
+
+    if (newLevel >= oldLevel) {
+        img.attr('src', `/assets/lineages/frameless/${lineageID}/${newIndex}.png`);
+        img.data('level', newLevel);
+    }
 });
 
 {

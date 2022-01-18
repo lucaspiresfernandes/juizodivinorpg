@@ -25,167 +25,154 @@ router.get('/1', async (req, res) => {
     if (!playerID) return res.redirect('/');
     if (isAdmin) return res.redirect('/sheet/admin/1');
 
-    const queries = [
-        //Info: 0
-        con.select('info.*', 'player_info.value')
-            .from('info')
-            .join('player_info', 'info.info_id', 'player_info.info_id')
-            .where('player_info.player_id', playerID),
-
-        //Avatar: 1
-        con.select('attribute_status.name', 'player_avatar.link', 'player_avatar.attribute_status_id')
-            .from('player_avatar')
-            .leftJoin('attribute_status', 'player_avatar.attribute_status_id', 'attribute_status.attribute_status_id')
-            .where('player_avatar.player_id', playerID),
-
-        //Attributes and Attribute Status: 2
-        (async () => {
-            const results = await Promise.all([
-                //Attributes
-                con.select('attribute.*', 'player_attribute.value', 'player_attribute.max_value',
-                    'player_attribute.coefficient', 'player_attribute.extra_value', 'player_attribute.total_value')
-                    .from('attribute')
-                    .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
-                    .where('player_attribute.player_id', playerID),
-
-                //Status
-                con.select('attribute_status.*', 'player_attribute_status.value')
-                    .from('attribute_status')
-                    .join('player_attribute_status', 'attribute_status.attribute_status_id', 'player_attribute_status.attribute_status_id')
-                    .where('player_attribute_status.player_id', playerID)
-            ]);
-
-            const attributes = results[0];
-            const status = results[1];
-
-            for (let i = 0; i < attributes.length; i++) {
-                const attr = attributes[i];
-                attr.status = [];
-
-                for (let j = 0; j < status.length; j++) {
-                    const stat = status[j];
-                    stat.checked = stat.value ? true : false;
-                    if (stat.attribute_id === attr.attribute_id)
-                        attr.status.push(stat);
-                }
-            }
-
-            return attributes;
-        })(),
-
-        //Specs: 3
-        con.select('spec.*', 'player_spec.value')
-            .from('spec')
-            .join('player_spec', 'spec.spec_id', 'player_spec.spec_id')
-            .where('player_spec.player_id', playerID),
-
-        //Characteristics: 4
-        con.select('characteristic.*', 'player_characteristic.value')
-            .from('characteristic')
-            .join('player_characteristic', 'characteristic.characteristic_id', 'player_characteristic.characteristic_id')
-            .where('player_characteristic.player_id', playerID),
-
-        //Player Equipments: 5
-        con.select('equipment.*', 'skill.name as skill_name', 'player_equipment.using', 'player_equipment.current_ammo')
-            .from('equipment')
-            .join('skill', 'equipment.skill_id', 'skill.skill_id')
-            .join('player_equipment', 'equipment.equipment_id', 'player_equipment.equipment_id')
-            .where('player_equipment.player_id', playerID),
-
-        //Available Equipments: 6
-        con.select('equipment_id', 'name')
-            .from('equipment')
-            .where('visible', true)
-            .whereNotIn('equipment_id', con.select('equipment_id').from('player_equipment').where('player_id', playerID))
-            .orderBy('name'),
-
-        //Skills: 7
-        (async () => {
-            const skills = await con('skill').select('skill.skill_id', 'skill.name',
-                'player_skill.value', 'specialization.name as specialization_name',
-                'skill.characteristic_id', 'player_skill.total_value', 'player_skill.extra_value')
-                .join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
-                .leftJoin('specialization', 'specialization.specialization_id', 'skill.specialization_id')
-                .join('player_characteristic', function () {
-                    this.on('player_characteristic.characteristic_id', 'skill.characteristic_id')
-                        .andOn('player_characteristic.player_id', 'player_skill.player_id')
-                })
-                .where('player_skill.player_id', playerID);
-
-            for (let i = 0; i < skills.length; i++) {
-                const skill = skills[i];
-                let skillName = skill.name;
-                let specializationName = skill.specialization_name;
-                if (specializationName)
-                    skills[i].name = `${specializationName} (${skillName})`;
-            }
-            skills.sort((a, b) => a.name.localeCompare(b.name));
-            return skills;
-        })(),
-
-        //Available Skills: 8
-        con.select('skill_id', 'name')
-            .from('skill')
-            .whereNotIn('skill_id', con.select('skill_id').from('player_skill').where('player_id', playerID))
-            .orderBy('name'),
-
-        //Items: 9
-        con.select('item.item_id', 'item.name', 'player_item.description', 'player_item.quantity')
-            .from('item')
-            .join('player_item', 'item.item_id', 'player_item.item_id')
-            .where('player_item.player_id', playerID),
-
-        //Available Items: 10
-        con.select('item_id', 'name')
-            .from('item')
-            .where('visible', true)
-            .whereNotIn('item_id', con.select('item_id').from('player_item').where('player_id', playerID))
-            .orderBy('name'),
-
-        //Specializations: 12
-        con.select().from('specialization'),
-
-        //Combat Specializations: 13
-        con('skill').select('skill.name', 'skill.skill_id'),
-
-        //Notes: 14
-        con('player_note').select('value').where('player_id', playerID).first(),
-
-        //Classes List: 15
-        (async () => {
-            const classes = await con('class').select();
-            await Promise.all(classes.map(async _class => {
-                const skills = await con('class_skill').select('skill_id')
-                    .where('class_id', _class.class_id);
-                _class.skills = JSON.stringify(skills.map(skill => skill.skill_id));
-            }));
-            return classes;
-        })(),
-
-        //Player Class: 16
-        (async () => {
-            const _class = await con('player').select('player.class_id', 'class.ability_title',
-                'class.ability_description', 'class.attribute_id', 'class.bonus')
-                .join('class', 'class.class_id', 'player.class_id')
-                .where('player_id', playerID)
-                .first();
-
-            if (_class) {
-                const skills = await con('class_skill').select('skill_id')
-                    .where('class_id', _class.class_id);
-                _class.skills = JSON.stringify(skills.map(skill => skill.skill_id));
-            }
-            return _class;
-        })(),
-
-        //Player Info: 17
-        con('extra_info').select('extra_info.*', 'player_extra_info.value')
-            .join('player_extra_info', 'extra_info.extra_info_id', 'player_extra_info.extra_info_id')
-            .where('player_extra_info.player_id', playerID)
-    ];
-
     try {
-        const results = await Promise.all(queries);
+        const results = await Promise.all([
+            //Info: 0
+            con('info').select('info.*', 'player_info.value')
+                .join('player_info', 'info.info_id', 'player_info.info_id')
+                .where('player_info.player_id', playerID),
+
+            //Avatar: 1
+            con('player_avatar').select('attribute_status.name', 'player_avatar.link', 'player_avatar.attribute_status_id')
+                .leftJoin('attribute_status', 'player_avatar.attribute_status_id', 'attribute_status.attribute_status_id')
+                .where('player_avatar.player_id', playerID),
+
+            //Attributes and Attribute Status: 2
+            (async () => {
+                const results = await Promise.all([
+                    //Attributes
+                    con('attribute').select('attribute.*', 'player_attribute.value', 'player_attribute.max_value',
+                        'player_attribute.coefficient', 'player_attribute.extra_value', 'player_attribute.total_value')
+                        .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
+                        .where('player_attribute.player_id', playerID),
+
+                    //Status
+                    con('attribute_status').select('attribute_status.*', 'player_attribute_status.value')
+                        .join('player_attribute_status', 'attribute_status.attribute_status_id', 'player_attribute_status.attribute_status_id')
+                        .where('player_attribute_status.player_id', playerID)
+                ]);
+
+                const attributes = results[0];
+                const status = results[1];
+
+                for (let i = 0; i < attributes.length; i++) {
+                    const attr = attributes[i];
+                    attr.status = [];
+
+                    for (let j = 0; j < status.length; j++) {
+                        const stat = status[j];
+                        stat.checked = stat.value ? true : false;
+                        if (stat.attribute_id === attr.attribute_id)
+                            attr.status.push(stat);
+                    }
+                }
+
+                return attributes;
+            })(),
+
+            //Specs: 3
+            con('spec').select('spec.*', 'player_spec.value')
+                .join('player_spec', 'spec.spec_id', 'player_spec.spec_id')
+                .where('player_spec.player_id', playerID),
+
+            //Characteristics: 4
+            con('characteristic').select('characteristic.*', 'player_characteristic.value')
+                .join('player_characteristic', 'characteristic.characteristic_id', 'player_characteristic.characteristic_id')
+                .where('player_characteristic.player_id', playerID),
+
+            //Player Equipments: 5
+            con('equipment').select('equipment.*', 'skill.name as skill_name', 'player_equipment.using', 'player_equipment.current_ammo')
+                .join('skill', 'equipment.skill_id', 'skill.skill_id')
+                .join('player_equipment', 'equipment.equipment_id', 'player_equipment.equipment_id')
+                .where('player_equipment.player_id', playerID),
+
+            //Available Equipments: 6
+            con('equipment').select('equipment_id', 'name')
+                .where('visible', true)
+                .whereNotIn('equipment_id', con('player_equipment').select('equipment_id').where('player_id', playerID))
+                .orderBy('name'),
+
+            //Skills: 7
+            (async () => {
+                const skills = await con('skill').select('skill.skill_id', 'skill.name',
+                    'player_skill.value', 'specialization.name as specialization_name',
+                    'player_skill.total_value', 'player_skill.extra_value')
+                    .join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
+                    .leftJoin('specialization', 'specialization.specialization_id', 'skill.specialization_id')
+                    .join('player_characteristic', function () {
+                        this.on('player_characteristic.characteristic_id', 'skill.characteristic_id')
+                            .andOn('player_characteristic.player_id', 'player_skill.player_id')
+                    })
+                    .where('player_skill.player_id', playerID);
+
+                for (let i = 0; i < skills.length; i++) {
+                    const skill = skills[i];
+                    let skillName = skill.name;
+                    let specializationName = skill.specialization_name;
+                    if (specializationName)
+                        skills[i].name = `${specializationName} (${skillName})`;
+                }
+                skills.sort((a, b) => a.name.localeCompare(b.name));
+                return skills;
+            })(),
+
+            //Available Skills: 8
+            con('skill').select('skill_id', 'name')
+                .whereNotIn('skill_id', con('player_skill').select('skill_id').where('player_id', playerID))
+                .orderBy('name'),
+
+            //Items: 9
+            con('item').select('item.item_id', 'item.name', 'player_item.description', 'player_item.quantity')
+                .join('player_item', 'item.item_id', 'player_item.item_id')
+                .where('player_item.player_id', playerID),
+
+            //Available Items: 10
+            con('item').select('item_id', 'name')
+                .where('visible', true)
+                .whereNotIn('item_id', con('player_item').select('item_id').where('player_id', playerID))
+                .orderBy('name'),
+
+            //Specializations: 12
+            con('specialization').select(),
+
+            //Combat Specializations: 13
+            con('skill').select('skill.name', 'skill.skill_id'),
+
+            //Notes: 14
+            con('player_note').select('value').where('player_id', playerID).first(),
+
+            //Classes List: 15
+            (async () => {
+                const classes = await con('class').select();
+                await Promise.all(classes.map(async _class => {
+                    const skills = await con('class_skill').select('skill_id')
+                        .where('class_id', _class.class_id);
+                    _class.skills = JSON.stringify(skills.map(skill => skill.skill_id));
+                }));
+                return classes;
+            })(),
+
+            //Player Class: 16
+            (async () => {
+                const _class = await con('player').select('player.class_id', 'class.ability_title',
+                    'class.ability_description', 'class.attribute_id', 'class.bonus')
+                    .join('class', 'class.class_id', 'player.class_id')
+                    .where('player_id', playerID)
+                    .first();
+
+                if (_class) {
+                    const skills = await con('class_skill').select('skill_id')
+                        .where('class_id', _class.class_id);
+                    _class.skills = JSON.stringify(skills.map(skill => skill.skill_id));
+                }
+                return _class;
+            })(),
+
+            //Player Info: 17
+            con('extra_info').select('extra_info.*', 'player_extra_info.value')
+                .join('player_extra_info', 'extra_info.extra_info_id', 'player_extra_info.extra_info_id')
+                .where('player_extra_info.player_id', playerID)
+        ]);
         res.render('sheet1', {
             playerID,
             info: results[0],
@@ -264,7 +251,7 @@ router.get('/2', async (req, res) => {
             playerID,
             nodeRows: results[0],
             playerLineage: playerLineageID,
-            playerScore: results[1]?.score || 0
+            playerScore: results[1].score
         });
     }
     catch (err) {
@@ -281,14 +268,13 @@ router.get('/admin/1', async (req, res) => {
     if (!isAdmin) return res.redirect('/sheet/1');
 
     try {
-        const charIDs = await con.select('player_id').from('player').where('admin', false);
+        const charIDs = await con('player').select('player_id').where('admin', false);
         const characters = await Promise.all(charIDs.map(async charID => {
             const playerID = charID.player_id;
             const results = await Promise.all([
                 //Info: 0
                 (async () => {
-                    const info = await con.select('info.info_id', 'player_info.value', 'info.name')
-                        .from('info')
+                    const info = await con('info').select('info.info_id', 'player_info.value', 'info.name')
                         .join('player_info', 'info.info_id', 'player_info.info_id')
                         .where('player_id', playerID)
                         .andWhere('info.name', 'Nome')
@@ -300,35 +286,30 @@ router.get('/admin/1', async (req, res) => {
                 })(),
 
                 //Attributes: 1
-                con.select('attribute.attribute_id', 'attribute.name', 'attribute.fill_color',
+                con('attribute').select('attribute.attribute_id', 'attribute.name', 'attribute.fill_color',
                     'player_attribute.value', 'player_attribute.max_value', 'player_attribute.extra_value',
                     'player_attribute.total_value')
-                    .from('attribute')
                     .join('player_attribute', 'attribute.attribute_id', 'player_attribute.attribute_id')
                     .where('player_attribute.player_id', playerID),
 
                 //Specs: 2
-                con.select('spec.*', 'player_spec.value')
-                    .from('spec')
+                con('spec').select('spec.*', 'player_spec.value')
                     .join('player_spec', 'spec.spec_id', 'player_spec.spec_id')
                     .where('player_spec.player_id', playerID),
 
                 //Characteristics: 3
-                con.select('characteristic.characteristic_id', 'characteristic.name', 'player_characteristic.value')
-                    .from('characteristic')
+                con('characteristic').select('characteristic.characteristic_id', 'characteristic.name', 'player_characteristic.value')
                     .join('player_characteristic', 'characteristic.characteristic_id', 'player_characteristic.characteristic_id')
                     .where('player_characteristic.player_id', playerID)
                     .andWhere('characteristic.name', 'Deslocamento'),
 
                 //Combat: 4
-                con.select('equipment.equipment_id', 'player_equipment.using', 'equipment.name', 'equipment.damage', 'equipment.range', 'equipment.attacks')
-                    .from('equipment')
+                con('equipment').select('equipment.equipment_id', 'player_equipment.using', 'equipment.name', 'equipment.damage', 'equipment.range', 'equipment.attacks')
                     .join('player_equipment', 'equipment.equipment_id', 'player_equipment.equipment_id')
                     .where('player_equipment.player_id', playerID),
 
                 //Items: 5
-                con.select('item.item_id', 'item.name', 'player_item.description', 'player_item.quantity')
-                    .from('item')
+                con('item').select('item.item_id', 'item.name', 'player_item.description', 'player_item.quantity')
                     .join('player_item', 'item.item_id', 'player_item.item_id')
                     .where('player_item.player_id', playerID),
 
@@ -361,8 +342,7 @@ router.get('/admin/1', async (req, res) => {
 
         const results = await Promise.all([
             //Admin Notes: 0
-            con.select('value')
-                .from('player_note')
+            con('player_note').select('value')
                 .where('player_id', playerID)
                 .first(),
             //Portrait Environment: 1
@@ -390,8 +370,7 @@ router.get('/admin/2', async (req, res) => {
 
     const queries = [
         //All Equipments: 0
-        con.select('equipment.*', 'skill.name as skill_name')
-            .from('equipment')
+        con('equipment').select('equipment.*', 'skill.name as skill_name')
             .join('skill', 'equipment.skill_id', 'skill.skill_id'),
 
         //All Skills: 1
@@ -887,7 +866,7 @@ router.put('/player/item', jsonParser, async (req, res) => {
         await con('player_item').insert({
             'player_id': playerID,
             'item_id': itemID,
-            'description': con.select('description').from('item').where('item_id', itemID)
+            'description': con('item').select('description').where('item_id', itemID)
         });
 
         const item = await con('item').select('item.item_id', 'item.name',
@@ -1144,43 +1123,48 @@ router.post('/player/lineage', jsonParser, async (req, res) => {
 router.post('/player/lineage/node', jsonParser, async (req, res) => {
     const playerID = req.session.playerID;
     const index = parseInt(req.body.index);
-    const newScore = parseInt(req.body.newScore);
     const newNodes = [];
 
     if (!playerID || !index) return res.status(401).send();
 
     try {
-        await con('player_lineage_node').insert({ player_id: playerID, index }),
-            await Promise.all([
-                con('player').where('player_id', playerID).update('score', newScore),
-                (async () => {
-                    const lineageID = (await con('player').select('lineage_id').where('player_id', playerID).first()).lineage_id;
+        await con('player_lineage_node').insert({ player_id: playerID, index });
+        const player = await con('player').select('lineage_id', 'score').where('player_id', playerID).first();
+        const lineageID = player.lineage_id;
+        const playerScore = player.score;
 
-                    const conqueredNodes = (await con('player_lineage_node').select('index').where('player_id', playerID)).map(node => node.index);
-                    const newlyConqueredSubsequentsNode = await con('lineage_node_connection').select()
-                        .where('lineage_node_connection.lineage_id', lineageID).andWhere('lineage_node_connection.index', index)
-                        .join('lineage_node', function () {
-                            this.on('lineage_node.lineage_id', 'lineage_node_connection.lineage_id');
-                            this.andOn('lineage_node.index', 'lineage_node_connection.next_index');
-                        });
+        const lineageNode = await con('lineage_node').select('cost', 'level')
+            .where('lineage_id', lineageID).andWhere('index', index).first();
+        const newScore = playerScore - lineageNode.cost;
 
-                    for (const node of newlyConqueredSubsequentsNode) {
-                        const connectedNodes = await con('lineage_node_connection').select('index').where('lineage_id', lineageID)
-                            .andWhere('next_index', node.index);
-                        let available = true;
-                        for (const connection of connectedNodes) {
-                            if (!conqueredNodes.includes(connection.index)) {
-                                available = false;
-                                break;
-                            }
+        await Promise.all([
+            con('player').where('player_id', playerID).update('score', newScore),
+            (async () => {
+                const conqueredNodes = (await con('player_lineage_node').select('index').where('player_id', playerID)).map(node => node.index);
+                const newlyConqueredSubsequentsNode = await con('lineage_node_connection').select()
+                    .where('lineage_node_connection.lineage_id', lineageID).andWhere('lineage_node_connection.index', index)
+                    .join('lineage_node', function () {
+                        this.on('lineage_node.lineage_id', 'lineage_node_connection.lineage_id');
+                        this.andOn('lineage_node.index', 'lineage_node_connection.next_index');
+                    });
+
+                for (const node of newlyConqueredSubsequentsNode) {
+                    const connectedNodes = await con('lineage_node_connection').select('index').where('lineage_id', lineageID)
+                        .andWhere('next_index', node.index);
+                    let available = true;
+                    for (const connection of connectedNodes) {
+                        if (!conqueredNodes.includes(connection.index)) {
+                            available = false;
+                            break;
                         }
-                        if (available) newNodes.push(node);
                     }
-                })()
-            ]);
-        res.send({ newNodes });
+                    if (available) newNodes.push(node);
+                }
+            })()
+        ]);
+        res.send({ newNodes, newScore });
         io.to('admin').emit('score change', { playerID, newScore });
-        io.to(`portrait${playerID}`).emit('lineage node change', { index });
+        io.to(`portrait${playerID}`).emit('lineage node change', { index, level: lineageNode.level });
     }
     catch (err) {
         console.error(err);

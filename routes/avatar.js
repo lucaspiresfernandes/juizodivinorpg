@@ -5,26 +5,21 @@ const con = require('../utils/connection');
 const axios = require('axios');
 const path = require('path');
 
-async function sendAvatar(playerID, attrStatusID, res) {
-    const link = (await con('player_avatar').select('link')
-        .where('attribute_status_id', attrStatusID)
-        .andWhere('player_id', playerID).first())?.link;
-
-    if (!link) return res.sendFile(path.join(__dirname, '../public/assets/avatar404.png'));
-    const response = await axios.get(link, { responseType: 'arraybuffer', timeout: 10000 });
-    res.contentType(response.headers['content-type']);
-    res.end(response.data, 'binary');
-}
-
 router.get('/:attrStatusID', async (req, res) => {
     const playerID = req.query.playerID || req.session.playerID;
-    let attrStatusID = req.params.attrStatusID;
-    if (attrStatusID < 1 || isNaN(attrStatusID)) attrStatusID = null;
+    const attrStatusID = req.params.attrStatusID || null;
 
     if (!playerID) return res.status(401).send();
 
     try {
-        sendAvatar(playerID, attrStatusID, res);
+        const link = (await con('player_avatar').select('link')
+            .where('attribute_status_id', attrStatusID)
+            .andWhere('player_id', playerID).first())?.link;
+
+        if (!link) return res.sendFile(path.join(__dirname, '../public/assets/avatar404.png'));
+        const response = await axios.get(link, { responseType: 'arraybuffer', timeout: 10000 });
+        res.contentType(response.headers['content-type']);
+        res.end(response.data, 'binary');
     }
     catch (err) {
         console.error(err);
@@ -39,8 +34,8 @@ router.post('/', jsonParser, async (req, res) => {
     if (!playerID || !data) return res.status(401).send();
 
     try {
-        const avatars = await con.select('attribute_status_id')
-            .from('player_avatar').where('player_id', playerID);
+        const avatars = await con('player_avatar').select('attribute_status_id')
+            .where('player_id', playerID);
 
         await Promise.all(avatars.map(avatar => {
             const id = avatar.attribute_status_id;

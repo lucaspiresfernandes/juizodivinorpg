@@ -658,6 +658,7 @@ CREATE TABLE `player` (
 CREATE TABLE `player_lineage_node` (
     `player_id` INT UNSIGNED NOT NULL,
     `index` INT UNSIGNED NOT NULL,
+    `date_conquered` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`player_id`, `index`),
     CONSTRAINT `fk_player_lineage_node_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );

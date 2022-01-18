@@ -23,11 +23,10 @@ $('.lineage-node img').click(async ev => {
 
     if (conquered || !available) return;
 
-    const newScore = currentScore - cost;
-
     try {
-        const response = await axios.post('/sheet/player/lineage/node', { index, newScore });
+        const response = await axios.post('/sheet/player/lineage/node', { index });
         const newNodes = response.data.newNodes;
+        const newScore = response.data.newScore;
 
         $(ev.target).removeClass('unconquered');
         parent.data('conquered', true);
