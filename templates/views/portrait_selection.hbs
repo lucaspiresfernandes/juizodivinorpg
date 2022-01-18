@@ -16,15 +16,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col my-3 h4">
-                        Selecione a moldura que quer acessar.
+                    <div class="col my-3 h3">
+                        Selecione o retrato que deseja acessar.
                     </div>
                 </div>
                 {{#each players}}
                 {{#with this}}
                 <div class="row">
                     <div class="col my-1">
-                        <a href="/portrait/{{player_id}}">{{value}} ({{player_id}})</a>
+                        <a href="/portrait/{{player_id}}" class="h5">{{value}} ({{player_id}})</a>
                     </div>
                 </div>
                 {{/with}}

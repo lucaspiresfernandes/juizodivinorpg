@@ -32,8 +32,7 @@
                 </div>
                 <div class="row">
                     <div class="col h4">
-                        Pontos de Linhagem: <span style="color: red;" id="playerScore"
-                            data-score="{{playerScore}}">{{playerScore}}</span>
+                        Pontos de Linhagem: <span id="playerScore" data-score="{{playerScore}}">{{playerScore}}</span>
                     </div>
                 </div>
                 <div class="row">
@@ -50,7 +49,7 @@
                                             available}}????????????{{else}}{{this.name}}{{/unless}}</span></p>
                                     <p><span class="cost">{{#unless
                                             available}}?{{else}}{{this.cost}}{{/unless}}</span></p>
-                                    <p><span class="description h6" style="color: #999;">{{#unless
+                                    <p><span class="description h6">{{#unless
                                             available}}????????????{{else}}{{this.description}}{{/unless}}</span></p>
                                     <p><span class="footer"
                                             style="color: {{#unless available}}red{{else}}{{#if conquered}}green{{else}}yellow{{/if}}{{/unless}}">{{#unless

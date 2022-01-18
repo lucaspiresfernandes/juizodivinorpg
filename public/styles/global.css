@@ -73,3 +73,7 @@ body {
     filter: brightness(10%);
 }
 
+.toast-container {
+    z-index: 1020;
+}
+

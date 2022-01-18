@@ -1,9 +1,6 @@
 function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
     const bar = container.find('.progress-bar');
 
-    if (newCur === undefined) newCur = bar.data('current');
-    bar.data('current', newCur);
-
     if (newMax === undefined) newMax = bar.data('max');
     bar.data('max', newMax);
 
@@ -11,6 +8,10 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
     bar.data('extra', newExtra);
 
     const newTotal = newMax + newExtra;
+
+    if (newCur === undefined) newCur = bar.data('current');
+    newCur = clamp(newCur, 0, newTotal);
+    bar.data('current', newCur);
 
     container.find('.attribute-description').text(`${newCur}/${newTotal}`);
     bar.data('total', newTotal);
@@ -274,6 +275,7 @@ const addEquipmentButton = $('#addEquipmentButton');
 
             const newRow = $(equipmentRowTemplate);
             newRow.data('equipment-id', equipmentID);
+            newRow.attr('data-equipment-id', equipmentID);
             newRow.find('.using').prop('checked', equipment.using);
             newRow.find('.name').text(equipment.name)
             newRow.find('.skill-name').text(equipment.skill_name);
@@ -329,6 +331,49 @@ const addEquipmentButton = $('#addEquipmentButton');
         }
         createEquipmentModal.hide();
     });
+
+    socket.on('equipment added', content => {
+        const equipmentID = content.equipmentID;
+        const name = content.name;
+        if (equipmentTable.find(`tr[data-equipment-id="${equipmentID}"]`).length > 0 ||
+            addEquipmentList.find(`option[value="${equipmentID}"]`).length > 0) return;
+
+        const opt = $(`<option value="${equipmentID}">${name}</option>`);
+        addEquipmentList.append(opt);
+        addEquipmentButton.prop('disabled', false);
+    });
+
+    socket.on('equipment removed', content => {
+        const equipmentID = content.equipmentID;
+        addEquipmentList.find(`option[value="${equipmentID}"]`).remove();
+        addEquipmentButton.prop('disabled', addEquipmentList.children().length === 0);
+    });
+
+    socket.on('equipment changed', content => {
+        const equipmentID = content.equipmentID;
+        const name = content.name;
+        const skill_name = content.skill_name;
+        const type = content.type;
+        const damage = content.damage;
+        const range = content.range;
+        const attacks = content.attacks;
+        const ammo = content.ammo;
+
+        const row = equipmentTable.find(`tr[data-equipment-id="${equipmentID}"]`);
+        if (row.length > 0) {
+            if (name) row.find('.name').text(name);
+            if (skill_name) row.find('.skill-name').text(skill_name);
+            if (type) row.find('.type').text(type);
+            if (damage) row.find('.damage').text(damage);
+            if (range) row.find('.range').text(range);
+            if (attacks) row.find('.attacks').text(attacks);
+            if (ammo) row.find('.max-ammo').text(ammo);
+        }
+        else {
+            const opt = addEquipmentList.find(`option[value="${equipmentID}"]`);
+            if (name) opt.text(name);
+        }
+    });
 }
 
 async function deleteEquipmentClick(ev) {
@@ -341,8 +386,8 @@ async function deleteEquipmentClick(ev) {
 
     try {
         await axios.delete('/sheet/player/equipment', { data: { equipmentID } });
-
-        addEquipmentList.append($(`<option value="${equipmentID}">${equipName}</option>`));
+        if (addEquipmentList.find(`option[value="${equipmentID}"]`).length === 0)
+            addEquipmentList.append($(`<option value="${equipmentID}">${equipName}</option>`));
         row.remove();
         addEquipmentButton.prop('disabled', false);
     }
@@ -482,7 +527,6 @@ const addSkillList = $('#addSkillList');
 
             const container = $(skillContainerTemplate);
             container.data('skill-id', skill.skill_id);
-            container.data('characteristic-id', skill.characteristic_id);
             container.find('input').val(skill.value).data('last-value', skill.value);
             container.find('.total').text(skill.total_value);
             container.find('.name').text(skill.name);
@@ -512,6 +556,13 @@ const addSkillList = $('#addSkillList');
             const name = container.find('.skill-label').text().toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
             container.toggleClass('d-none', !name.includes(str));
         }
+    });
+
+    socket.on('skill changed', content => {
+        const skillID = content.skillID;
+        const name = content.name;
+        const element = $(`.skill-container[data-skill-id="${skillID}"] .name`);
+        if (element.length > 0 && name) element.text(name);
     });
 }
 
@@ -592,6 +643,7 @@ const addItemList = $('#addItemList');
 
             const newRow = $(itemRowTemplate);
             newRow.data('item-id', itemID);
+            newRow.attr('data-item-id', itemID);
             newRow.find('.name').text(item.name);
             newRow.find('.description').val(item.description);
             newRow.find('.quantity').val(item.quantity);
@@ -621,7 +673,38 @@ const addItemList = $('#addItemList');
         }
         catch (err) { showFailureToastMessage(err) }
         createItemModal.hide();
-    })
+    });
+
+    socket.on('item added', content => {
+        const itemID = content.itemID;
+        const name = content.name;
+        if (itemTable.find(`tr[data-item-id="${itemID}"]`).length > 0 ||
+            addItemList.find(`option[value="${itemID}"]`).length > 0) return;
+
+        const opt = $(`<option value="${itemID}">${name}</option>`);
+        addItemList.append(opt);
+        addItemButton.prop('disabled', false);
+    });
+
+    socket.on('item removed', content => {
+        const itemID = content.itemID;
+        addItemList.find(`option[value="${itemID}"]`).remove();
+        addItemButton.prop('disabled', addItemList.children().length === 0);
+    });
+
+    socket.on('item changed', content => {
+        const itemID = content.itemID;
+        const name = content.name;
+
+        const row = itemTable.find(`tr[data-item-id="${itemID}"]`);
+        if (row.length > 0) {
+            if (name) row.find('.name').text(name);
+        }
+        else {
+            const opt = addItemList.find(`option[value="${itemID}"]`);
+            if (name) opt.text(name);
+        }
+    });
 }
 
 async function deleteItemClick(ev) {
@@ -631,7 +714,8 @@ async function deleteItemClick(ev) {
     const itemID = row.data('item-id');
     try {
         await axios.delete('/sheet/player/item', { data: { itemID } });
-        addItemList.append($(`<option value="${itemID}">${row.find('.name').text()}</option>`));
+        if (addItemList.find(`option[value="${itemID}"]`).length === 0)
+            addItemList.append($(`<option value="${itemID}">${row.find('.name').text()}</option>`));
         row.remove();
         addItemButton.prop('disabled', false);
     }
@@ -671,13 +755,13 @@ $('#playerAnotations').change(async ev => {
 function updateSkillAndBar(data) {
     const updatedSkills = data.updatedSkills || [];
     for (const skill of updatedSkills) {
-        const container = $(`.skill-container[data-skill-id="${skill.skill_id}"]`);
-        container.data('extra', skill.extra_value)
-        container.find('.total').text(skill.total_value);
+        const container = $(`.skill-container[data-skill-id="${skill.skillID}"]`);
+        container.data('extra', skill.extraValue)
+        container.find('.total').text(skill.totalValue);
     }
     const updatedAttributes = data.updatedAttributes || [];
     for (const attribute of updatedAttributes) {
-        const container = $(`.attribute-container[data-attribute-id="${attribute.attribute_id}"]`);
-        resolveAttributeBar(container, { newExtra: attribute.extra_value });
+        const container = $(`.attribute-container[data-attribute-id="${attribute.attributeID}"]`);
+        resolveAttributeBar(container, { newExtra: attribute.extraValue });
     }
 }

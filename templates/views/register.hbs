@@ -78,28 +78,7 @@
         pass[0].onchange = validatePassword;
         confirmPass[0].onkeyup = validatePassword;
 
-        function onRegisterSuccess() {
-            const success = $(`<p style="color: red;" class="h4">Cadastro realizado com sucesso! - Redirecionando para a ficha...</p>`);
-            $('.col.return').append(success);
-
-            setTimeout(() => {
-                location.replace('/sheet/1');
-            }, 1000);
-        }
-
-        function onRegisterFail(err) {
-            const error = $(`<p style="color: red;" class="h4">Erro: ${err.responseText}</p>`);
-            $('.col.return').append(error);
-
-            setTimeout(() => {
-                error.fadeOut(2000, () => error.remove());
-            }, 500);
-
-            console.error(`Server: ${err}`);
-            registerForm.show();
-        }
-
-        registerForm.submit(ev => {
+        registerForm.submit(async ev => {
             ev.preventDefault();
 
             registerForm.hide();
@@ -108,16 +87,29 @@
             const password = pass.val();
             const adminKey = $('#adminKey').val();
             pass.val('');
-
             confirmPass.val('');
 
-            $.ajax('/register',
-                {
-                    method: 'POST',
-                    data: { username, password, adminKey },
-                    success: onRegisterSuccess,
-                    error: onRegisterFail
-                });
+            try {
+                const response = await axios.post('/register', { username, password, adminKey });
+                const success = $(`<p style="color: red;" class="h4">
+                    Cadastro realizado com sucesso! - Redirecionando para a ficha...</p>`);
+                $('.col.return').append(success);
+
+                setTimeout(() => {
+                    location.replace('/sheet/1');
+                }, 1000);
+            }
+            catch (err) {
+                const error = $(`<p style="color: red;" class="h4">Erro: ${err.message} - ${err.response.data}</p>`);
+                $('.col.return').append(error);
+
+                setTimeout(() => {
+                    error.fadeOut(2000, () => error.remove());
+                }, 500);
+
+                console.error(err);
+                registerForm.show();
+            }
         });
 
     </script>

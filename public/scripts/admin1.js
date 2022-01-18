@@ -11,8 +11,9 @@ $('#changeEnvironment').click(async ev => {
 });
 
 async function playerLineageChange(ev) {
-    const lineageID = $(ev.target).val();
+    const lineageID = parseInt($(ev.target).val());
     const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
+    console.log({ lineageID, playerID });
     try { await axios.post('/sheet/player/lineage', { lineageID, playerID }) }
     catch (err) { showFailureToastMessage(err) }
 }
@@ -49,11 +50,11 @@ socket.on('attribute changed', content => {
 
 socket.on('attribute status changed', content => {
     const container = $(`.acds-player-container[data-player-id="${content.playerID}"]`);
-    const array = container.data('attributes');
+    const array = container.data('attribute-status');
 
     const updatedAttrStatus = array.find(attr => attr.attribute_status_id === content.attrStatusID);
     updatedAttrStatus.value = content.value;
-    container.data('attributes', array);
+    container.data('attribute-status', array);
 
     for (const attr of array)
         if (attr.value) return showAvatar(container, attr.attribute_status_id);
@@ -119,10 +120,11 @@ socket.on('item added', content => {
     const itemID = content.itemID;
     const name = content.name;
     const description = content.description;
+    const quantity = content.quantity;
 
     const row = $($('#itemRowTemplate').html());
     row.data('item-id', itemID);
-    row.find('.name.description').text(name).attr('title', description);
+    row.find('.name.description').text(name).attr('title', `${description} (${quantity})`);
 
     $(`.acds-player-container[data-player-id="${playerID}"] .player-item-table`).append(row);
 });
@@ -132,6 +134,16 @@ socket.on('item deleted', content => {
     const itemID = content.itemID;
     $(`.acds-player-container[data-player-id="${playerID}"]
     .player-item[data-item-id="${itemID}"]`).remove();
+});
+
+socket.on('item changed', content => {
+    const playerID = content.playerID;
+    const itemID = content.itemID;
+    const description = content.description;
+    const quantity = content.quantity;
+
+    $(`.acds-player-container[data-player-id="${playerID}"]
+    .player-item[data-item-id="${itemID}"]`).attr('title', `${description} (${quantity})`);
 });
 
 socket.on('dice result', content => {
@@ -212,7 +224,7 @@ function showAvatar(container, attrStatusID = 0) {
     const containers = $('.acds-player-container');
     for (let i = 0; i < containers.length; i++) {
         const container = containers.eq(i);
-        const attr = container.data('attributes').find(attr => attr.value === 1);
+        const attr = container.data('attribute-status').find(attr => attr.value === 1);
         showAvatar(container, attr?.attribute_status_id || 0);
     }
 }

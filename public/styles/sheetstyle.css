@@ -107,8 +107,20 @@
     transition: all 0.15s ease-in;
 }
 
+.acds-tooltip .description {
+    color: #999;
+}
+
 .lineage-node img:hover+.acds-tooltip {
     visibility: visible;
     opacity: 1;
     transition: all 0.3s 0.3s ease-out;
+}
+
+#playerClassTitle {
+    color: red;
+}
+
+#playerScore {
+    color: red;
 }

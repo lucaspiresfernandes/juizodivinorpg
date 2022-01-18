@@ -2,9 +2,10 @@
 <html>
 
 <head>
-    {{> head ignore_socketio=1}}
+    {{> head}}
     <script src="/scripts/sheet1.js" defer></script>
     <link rel="stylesheet" href="/styles/sheetstyle.css">
+    <script>socket.emit('room:join', 'player' + {{ playerID }});</script>
 </head>
 
 <body>
@@ -75,7 +76,7 @@
                 <div class="row my-4">
                     <div class="col" id="playerClass" data-bonus="{{playerClass.bonus}}"
                         data-attribute-id="{{attribute_id}}" data-skills="{{playerClass.skills}}">
-                        <span id="playerClassTitle" style="color: red;">{{playerClass.ability_title}}{{#if
+                        <span id="playerClassTitle">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>
                         <span id="playerClassDescription">{{playerClass.ability_description}}</span>
                     </div>

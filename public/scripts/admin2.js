@@ -113,11 +113,11 @@ async function equipmentVisibleChange(ev) {
         skillLoading.show();
 
         const name = $('#createSkillName').val();
-        const specializationID = $('#createSkillSpecialization').val();
-        const characteristicID = $('#createSkillCharacteristic').val();
+        const specializationID = parseInt($('#createSkillSpecialization').val());
+        const characteristicID = parseInt($('#createSkillCharacteristic').val());
 
         try {
-            const response = await axios.put('/sheet/skill', { data: { name, specializationID, characteristicID } });
+            const response = await axios.put('/sheet/skill', { name, specializationID, characteristicID });
             const id = response.data.skillID;
             addSkill({ id, name, specializationID, characteristicID, mandatory: false });
         }

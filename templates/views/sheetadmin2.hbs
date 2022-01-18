@@ -62,7 +62,7 @@
                     <div class="col offset-2 h2 text-center">Perícias</div>
                     <div class="col-2">
                         <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
-                            data-bs-target="#createEquipment">
+                            data-bs-target="#createSkill">
                     </div>
                 </div>
                 <hr>
@@ -93,7 +93,7 @@
                     <div class="col offset-2 h2 text-center">Itens</div>
                     <div class="col-2">
                         <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
-                            data-bs-target="#createEquipment">
+                            data-bs-target="#createItem">
                     </div>
                 </div>
                 <hr>
@@ -152,40 +152,46 @@
                     <div class="modal-body text-center" id="createEquipmentContainer">
                         {{> loading}}
                         <div class="container-fluid">
-                            <div class="row">
-                                <div class="col my-2">
-                                    <input id="createEquipmentName" type="text" placeholder="Nome" required>
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input class="acds-element form-control" id="createEquipmentName" type="text"
+                                        placeholder="Nome" required>
+                                </div>
+                            </div>
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input class="acds-element form-control" id="createEquipmentType" type="text"
+                                        placeholder="Tipo" required>
+                                </div>
+                            </div>
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input class="acds-element form-control" id="createEquipmentDamage" type="text"
+                                        placeholder="Dano" required>
+                                </div>
+                            </div>
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input class="acds-element form-control" id="createEquipmentRange" type="text"
+                                        placeholder="Alcance" required>
+                                </div>
+                            </div>
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input class="acds-element form-control" id="createEquipmentAttacks" type="text"
+                                        placeholder="Ataques" required>
+                                </div>
+                            </div>
+                            <div class="row my-3">
+                                <div class="col">
+                                    <input class="acds-element form-control" id="createEquipmentAmmo" type="text"
+                                        placeholder="Munição" required>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col my-2">
-                                    <input id="createEquipmentType" type="text" placeholder="Tipo" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col my-2">
-                                    <input id="createEquipmentDamage" type="text" placeholder="Dano" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col my-2">
-                                    <input id="createEquipmentRange" type="text" placeholder="Alcance" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col my-2">
-                                    <input id="createEquipmentAttacks" type="text" placeholder="Ataques" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col my-2">
-                                    <input id="createEquipmentAmmo" type="text" placeholder="Munição" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col my-2">
+                                <div class="col">
                                     <label for="combatSpecializationList">Perícia</label>
-                                    <select id="combatSpecializationList" class="form-select acds-element my-2">
+                                    <select id="combatSpecializationList" class="form-select acds-element">
                                         {{#each combatSpecializations}}
                                         {{#with this}}
                                         <option value="{{skill_id}}">{{name}}</option>
@@ -222,16 +228,16 @@
                     <div class="modal-body text-center" id="createSkillContainer">
                         {{> loading}}
                         <div class="container-fluid">
-                            <div class="row">
+                            <div class="row my-2">
                                 <div class="col">
-                                    <input id="createSkillName" type="text" placeholder="Nome da Perícia" class="my-2"
-                                        required>
+                                    <input id="createSkillName" type="text" placeholder="Nome da Perícia"
+                                        class="acds-element form-control" required>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row my-2">
                                 <div class="col">
                                     <label for="createSkillSpecialization">Especialização</label>
-                                    <select id="createSkillSpecialization" class="form-select acds-element my-2">
+                                    <select id="createSkillSpecialization" class="form-select acds-element">
                                         <option value="0" selected>Nenhuma</option>
                                         {{#each specializations}}
                                         {{#with this}}
@@ -243,10 +249,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row my-2">
                                 <div class="col">
                                     <label for="createSkillCharacteristic">Atributo</label>
-                                    <select id="createSkillCharacteristic" class="form-select acds-element my-2">
+                                    <select id="createSkillCharacteristic" class="form-select acds-element">
                                         {{#each characteristics}}
                                         {{#with this}}
                                         <option id="createSkillCharacteristicOption{{characteristic_id}}"
@@ -285,14 +291,15 @@
                     <div class="modal-body text-center" id="createItemContainer">
                         {{> loading}}
                         <div class="container-fluid">
-                            <div class="row">
+                            <div class="row my-2">
                                 <div class="col">
-                                    <input id="createItemName" type="text" placeholder="Nome" class="my-2" required>
+                                    <input id="createItemName" type="text" placeholder="Nome"
+                                        class="acds-element form-control" required>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row my-2">
                                 <div class="col">
-                                    <textarea class="form-control" id="createItemDescription"
+                                    <textarea class="acds-element form-control" id="createItemDescription"
                                         placeholder="Descrição Inicial" rows="3" required></textarea>
                                 </div>
                             </div>
