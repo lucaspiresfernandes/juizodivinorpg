@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    {{> head ignore_socketio=1}}
+    {{> head ignore_jquery=1 ignore_socketio=1 ignore_axios=1}}
+    <meta charset="utf-8">
     <link rel="stylesheet" href="/styles/home.css">
 </head>
 
@@ -37,7 +38,7 @@
                 </form>
                 <div class="row my-3">
                     <div class="col">
-                        Não possui cadastro? <a class="h5 login-link" href="/register">Registrar-se</a>
+                        Não possui cadastro? <a class="h5" href="/register">Registrar-se</a>
                     </div>
                 </div>
                 <div class="row">
@@ -49,8 +50,10 @@
         </div>
     </div>
 
-
     <script>
+
+        // LOGIN
+
         const loginForm = $('#loginForm');
         loginForm.submit(async ev => {
             ev.preventDefault();
@@ -87,7 +90,8 @@
             $('.col.return').append(responseElement);
         });
 
-    </script>
+</script>
+
 </body>
 
 </html>
