@@ -832,7 +832,6 @@ router.post('/skill', jsonParser, async (req, res) => {
 
         let skillName = skillNames.skill_name;
         if (skillNames.spec_name) skillName = `${skillNames.spec_name} (${skillName})`;
-        console.log(skillName);
         emitToAllPlayers('skill changed', { skillID, name: skillName });
     }
     catch (err) {

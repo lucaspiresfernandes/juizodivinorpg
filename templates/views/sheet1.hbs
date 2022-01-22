@@ -4,7 +4,7 @@
 <head>
     {{> head}}
     <script src="/scripts/sheet1.js" defer></script>
-    <link rel="stylesheet" href="/styles/sheetstyle.css">
+    <link rel="stylesheet" href="/styles/playersheet.css">
     <script>socket.emit('room:join', 'player' + {{ playerID }});</script>
 </head>
 
@@ -32,14 +32,22 @@
                 {{#each info}}
                 {{#with this}}
                 <div class="row mt-4 info-container" data-info-id="{{info_id}}">
-                    <div class="col">
+                    <div class="col mx-2">
                         <div class="row">
-                            <div class="col mx-2 h5"><label for="info{{@index}}">{{name}}</label></div>
+                            <div class="col h5">
+                                <label class="info-label" for="info{{@index}}">
+                                    {{name}}
+                                </label>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                <input class="acds-element acds-bottom-text" type="text" id="info{{@index}}"
+                                {{#if value}}
+                                <label class="info-field" for="info{{@index}}">{{value}}</label>
+                                {{else}}
+                                <input class="acds-element acds-bottom-text info-field" type="text" id="info{{@index}}"
                                     value="{{value}}" autocomplete="off">
+                                {{/if}}
                             </div>
                         </div>
                     </div>
@@ -49,7 +57,9 @@
                 <div class="row mt-4">
                     <div class="col">
                         <div class="row">
-                            <div class="col mx-2 h5"><label for="playerClassSelect">Classe</label></div>
+                            <div class="col mx-2 h5">
+                                <label class="class-label" for="playerClassSelect">Classe</label>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col">
@@ -100,7 +110,7 @@
                         <div class="row attribute-container" data-attribute-id="{{attribute_id}}">
                             <div class="col">
                                 <div class="row">
-                                    <div class="col"><label for="attribute{{@index}}">{{name}}</label></div>
+                                    <div class="col"><label for="attribute{{@index}}">Pontos de {{name}}</label></div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
@@ -192,11 +202,13 @@
                     {{#with this}}
                     <div class="col my-2 characteristic-container" data-characteristic-id="{{characteristic_id}}"
                         data-rollable="{{rollable}}">
+                        {{#if rollable}}
                         <div class="row mb-2">
                             <div class="col">
                                 <img class="img-fluid acds-clickable" src="/assets/dice.png">
                             </div>
                         </div>
+                        {{/if}}
                         <div class="row">
                             <div class="col"><label for="characteristic{{@index}}">{{name}}</label></div>
                         </div>

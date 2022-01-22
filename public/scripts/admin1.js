@@ -13,7 +13,6 @@ $('#changeEnvironment').click(async ev => {
 async function playerLineageChange(ev) {
     const lineageID = parseInt($(ev.target).val());
     const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
-    console.log({ lineageID, playerID });
     try { await axios.post('/sheet/player/lineage', { lineageID, playerID }) }
     catch (err) { showFailureToastMessage(err) }
 }

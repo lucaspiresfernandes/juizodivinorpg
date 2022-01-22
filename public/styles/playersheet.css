@@ -45,8 +45,10 @@
     max-height: 50px;
 }
 
-.characteristic-container[data-rollable="0"] img {
-    visibility: hidden;
+.characteristic-container[data-rollable="0"] {
+    position: relative;
+    top: calc(50px + 0.5rem);
+    height: 100%;
 }
 
 .equipment-row img {
@@ -123,4 +125,17 @@
 
 #playerScore {
     color: red;
+}
+
+.info-label, .class-label {
+    color: rgb(185, 185, 185);
+}
+
+label.info-field {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

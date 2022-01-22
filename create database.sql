@@ -123,7 +123,7 @@ INSERT INTO
     )
 VALUES
     (
-        'Pontos de Vida',
+        'Vida',
         FALSE,
         '5a1e1e',
         'b62323',
