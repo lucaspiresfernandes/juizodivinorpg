@@ -1,7 +1,6 @@
 .skill-container {
     background-color: black;
     border-radius: 20px;
-    max-width: 250px;
 }
 
 .skill-container:hover {
@@ -43,12 +42,6 @@
 
 .characteristic-container img {
     max-height: 50px;
-}
-
-.characteristic-container[data-rollable="0"] {
-    position: relative;
-    top: calc(50px + 0.5rem);
-    height: 100%;
 }
 
 .equipment-row img {

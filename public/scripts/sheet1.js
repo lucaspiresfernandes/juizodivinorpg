@@ -583,7 +583,7 @@ const addSkillList = $('#addSkillList');
         const str = searchBar.val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
         for (let i = 0; i < skillsContainer.length; i++) {
             const container = skillsContainer.eq(i);
-            const name = container.find('.skill-label').text().toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+            const name = container.find('.name').text().toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
             container.toggleClass('d-none', !name.includes(str));
         }
     });
