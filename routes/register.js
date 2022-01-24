@@ -140,7 +140,7 @@ async function registerPlayerData(playerID) {
 }
 
 function registerAdminData(playerID) {
-    return con('player_note').insert({ 'player_id': playerID, 'value': '' }).then(() => { });
+    return con('player_note').insert({ 'player_id': playerID, 'value': '' });
 }
 
 module.exports = router;

@@ -59,20 +59,14 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
 
 //Class
 $("#playerClassSelect").change(async ev => {
-    const classID = parseInt($(ev.target).val());
     const option = $(ev.target).find('option:selected');
     const title = option.data('ability-title');
     const description = option.data('ability-description') || '';
-    const bonus = option.data('bonus') || 0;
-    const skills = option.data('skills') || [];
-    const attrID = option.data('attribute-id') || 0;
     $('#playerClassTitle').text(title ? title + ': ' : '');
     $('#playerClassDescription').text(description);
-    $('#playerClass').data('bonus', bonus);
-    $('#playerClass').data('attribute-id', attrID);
-    $('#playerClass').data('skills', skills);
 
     try {
+        const classID = parseInt($(ev.target).val());
         const response = await axios.post('/sheet/player/class', { classID });
         updateSkills(response.data.updatedSkills);
         updateAttributes(response.data.updatedAttributes);
@@ -558,7 +552,7 @@ const addSkillList = $('#addSkillList');
             const container = $(skillContainerTemplate);
             container.data('skill-id', skill.skill_id);
             container.find('input').val(skill.value).data('last-value', skill.value);
-            container.find('.total').text(skill.total_value);
+            container.find('.total').text(skill.value);
             container.find('.name').text(skill.name);
 
             skillTable.append(container);

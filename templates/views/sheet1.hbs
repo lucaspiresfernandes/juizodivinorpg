@@ -71,8 +71,7 @@
                                     {{#with this}}
                                     <option value="{{class_id}}" data-ability-title="{{ability_title}}"
                                         data-ability-description="{{ability_description}}"
-                                        title="{{ability_title}}: {{ability_description}}" data-skills="{{skills}}"
-                                        data-attribute-id="{{attribute_id}}" data-bonus="{{bonus}}" {{#ifEquals
+                                        title="{{ability_title}}: {{ability_description}}" {{#ifEquals
                                         ../playerClass.class_id class_id}}selected{{/ifEquals}}>
                                         {{name}}
                                     </option>
@@ -84,8 +83,7 @@
                     </div>
                 </div>
                 <div class="row my-4">
-                    <div class="col" id="playerClass" data-bonus="{{playerClass.bonus}}"
-                        data-attribute-id="{{attribute_id}}" data-skills="{{playerClass.skills}}">
+                    <div class="col" id="playerClass">
                         <span id="playerClassTitle">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>
                         <span id="playerClassDescription">{{playerClass.ability_description}}</span>
@@ -226,7 +224,7 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col px-4">
-                <div class="row mt-2 align-items-center">
+                <div class="row mt-2">
                     <div class="col offset-2 h2 text-center">Combate</div>
                     <div class="col-2">
                         <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
@@ -473,7 +471,7 @@
                                 <div class="col my-2">
                                     <label for="combatSpecializationList">Perícia</label>
                                     <select id="combatSpecializationList" class="form-select acds-element my-2">
-                                        {{#each combatSpecializations}}
+                                        {{#each specializations}}
                                         {{#with this}}
                                         <option value="{{skill_id}}">{{name}}</option>
                                         {{/with}}

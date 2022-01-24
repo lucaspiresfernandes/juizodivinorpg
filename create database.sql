@@ -295,7 +295,7 @@ VALUES
     (
         1,
         1,
-        0,
+        1,
         'Amarelinha',
         'Permite voar.',
         0
@@ -303,7 +303,7 @@ VALUES
     (
         1,
         2,
-        1,
+        2,
         'Amarelo elo',
         'Sim. Elo.',
         1
@@ -311,7 +311,7 @@ VALUES
     (
         1,
         3,
-        2,
+        3,
         'Relomarelo',
         'Lingua travada?',
         1
@@ -319,7 +319,7 @@ VALUES
     (
         1,
         4,
-        2,
+        3,
         'lero lero',
         'Ié ié!',
         1
@@ -327,7 +327,7 @@ VALUES
     (
         1,
         5,
-        3,
+        4,
         'Amarelo',
         'Tá ficando sério.',
         1
@@ -335,7 +335,7 @@ VALUES
     (
         1,
         6,
-        3,
+        4,
         'Amar. Elo. Amarelo',
         'Poético...',
         1
@@ -343,7 +343,7 @@ VALUES
     (
         1,
         7,
-        3,
+        4,
         'Amarelado',
         'Adjetivos, muito bom.',
         1
@@ -351,7 +351,7 @@ VALUES
     (
         1,
         8,
-        4,
+        5,
         'Amarelão',
         'Caralho, um amarelo muito grande.',
         1
@@ -359,7 +359,7 @@ VALUES
     (
         1,
         9,
-        5,
+        6,
         'Amarelo Deus',
         'Você é o Deus do amarelo',
         1
@@ -367,7 +367,7 @@ VALUES
     (
         2,
         1,
-        0,
+        1,
         'Azulzinho',
         'Bem piquititinho.',
         0
@@ -375,7 +375,7 @@ VALUES
     (
         2,
         2,
-        1,
+        2,
         'Azulejo',
         'Do seu banheiro.',
         1
@@ -383,7 +383,7 @@ VALUES
     (
         2,
         3,
-        2,
+        3,
         'Azulado',
         'Adjetivo de estado. :)',
         1
@@ -391,7 +391,7 @@ VALUES
     (
         2,
         4,
-        2,
+        3,
         'Azulto',
         'Um adulto azul.',
         1
@@ -399,7 +399,7 @@ VALUES
     (
         2,
         5,
-        3,
+        4,
         'Luza',
         '?meb odut áT',
         1
@@ -407,7 +407,7 @@ VALUES
     (
         2,
         6,
-        3,
+        4,
         'Azul',
         'Tá ficando sério...',
         1
@@ -415,7 +415,7 @@ VALUES
     (
         2,
         7,
-        3,
+        4,
         'Baleia Azul',
         'PrOOocuRANDO O NEEEeeeemO',
         1
@@ -423,7 +423,7 @@ VALUES
     (
         2,
         8,
-        4,
+        5,
         'Azulzão',
         'Caralho, muito azul.',
         1
@@ -431,7 +431,7 @@ VALUES
     (
         2,
         9,
-        5,
+        6,
         'Azul Deus',
         'Você é o deus do azul.',
         1
@@ -439,7 +439,7 @@ VALUES
     (
         3,
         1,
-        0,
+        1,
         'Verdinha',
         'Hmm... Sus...',
         0
@@ -447,7 +447,7 @@ VALUES
     (
         3,
         2,
-        1,
+        2,
         'Verdejante',
         'Sinceramente, eu nem sei exatamente o que isso significa.',
         1
@@ -455,7 +455,7 @@ VALUES
     (
         3,
         3,
-        2,
+        3,
         'Verdana',
         'Entendeu? rsrsrsrs',
         1
@@ -463,7 +463,7 @@ VALUES
     (
         3,
         4,
-        2,
+        3,
         'Verdedito',
         'Um veredito verde. Parece ser bom.',
         1
@@ -471,7 +471,7 @@ VALUES
     (
         3,
         5,
-        3,
+        4,
         'Verde',
         'ok, verde.',
         1
@@ -479,7 +479,7 @@ VALUES
     (
         3,
         6,
-        3,
+        4,
         'Verdura',
         'Tem que comer!',
         1
@@ -487,7 +487,7 @@ VALUES
     (
         3,
         7,
-        3,
+        4,
         'Verme- Verde!',
         'ERROU!',
         1
@@ -495,7 +495,7 @@ VALUES
     (
         3,
         8,
-        4,
+        5,
         'Verdão',
         'Muito verde!',
         1
@@ -503,7 +503,7 @@ VALUES
     (
         3,
         9,
-        5,
+        6,
         'Deus do verde',
         'Você é o deus do verde',
         1
@@ -511,7 +511,7 @@ VALUES
     (
         4,
         1,
-        0,
+        1,
         'Vermelhinho',
         'Tá doendo?',
         0
@@ -519,7 +519,7 @@ VALUES
     (
         4,
         2,
-        1,
+        2,
         'Avermelhado',
         'É como o seu sorriso me deixa... uWu',
         1
@@ -527,7 +527,7 @@ VALUES
     (
         4,
         3,
-        2,
+        3,
         'Vermédio',
         'Pra quando vc tá mal.',
         1
@@ -535,7 +535,7 @@ VALUES
     (
         4,
         4,
-        2,
+        3,
         'Verme...lho',
         'Muito nojento!',
         1
@@ -543,7 +543,7 @@ VALUES
     (
         4,
         5,
-        3,
+        4,
         'Vermelho',
         'OoO',
         1
@@ -551,7 +551,7 @@ VALUES
     (
         4,
         6,
-        3,
+        4,
         'Vermelha',
         'Tipo... o feminino de vermelho...',
         1
@@ -559,7 +559,7 @@ VALUES
     (
         4,
         7,
-        3,
+        4,
         'Vermeja',
         'Pra limpar a cozinha.',
         1
@@ -567,7 +567,7 @@ VALUES
     (
         4,
         8,
-        4,
+        5,
         'Vermelhão',
         'Meu Deus tá doendo muito!',
         1
@@ -575,7 +575,7 @@ VALUES
     (
         4,
         9,
-        5,
+        6,
         'Deus do Vermelho',
         'Você é o deus do Vermelho',
         1
@@ -785,7 +785,6 @@ CREATE TABLE `spec` (
 INSERT INTO
     `spec` (`name`)
 VALUES
-    ('Dano Bônus'),
     ('Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
