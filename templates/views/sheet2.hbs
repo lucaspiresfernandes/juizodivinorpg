@@ -34,19 +34,23 @@
                                 data-conquered="{{conquered}}" data-available="{{available}}" data-cost="{{cost}}">
                                 <img src="/assets/lineages/frame/{{../../playerLineage}}/{{this.index}}.png"
                                     class="img-fluid {{#unless available}}unavailable{{else}}acds-clickable{{/unless}} {{#unless conquered}}unconquered{{/unless}}">
-                                <div class="acds-tooltip p-3">
-                                    <p><span class="title text-center h3">{{#unless
-                                            available}}????????????{{else}}{{this.name}}{{/unless}}</span></p>
-                                    <p><span class="cost">{{#unless
-                                            available}}?{{else}}{{this.cost}}{{/unless}}</span></p>
-                                    <p><span class="description h6">{{#unless
-                                            available}}????????????{{else}}{{this.description}}{{/unless}}</span></p>
-                                    <p><span class="footer"
-                                            style="color: {{#unless available}}red{{else}}{{#if conquered}}green{{else}}yellow{{/if}}{{/unless}}">{{#unless
-                                            available}}Você não possui os requerimentos para essa
-                                            habilidade.{{else}}{{#if conquered}}Você possui essa habilidade.{{else}}Você
-                                            ainda não possui essa habilidade.{{/if}}{{/unless}}</span>
-                                    </p>
+                                <div class="acds-tooltip px-3 py-2">
+                                    <span class="title text-center h3">{{#unless
+                                        available}}????????????{{else}}{{this.name}}{{/unless}}</span>
+                                    <br>
+                                    Custo: <span class="cost">{{#unless
+                                        available}}?{{else}}{{this.cost}}{{/unless}}</span>
+                                    <p>Tipo: <span class="type">{{#unless
+                                            available}}?{{else}}{{this.type}}{{/unless}}</span></p>
+                                    <p class="description">{{#unless
+                                        available}}????????????{{else}}{{this.description}}{{/unless}}</p>
+                                    <span class="footer"
+                                        style="color: {{#unless available}}red{{else}}{{#if conquered}}green{{else}}yellow{{/if}}{{/unless}}">
+                                        {{#unless
+                                        available}}Você não possui os requerimentos para essa
+                                        habilidade.{{else}}{{#if conquered}}Você possui essa habilidade.{{else}}Você
+                                        ainda não possui essa habilidade.{{/if}}{{/unless}}
+                                    </span>
                                 </div>
                             </div>
                             {{/each}}

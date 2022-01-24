@@ -1,47 +1,15 @@
-.tablinks {
-    margin-bottom: 3px;
-    margin-top: 3px;
-    background-color: #000000;
-    color: #ffffff;
-    font-weight: bold;
-    border: 2px solid white;
-    padding: 10px;
-    transition: 0.2s; 
+#logo {
+    max-height: 200px;
 }
 
-.tab button:hover {
-    background-color: #ffffff52;
-    transition: 0.2s;
-}
-
-.tab button.active {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-#login-button {
-    margin-left: 3px;
-}
-
-.tab {
-    text-align: center;
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
-
-#register {
-    display: none;
-}
-
-.submit-button {
-    background-color: #000000;
+button[type="submit"] {
     border: 2px solid white;
     color: #ffffff;
     font-weight: bold;
     transition: 0.5s;
 }
 
-.submit-button:hover {
+button[type="submit"]:hover {
     background-color: #ffffff;
     padding-left: 30px;
     padding-right: 30px;

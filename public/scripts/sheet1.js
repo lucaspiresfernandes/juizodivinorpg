@@ -166,7 +166,7 @@ findAvatar();
     });
     containers.find('.dice').click(ev =>
         rollDice(parseInt($('.spec-container input[name="Exposição Pavorosa"]').val()), 100, false));
-    containers.find('.btn-attribute').click(async ev => {
+    containers.find('.attribute-button').click(async ev => {
         let coef = $(ev.target).data('coefficient');
         const container = $(ev.target).parents('.attribute-container');
         const bar = container.find('.progress-bar');

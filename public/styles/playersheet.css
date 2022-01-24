@@ -65,7 +65,7 @@
 }
 
 .item-row td .quantity {
-    max-width: 4rem;
+    max-width: 3rem;
 }
 
 #lineageGraph {
@@ -90,7 +90,6 @@
 }
 
 .lineage-node .acds-tooltip {
-    visibility: hidden;
     opacity: 0;
     background: #111;
     border-radius: 8px;
@@ -107,7 +106,6 @@
 }
 
 .lineage-node img:hover+.acds-tooltip {
-    visibility: visible;
     opacity: 1;
     transition: all 0.3s 0.3s ease-out;
 }
@@ -135,4 +133,13 @@ label.info-field {
 
 #sheetLogo {
     max-height: 150px;
+}
+
+#diceResultDescription {
+    opacity: 0;
+    transition: 1s;
+}
+
+#diceResultDescription.show {
+    opacity: 1;
 }

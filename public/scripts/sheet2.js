@@ -39,6 +39,7 @@ $('.lineage-node img').click(async ev => {
             container.data('available', true);
             const tooltip = container.find('.acds-tooltip');
             tooltip.find('.title').text(node.name);
+            tooltip.find('.type').text(node.type);
             tooltip.find('.cost').text(node.cost);
             tooltip.find('.description').text(node.description);
             tooltip.find('.footer').text('Você ainda não possui essa habilidade.').css('color', 'yellow');

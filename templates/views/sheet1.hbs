@@ -82,8 +82,8 @@
                 </div>
             </div>
             <div class="col">
-                <div class="row mb-3 avatar-container">
-                    <div class="col d-flex justify-content-center">
+                <div class="row mb-2 avatar-container justify-content-center">
+                    <div class="col">
                         <img id="avatar" class="img-fluid acds-clickable" data-bs-toggle="modal"
                             data-bs-target="#uploadAvatar">
                     </div>
@@ -92,7 +92,7 @@
                             data-bs-target="#generalDiceRoll">
                     </div>
                 </div>
-                <div class="row mb-3 justify-content-center">
+                <div class="row justify-content-center">
                     <div class="col">
                         {{#each attributes}}
                         {{#with this}}
@@ -118,21 +118,21 @@
                                     {{/if}}
                                 </div>
                                 <div class="row justify-content-center mt-2">
-                                    <div class="col-3">
+                                    <div class="col col-lg-3">
                                         <input type="button" value="-" data-coefficient="-1"
-                                            class="btn w-100 btn-dark btn-attribute">
+                                            class="btn w-100 btn-dark attribute-button">
                                     </div>
-                                    <div class="col-2 text-center">
+                                    <div class="col col-lg-2 text-center align-self-center">
                                         <label class="h5 attribute-description"
                                             for="attribute{{@index}}">{{value}}/{{total_value}}</label>
                                     </div>
-                                    <div class="col-3">
+                                    <div class="col col-lg-3">
                                         <input type="button" value="+" data-coefficient="1"
-                                            class="btn w-100 btn-dark btn-attribute">
+                                            class="btn w-100 btn-dark attribute-button">
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-2 offset-5 h5">
+                                    <div class="col-4 offset-4 col-lg-2 offset-lg-5 h5">
                                         <input type="text" maxlength="3" autocomplete="off" value="{{max_value}}"
                                             class="attribute-max acds-bottom-text acds-element text-center"
                                             id="attribute{{@index}}">
@@ -140,7 +140,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row my-2 px-4">
+                        <div class="row my-2">
                             {{#each status}}
                             {{#with this}}
                             <div class="col attribute-status-container"
@@ -158,17 +158,17 @@
                         {{/each}}
                     </div>
                 </div>
-                <div class="row my-3">
+                <div class="row">
                     {{#each specs}}
                     {{#with this}}
-                    <div class="col mt-3 text-center justify-content-center spec-container" data-spec-id="{{spec_id}}">
+                    <div class="col text-center spec-container" data-spec-id="{{spec_id}}">
                         <div class="row">
                             <div class="col">
-                                <input class="text-center acds-element acds-bottom-text h5 w-50" type="text"
+                                <input class="text-center acds-element acds-bottom-text h5" type="text"
                                     value="{{value}}" name="{{name}}" id="specField{{@index}}">
                             </div>
                         </div>
-                        <div class="row my-1">
+                        <div class="row">
                             <div class="col">
                                 <label for="specField{{@index}}">{{name}}</label>
                             </div>
@@ -214,10 +214,10 @@
             </div>
         </div>
         <div class="row my-3 acds-container">
-            <div class="col px-4">
-                <div class="row mt-2">
-                    <div class="col offset-2 h2 text-center">Combate</div>
-                    <div class="col-2">
+            <div class="col">
+                <div class="row">
+                    <div class="col mt-2 offset-3 h2 text-center">Combate</div>
+                    <div class="col-3 align-self-center">
                         <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
                             data-bs-target="#addEquipment">
                     </div>
@@ -252,10 +252,10 @@
             </div>
         </div>
         <div class="row my-3 acds-container">
-            <div class="col px-4">
-                <div class="row mt-2">
-                    <div class="col offset-2 h2 text-center">Perícias</div>
-                    <div class="col-2">
+            <div class="col">
+                <div class="row">
+                    <div class="col offset-3 mt-2 h2 text-center">Perícias</div>
+                    <div class="col-3 align-self-center">
                         <input type="button" value="+" class="btn btn-dark" data-bs-toggle="modal"
                             data-bs-target="#addSkill">
                     </div>
@@ -267,7 +267,7 @@
                             placeholder="Procurar">
                     </div>
                 </div>
-                <div id="skillTable" class="row mb-3 text-center justify-content-center">
+                <div id="skillTable" class="row mb-3 mx-1 text-center justify-content-center">
                     {{#each skills}}
                     {{> skill_container this}}
                     {{/each}}
@@ -275,10 +275,10 @@
             </div>
         </div>
         <div class="row my-3 acds-container">
-            <div class="col px-4">
-                <div class="row mt-2">
-                    <div class="col offset-2 h2 text-center">Inventário</div>
-                    <div class="col-2">
+            <div class="col">
+                <div class="row">
+                    <div class="col offset-3 mt-2 h2 text-center">Inventário</div>
+                    <div class="col-3 align-self-center">
                         <input type="button" value="+" class="btn btn-dark" data-bs-toggle="modal"
                             data-bs-target="#addItem">
                     </div>
@@ -291,8 +291,8 @@
                                 <tr>
                                     <th scope="col"></th>
                                     <th scope="col">Nome</th>
-                                    <th scope="col">Descrição Pessoal</th>
-                                    <th scope="col">Quantidade</th>
+                                    <th scope="col">Descrição</th>
+                                    <th scope="col">Quant.</th>
                                 </tr>
                             </thead>
                             <tbody id="itemTable">

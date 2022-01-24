@@ -277,6 +277,7 @@ CREATE TABLE `lineage_node` (
     `level` INT UNSIGNED NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
     `cost` DECIMAL (15, 2) NOT NULL,
     PRIMARY KEY (`lineage_id`, `index`),
     CONSTRAINT `fk_lineage_node_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -289,7 +290,8 @@ INSERT INTO
         `level`,
         `name`,
         `description`,
-        `cost`
+        `cost`,
+        `type`
     )
 VALUES
     (
@@ -298,7 +300,8 @@ VALUES
         1,
         'Amarelinha',
         'Permite voar.',
-        0
+        0,
+        'Passiva'
     ),
     (
         1,
@@ -306,7 +309,8 @@ VALUES
         2,
         'Amarelo elo',
         'Sim. Elo.',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -314,7 +318,8 @@ VALUES
         3,
         'Relomarelo',
         'Lingua travada?',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -322,7 +327,8 @@ VALUES
         3,
         'lero lero',
         'Ié ié!',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -330,7 +336,8 @@ VALUES
         4,
         'Amarelo',
         'Tá ficando sério.',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -338,7 +345,8 @@ VALUES
         4,
         'Amar. Elo. Amarelo',
         'Poético...',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -346,7 +354,8 @@ VALUES
         4,
         'Amarelado',
         'Adjetivos, muito bom.',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -354,7 +363,8 @@ VALUES
         5,
         'Amarelão',
         'Caralho, um amarelo muito grande.',
-        1
+        1,
+        'Passiva'
     ),
     (
         1,
@@ -362,7 +372,8 @@ VALUES
         6,
         'Amarelo Deus',
         'Você é o Deus do amarelo',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -370,7 +381,8 @@ VALUES
         1,
         'Azulzinho',
         'Bem piquititinho.',
-        0
+        0,
+        'Passiva'
     ),
     (
         2,
@@ -378,7 +390,8 @@ VALUES
         2,
         'Azulejo',
         'Do seu banheiro.',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -386,7 +399,8 @@ VALUES
         3,
         'Azulado',
         'Adjetivo de estado. :)',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -394,7 +408,8 @@ VALUES
         3,
         'Azulto',
         'Um adulto azul.',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -402,7 +417,8 @@ VALUES
         4,
         'Luza',
         '?meb odut áT',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -410,7 +426,8 @@ VALUES
         4,
         'Azul',
         'Tá ficando sério...',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -418,7 +435,8 @@ VALUES
         4,
         'Baleia Azul',
         'PrOOocuRANDO O NEEEeeeemO',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -426,7 +444,8 @@ VALUES
         5,
         'Azulzão',
         'Caralho, muito azul.',
-        1
+        1,
+        'Passiva'
     ),
     (
         2,
@@ -434,7 +453,8 @@ VALUES
         6,
         'Azul Deus',
         'Você é o deus do azul.',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -442,7 +462,8 @@ VALUES
         1,
         'Verdinha',
         'Hmm... Sus...',
-        0
+        0,
+        'Passiva'
     ),
     (
         3,
@@ -450,7 +471,8 @@ VALUES
         2,
         'Verdejante',
         'Sinceramente, eu nem sei exatamente o que isso significa.',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -458,7 +480,8 @@ VALUES
         3,
         'Verdana',
         'Entendeu? rsrsrsrs',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -466,7 +489,8 @@ VALUES
         3,
         'Verdedito',
         'Um veredito verde. Parece ser bom.',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -474,7 +498,8 @@ VALUES
         4,
         'Verde',
         'ok, verde.',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -482,7 +507,8 @@ VALUES
         4,
         'Verdura',
         'Tem que comer!',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -490,7 +516,8 @@ VALUES
         4,
         'Verme- Verde!',
         'ERROU!',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -498,7 +525,8 @@ VALUES
         5,
         'Verdão',
         'Muito verde!',
-        1
+        1,
+        'Passiva'
     ),
     (
         3,
@@ -506,7 +534,8 @@ VALUES
         6,
         'Deus do verde',
         'Você é o deus do verde',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -514,7 +543,8 @@ VALUES
         1,
         'Vermelhinho',
         'Tá doendo?',
-        0
+        0,
+        'Passiva'
     ),
     (
         4,
@@ -522,7 +552,8 @@ VALUES
         2,
         'Avermelhado',
         'É como o seu sorriso me deixa... uWu',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -530,7 +561,8 @@ VALUES
         3,
         'Vermédio',
         'Pra quando vc tá mal.',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -538,7 +570,8 @@ VALUES
         3,
         'Verme...lho',
         'Muito nojento!',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -546,7 +579,8 @@ VALUES
         4,
         'Vermelho',
         'OoO',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -554,7 +588,8 @@ VALUES
         4,
         'Vermelha',
         'Tipo... o feminino de vermelho...',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -562,7 +597,8 @@ VALUES
         4,
         'Vermeja',
         'Pra limpar a cozinha.',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -570,7 +606,8 @@ VALUES
         5,
         'Vermelhão',
         'Meu Deus tá doendo muito!',
-        1
+        1,
+        'Passiva'
     ),
     (
         4,
@@ -578,7 +615,8 @@ VALUES
         6,
         'Deus do Vermelho',
         'Você é o deus do Vermelho',
-        1
+        1,
+        'Passiva'
     );
 
 CREATE TABLE `lineage_node_connection` (
