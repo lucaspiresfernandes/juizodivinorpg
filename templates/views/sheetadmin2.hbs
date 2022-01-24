@@ -9,17 +9,8 @@
 
 <body>
     <div class="container">
-        <div class="row">
-            <div class="col my-2 text-start">
-                <form action="/sheet/leave">
-                    <button type="submit" class="btn btn-link h4">Sair</button>
-                </form>
-            </div>
-            <div class="col mt-2 text-end align-self-center">
-                <a href="/sheet/admin/1" class="h4">Acessar 1° Página</a>
-            </div>
-        </div>
-        <div class="row h1 text-center">
+        {{> header_footer logo=1 targetPage=1}}
+        <div class="row display-5 text-center">
             <div class="col">Administrador</div>
         </div>
         <div class="row my-3 acds-container">
@@ -116,16 +107,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col my-2 text-start">
-                <form action="/sheet/leave">
-                    <button type="submit" class="btn btn-link h4">Sair</button>
-                </form>
-            </div>
-            <div class="col mb-2 text-end align-self-center">
-                <a href="/sheet/admin/1" class="h4">Acessar 1° Página</a>
-            </div>
-        </div>
+        {{> header_footer targetPage=1}}
     </div>
 
     {{!Templates}}

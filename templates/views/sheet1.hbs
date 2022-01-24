@@ -10,20 +10,8 @@
 
 <body>
     <div class="container">
-        <div class="img-logo">
-            <img class="img-fluid" src="/assets/logo.png" alt="Logo" style="height: 100px;">
-        </div>
-        <div class="row my-2">
-            <div class="col text-start">
-                <form action="/sheet/leave">
-                    <button type="submit" class="btn btn-link h4">Sair</button>
-                </form>
-            </div>
-            <div class="col text-end align-self-center">
-                <a href="/sheet/2" class="h4">Acessar 2° Página</a>
-            </div>
-        </div>
-        <div class="row h1 text-center mt-5">
+        {{> header_footer logo=1 targetPage=2}}
+        <div class="row display-5 text-center">
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
         <div class="row my-3">
@@ -358,16 +346,7 @@
                 </div>
             </div>
         </div>
-        <div class="row my-2">
-            <div class="col text-start">
-                <form action="/sheet/leave">
-                    <button type="submit" class="btn btn-link h4">Sair</button>
-                </form>
-            </div>
-            <div class="col text-end align-self-center">
-                <a href="/sheet/2" class="h4">Acessar 2° Página</a>
-            </div>
-        </div>
+        {{> header_footer targetPage=2}}
     </div>
 
     {{!Templates}}

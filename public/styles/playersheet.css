@@ -120,13 +120,6 @@
     color: red;
 }
 
-.img-logo {
-    position: absolute;
-    left: 50%;
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
-}
-
 .info-label, .class-label {
     color: rgb(185, 185, 185);
 }
@@ -138,4 +131,8 @@ label.info-field {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+#sheetLogo {
+    max-height: 150px;
 }

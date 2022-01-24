@@ -29,3 +29,7 @@ const global = {};
         return clickEvent.clickCount;
     }
 }
+
+$(document.body).ready(() => {
+    $('form[action="/sheet/leave"] a').click(ev => $(ev.target).parent().trigger('submit'));
+})

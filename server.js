@@ -47,7 +47,7 @@ module.exports.io = io;
 
 app.get('/', (req, res) => {
     if (req.session.playerID) return res.redirect('/sheet/1');
-    res.render('home');
+    res.redirect('/login');
 });
 
 const routes = require('./routes');
