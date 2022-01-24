@@ -1,7 +1,6 @@
 .skill-container {
     background-color: black;
     border-radius: 20px;
-    max-width: 250px;
 }
 
 .skill-container:hover {
@@ -45,10 +44,6 @@
     max-height: 50px;
 }
 
-.characteristic-container[data-rollable="0"] img {
-    visibility: hidden;
-}
-
 .equipment-row img {
     max-height: 1.75rem;
 }
@@ -87,7 +82,7 @@
 }
 
 .unconquered {
-    filter: brightness(40%);
+    filter: brightness(50%);
 }
 
 .unavailable {
@@ -130,4 +125,17 @@
     left: 50%;
     -ms-transform: translateX(-50%);
     transform: translateX(-50%);
+}
+
+.info-label, .class-label {
+    color: rgb(185, 185, 185);
+}
+
+label.info-field {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

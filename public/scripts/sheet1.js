@@ -10,7 +10,7 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
     const newTotal = newMax + newExtra;
 
     if (newCur === undefined) newCur = bar.data('current');
-    newCur = clamp(newCur, 0, newTotal);
+    newCur = global.clamp(newCur, 0, newTotal);
     bar.data('current', newCur);
 
     container.find('.attribute-description').text(`${newCur}/${newTotal}`);
@@ -19,32 +19,57 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
 }
 
 //Info
-$('.info-container input').change(async ev => {
-    const value = $(ev.target).val();
-    const infoID = $(ev.target).parents('.info-container').data('info-id');
+{
+    $('.info-container input.info-field').focusout(infoFocusOut);
+    $('.info-container label.info-field').click(infoClick);
 
-    try { await axios.post('/sheet/player/info', { infoID, value }) }
-    catch (err) { showFailureToastMessage(err) }
-});
+    let initialValue = '';
+
+    function infoClick(ev) {
+        if (global.getClickCount(ev) < 2) return;
+
+        const forLabel = $(ev.target).attr('for');
+        const value = $(ev.target).text();
+
+        const input = $(`<input class="acds-element acds-bottom-text info-field" type="text" id="${forLabel}"
+        value="${value}" autocomplete="off"></input>`);
+
+        $(ev.target).parent().empty().append(input).unbind().focusout(infoFocusOut);
+        input.focus()[0].selectionStart = value.length;
+        initialValue = value;
+    }
+
+    async function infoFocusOut(ev) {
+        const value = $(ev.target).val();
+
+        if (initialValue !== value) {
+            const infoID = $(ev.target).parents('.info-container').data('info-id');
+
+            try { await axios.post('/sheet/player/info', { infoID, value }) }
+            catch (err) { showFailureToastMessage(err) }
+        }
+
+        if (!value) return;
+
+        const forID = $(ev.target).attr('id');
+        const label = $(`<label class="info-field" for="${forID}">${value}</label>`);
+        $(ev.target).parent().empty().append(label).unbind().click(infoClick);
+    }
+}
 
 //Class
 $("#playerClassSelect").change(async ev => {
-    const classID = parseInt($(ev.target).val());
     const option = $(ev.target).find('option:selected');
     const title = option.data('ability-title');
     const description = option.data('ability-description') || '';
-    const bonus = option.data('bonus') || 0;
-    const skills = option.data('skills') || [];
-    const attrID = option.data('attribute-id') || 0;
     $('#playerClassTitle').text(title ? title + ': ' : '');
     $('#playerClassDescription').text(description);
-    $('#playerClass').data('bonus', bonus);
-    $('#playerClass').data('attribute-id', attrID);
-    $('#playerClass').data('skills', skills);
 
     try {
+        const classID = parseInt($(ev.target).val());
         const response = await axios.post('/sheet/player/class', { classID });
-        updateSkillAndBar(response.data);
+        updateSkills(response.data.updatedSkills);
+        updateAttributes(response.data.updatedAttributes);
     }
     catch (err) {
         showFailureToastMessage(err);
@@ -129,7 +154,7 @@ findAvatar();
 
         if (newMax === max) return;
 
-        const newCur = clamp(cur, 0, newMax + extra);
+        const newCur = global.clamp(cur, 0, newMax + extra);
 
         try {
             await axios.post('/sheet/player/attribute', { attributeID, value: newCur, maxValue: newMax });
@@ -152,7 +177,7 @@ findAvatar();
         const cur = bar.data('current');
         const total = bar.data('total');
 
-        const newCur = clamp(cur + coef, 0, total);
+        const newCur = global.clamp(cur + coef, 0, total);
 
         if (cur === newCur) return;
 
@@ -205,7 +230,8 @@ $('.spec-container input').change(async ev => {
 
         try {
             const response = await axios.post('/sheet/player/characteristic', { characteristicID, value });
-            updateSkillAndBar(response.data);
+            updateSkills(response.data.updatedSkills);
+            updateAttributes(response.data.updatedAttributes);
         }
         catch (err) {
             showFailureToastMessage(err);
@@ -274,7 +300,6 @@ const addEquipmentButton = $('#addEquipmentButton');
 
             const newRow = $(equipmentRowTemplate);
             newRow.data('equipment-id', equipmentID);
-            newRow.attr('data-equipment-id', equipmentID);
             newRow.find('.using').prop('checked', equipment.using);
             newRow.find('.name').text(equipment.name)
             newRow.find('.skill-name').text(equipment.skill_name);
@@ -334,7 +359,7 @@ const addEquipmentButton = $('#addEquipmentButton');
     socket.on('equipment added', content => {
         const equipmentID = content.equipmentID;
         const name = content.name;
-        if (equipmentTable.find(`tr[data-equipment-id="${equipmentID}"]`).length > 0 ||
+        if (equipmentTable.find('tr').filter((i, el) => $(el).data('equipment-id') === equipmentID).length > 0 ||
             addEquipmentList.find(`option[value="${equipmentID}"]`).length > 0) return;
 
         const opt = $(`<option value="${equipmentID}">${name}</option>`);
@@ -358,7 +383,7 @@ const addEquipmentButton = $('#addEquipmentButton');
         const attacks = content.attacks;
         const ammo = content.ammo;
 
-        const row = equipmentTable.find(`tr[data-equipment-id="${equipmentID}"]`);
+        const row = equipmentTable.find('tr').filter((i, el) => $(el).data('equipment-id') === equipmentID);
         if (row.length > 0) {
             if (name) row.find('.name').text(name);
             if (skill_name) row.find('.skill-name').text(skill_name);
@@ -527,7 +552,7 @@ const addSkillList = $('#addSkillList');
             const container = $(skillContainerTemplate);
             container.data('skill-id', skill.skill_id);
             container.find('input').val(skill.value).data('last-value', skill.value);
-            container.find('.total').text(skill.total_value);
+            container.find('.total').text(skill.value);
             container.find('.name').text(skill.name);
 
             skillTable.append(container);
@@ -552,7 +577,7 @@ const addSkillList = $('#addSkillList');
         const str = searchBar.val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
         for (let i = 0; i < skillsContainer.length; i++) {
             const container = skillsContainer.eq(i);
-            const name = container.find('.skill-label').text().toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+            const name = container.find('.name').text().toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
             container.toggleClass('d-none', !name.includes(str));
         }
     });
@@ -578,7 +603,7 @@ async function skillChange(ev) {
         const response = await axios.post('/sheet/player/skill', { skillID, value });
         const extra = container.data('extra');
         container.find('.total').text(value + extra);
-        updateSkillAndBar(response.data);
+        updateAttributes(response.data.updatedAttributes);
     }
     catch (err) {
         showFailureToastMessage(err);
@@ -642,7 +667,6 @@ const addItemList = $('#addItemList');
 
             const newRow = $(itemRowTemplate);
             newRow.data('item-id', itemID);
-            newRow.attr('data-item-id', itemID);
             newRow.find('.name').text(item.name);
             newRow.find('.description').val(item.description);
             newRow.find('.quantity').val(item.quantity);
@@ -677,7 +701,7 @@ const addItemList = $('#addItemList');
     socket.on('item added', content => {
         const itemID = content.itemID;
         const name = content.name;
-        if (itemTable.find(`tr[data-item-id="${itemID}"]`).length > 0 ||
+        if (itemTable.find('tr').filter((i, el) => $(el).data('item-id') === itemID).length > 0 ||
             addItemList.find(`option[value="${itemID}"]`).length > 0) return;
 
         const opt = $(`<option value="${itemID}">${name}</option>`);
@@ -695,7 +719,7 @@ const addItemList = $('#addItemList');
         const itemID = content.itemID;
         const name = content.name;
 
-        const row = itemTable.find(`tr[data-item-id="${itemID}"]`);
+        const row = itemTable.find('tr').filter((i, el) => $(el).data('item-id') === itemID);
         if (row.length > 0) {
             if (name) row.find('.name').text(name);
         }
@@ -751,15 +775,16 @@ $('#playerAnotations').change(async ev => {
     catch (err) { showFailureToastMessage(err) }
 });
 
-function updateSkillAndBar(data) {
-    const updatedSkills = data.updatedSkills || [];
-    for (const skill of updatedSkills) {
+function updateSkills(skillsToUpdate) {
+    for (const skill of skillsToUpdate) {
         const container = $(`.skill-container[data-skill-id="${skill.skillID}"]`);
         container.data('extra', skill.extraValue)
         container.find('.total').text(skill.totalValue);
     }
-    const updatedAttributes = data.updatedAttributes || [];
-    for (const attribute of updatedAttributes) {
+}
+
+function updateAttributes(attributesToUpdate) {
+    for (const attribute of attributesToUpdate) {
         const container = $(`.attribute-container[data-attribute-id="${attribute.attributeID}"]`);
         resolveAttributeBar(container, { newExtra: attribute.extraValue });
     }

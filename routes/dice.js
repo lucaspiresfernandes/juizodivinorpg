@@ -76,11 +76,11 @@ router.post('/', jsonParser, async (req, res) => {
 
 const resolveSuccessType = {
     '20': function (number, roll) {
-        const f2 = Math.floor(number / 2);
-        const f5 = Math.floor(number / 5);
-        const f10 = Math.floor(number / 10);
-        const f10_10 = Math.floor((number - 10) / 10);
-        const f10_20 = Math.floor((number - 20) / 10);
+        const f2 = Math.floor(number * 0.5);
+        const f5 = Math.floor(number * 0.2);
+        const f10 = Math.floor(number * 0.1);
+        const f10_10 = Math.floor((number - 10) * 0.1);
+        const f10_20 = Math.floor((number - 20) * 0.1);
 
         if (roll > 20 - f10_20) return { description: 'Extremo', isCritical: true };
         if (roll > 20 - f10_10) return { description: 'Bom', isCritical: true };

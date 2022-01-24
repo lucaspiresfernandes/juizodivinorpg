@@ -4,7 +4,7 @@
 <head>
     {{> head}}
     <script src="/scripts/sheet1.js" defer></script>
-    <link rel="stylesheet" href="/styles/sheetstyle.css">
+    <link rel="stylesheet" href="/styles/playersheet.css">
     <script>socket.emit('room:join', 'player' + {{ playerID }});</script>
 </head>
 
@@ -35,14 +35,22 @@
                 {{#each info}}
                 {{#with this}}
                 <div class="row mt-4 info-container" data-info-id="{{info_id}}">
-                    <div class="col">
+                    <div class="col mx-2">
                         <div class="row">
-                            <div class="col mx-2 h5"><label for="info{{@index}}">{{name}}</label></div>
+                            <div class="col h5">
+                                <label class="info-label" for="info{{@index}}">
+                                    {{name}}
+                                </label>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                <input class="acds-element acds-bottom-text" type="text" id="info{{@index}}"
+                                {{#if value}}
+                                <label class="info-field" for="info{{@index}}">{{value}}</label>
+                                {{else}}
+                                <input class="acds-element acds-bottom-text info-field" type="text" id="info{{@index}}"
                                     value="{{value}}" autocomplete="off">
+                                {{/if}}
                             </div>
                         </div>
                     </div>
@@ -52,7 +60,9 @@
                 <div class="row mt-4">
                     <div class="col">
                         <div class="row">
-                            <div class="col mx-2 h5"><label for="playerClassSelect">Classe</label></div>
+                            <div class="col mx-2 h5">
+                                <label class="class-label" for="playerClassSelect">Classe</label>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col">
@@ -64,8 +74,7 @@
                                     {{#with this}}
                                     <option value="{{class_id}}" data-ability-title="{{ability_title}}"
                                         data-ability-description="{{ability_description}}"
-                                        title="{{ability_title}}: {{ability_description}}" data-skills="{{skills}}"
-                                        data-attribute-id="{{attribute_id}}" data-bonus="{{bonus}}" {{#ifEquals
+                                        title="{{ability_title}}: {{ability_description}}" {{#ifEquals
                                         ../playerClass.class_id class_id}}selected{{/ifEquals}}>
                                         {{name}}
                                     </option>
@@ -77,15 +86,14 @@
                     </div>
                 </div>
                 <div class="row my-4">
-                    <div class="col" id="playerClass" data-bonus="{{playerClass.bonus}}"
-                        data-attribute-id="{{attribute_id}}" data-skills="{{playerClass.skills}}">
+                    <div class="col" id="playerClass">
                         <span id="playerClassTitle">{{playerClass.ability_title}}{{#if
                             playerClass.ability_title}}:{{/if}} </span>
                         <span id="playerClassDescription">{{playerClass.ability_description}}</span>
                     </div>
                 </div>
             </div>
-            <div class="col mt-3">
+            <div class="col">
                 <div class="row mb-3 avatar-container">
                     <div class="col d-flex justify-content-center">
                         <img id="avatar" class="img-fluid acds-clickable" data-bs-toggle="modal"
@@ -103,7 +111,7 @@
                         <div class="row attribute-container" data-attribute-id="{{attribute_id}}">
                             <div class="col">
                                 <div class="row">
-                                    <div class="col"><label for="attribute{{@index}}">{{name}}</label></div>
+                                    <div class="col"><label for="attribute{{@index}}">Pontos de {{name}}</label></div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
@@ -121,13 +129,12 @@
                                     </div>
                                     {{/if}}
                                 </div>
-                                <div
-                                    class="row {{#if rollable}}px-5{{else}}justify-content-center{{/if}} text-center mt-2">
+                                <div class="row justify-content-center mt-2">
                                     <div class="col-3">
                                         <input type="button" value="-" data-coefficient="-1"
                                             class="btn w-100 btn-dark btn-attribute">
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-2 text-center">
                                         <label class="h5 attribute-description"
                                             for="attribute{{@index}}">{{value}}/{{total_value}}</label>
                                     </div>
@@ -136,8 +143,8 @@
                                             class="btn w-100 btn-dark btn-attribute">
                                     </div>
                                 </div>
-                                <div class="row {{#if rollable}}px-5{{/if}}">
-                                    <div class="col-2 offset-{{#if rollable}}4{{else}}5{{/if}} h5">
+                                <div class="row">
+                                    <div class="col-2 offset-5 h5">
                                         <input type="text" maxlength="3" autocomplete="off" value="{{max_value}}"
                                             class="attribute-max acds-bottom-text acds-element text-center"
                                             id="attribute{{@index}}">
@@ -145,20 +152,20 @@
                                 </div>
                             </div>
                         </div>
-                        {{#if status}}
-                        <div class="row px-5">
+                        <div class="row my-2 px-4">
                             {{#each status}}
                             {{#with this}}
-                            <div class="col form-check attribute-status-container"
+                            <div class="col attribute-status-container"
                                 data-attribute-status-id="{{attribute_status_id}}">
-                                <input class="form-check-input" type="checkbox" {{#if checked}}checked{{/if}}
-                                    id="status{{@../index}}{{@index}}">
-                                <label class="form-check-label" for="status{{@../index}}{{@index}}">{{name}}</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" {{#if checked}}checked{{/if}}
+                                        id="status{{@../index}}{{@index}}">
+                                    <label class="form-check-label" for="status{{@../index}}{{@index}}">{{name}}</label>
+                                </div>
                             </div>
                             {{/with}}
                             {{/each}}
                         </div>
-                        {{/if}}
                         {{/with}}
                         {{/each}}
                     </div>
@@ -190,16 +197,18 @@
                     <div class="col h2">Atributos</div>
                     <hr>
                 </div>
-                <div class="row mb-3 text-center">
+                <div class="row mb-3 text-center align-items-end justify-content-center">
                     {{#each characteristics}}
                     {{#with this}}
-                    <div class="col my-2 characteristic-container" data-characteristic-id="{{characteristic_id}}"
-                        data-rollable="{{rollable}}">
+                    <div class="col-5 col-lg-2 col-xl my-2 characteristic-container"
+                        data-characteristic-id="{{characteristic_id}}" data-rollable="{{rollable}}">
+                        {{#if rollable}}
                         <div class="row mb-2">
                             <div class="col">
                                 <img class="img-fluid acds-clickable" src="/assets/dice.png">
                             </div>
                         </div>
+                        {{/if}}
                         <div class="row">
                             <div class="col"><label for="characteristic{{@index}}">{{name}}</label></div>
                         </div>
@@ -308,8 +317,8 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3">
-            <div class="col acds-container">
+        <div class="row my-3 acds-container">
+            <div class="col">
                 <div class="row mt-2 text-center">
                     <div class="col h2">Detalhes Pessoais</div>
                     <hr>
@@ -465,7 +474,7 @@
                                 <div class="col my-2">
                                     <label for="combatSpecializationList">Perícia</label>
                                     <select id="combatSpecializationList" class="form-select acds-element my-2">
-                                        {{#each combatSpecializations}}
+                                        {{#each specializations}}
                                         {{#with this}}
                                         <option value="{{skill_id}}">{{name}}</option>
                                         {{/with}}
