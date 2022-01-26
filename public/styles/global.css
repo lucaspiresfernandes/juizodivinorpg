@@ -9,7 +9,7 @@ body {
     border-width: 1px;
     border-color: gray;
     border-radius: 20px;
-    margin: 0 0.1rem 0 0.1rem;
+    /* margin: 0 0.1rem 0 0.1rem; */
 }
 
 .acds-clickable:hover {
@@ -110,4 +110,8 @@ a:active, .btn-link:active {
 
 #diceRoll .modal-body {
     height: 120px;
+}
+
+#generalDiceRoll img {
+    max-height: 75px;
 }

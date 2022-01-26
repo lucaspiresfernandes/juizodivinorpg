@@ -83,11 +83,11 @@
             </div>
             <div class="col">
                 <div class="row mb-2 avatar-container justify-content-center">
-                    <div class="col">
+                    <div class="col text-center offset-lg-3">
                         <img id="avatar" class="img-fluid acds-clickable" data-bs-toggle="modal"
                             data-bs-target="#uploadAvatar">
                     </div>
-                    <div class="col-auto align-self-center">
+                    <div class="col-auto col-lg-3 align-self-center">
                         <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
                             data-bs-target="#generalDiceRoll">
                     </div>
@@ -158,10 +158,10 @@
                         {{/each}}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row my-2 justify-content-center">
                     {{#each specs}}
                     {{#with this}}
-                    <div class="col text-center spec-container" data-spec-id="{{spec_id}}">
+                    <div class="col col-lg-4 text-center spec-container" data-spec-id="{{spec_id}}">
                         <div class="row">
                             <div class="col">
                                 <input class="text-center acds-element acds-bottom-text h5" type="text"
@@ -188,7 +188,7 @@
                 <div class="row mb-3 text-center align-items-end justify-content-center">
                     {{#each characteristics}}
                     {{#with this}}
-                    <div class="col-5 col-lg-2 col-xl my-2 characteristic-container"
+                    <div class="col col-lg-2 col-xl my-2 characteristic-container"
                         data-characteristic-id="{{characteristic_id}}" data-rollable="{{rollable}}">
                         {{#if rollable}}
                         <div class="row mb-2">
