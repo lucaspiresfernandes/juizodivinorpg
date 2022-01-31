@@ -695,10 +695,12 @@ CREATE TABLE `player` (
 -- Represent a lineage node conquered by a player.
 CREATE TABLE `player_lineage_node` (
     `player_id` INT UNSIGNED NOT NULL,
+    `lineage_id` INT UNSIGNED NOT NULL,
     `index` INT UNSIGNED NOT NULL,
     `date_conquered` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`player_id`, `index`),
-    CONSTRAINT `fk_player_lineage_node_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT `fk_player_lineage_node_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_player_lineage_node_lineage_id_index` FOREIGN KEY (`lineage_id`, `index`) REFERENCES `lineage_node`(`lineage_id`, `index`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_characteristic` (

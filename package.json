@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lunapiresfernandescefet/juizodivinorpg.git"
+    "url": "git+https://github.com/alyssapiresfernandescefet/juizodivinorpg.git"
   },
   "keywords": [],
-  "author": "Luna Fernandes",
+  "author": "Alyssa Fernandes",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/lunapiresfernandescefet/juizodivinorpg/issues"
+    "url": "https://github.com/alyssapiresfernandescefet/juizodivinorpg/issues"
   },
-  "homepage": "https://github.com/lunapiresfernandescefet/juizodivinorpg#readme",
+  "homepage": "https://github.com/alyssapiresfernandescefet/juizodivinorpg#readme",
   "dependencies": {
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",

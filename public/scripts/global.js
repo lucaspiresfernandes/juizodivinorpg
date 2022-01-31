@@ -28,6 +28,10 @@ const global = {};
 
         return clickEvent.clickCount;
     }
+
+    global.sleep = function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 }
 
 $(document.body).ready(() => {

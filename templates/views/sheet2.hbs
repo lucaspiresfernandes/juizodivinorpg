@@ -14,7 +14,8 @@
         <div class="row display-5 text-center">
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
-        <div class="row my-3" {{#unless playerLineage}}hidden{{/unless}} id="lineageContainer">
+        <div class="row my-3" {{#unless playerLineage.lineage_id}}hidden{{/unless}} id="lineageContainer"
+            data-lineage-id="{{playerLineage.lineage_id}}" data-divine="{{playerLineage.divine}}">
             <div class="col">
                 <div class="row mt-2 text-center">
                     <div class="col h2">Linhagem</div>
@@ -28,30 +29,13 @@
                 <div class="row">
                     <div class="col text-center" id="lineageGraph">
                         {{#each nodeRows}}
-                        <div class="row my-5 py-5 px-1">
+                        <div class="row my-5 py-5">
                             {{#each this}}
-                            <div class="col lineage-node d-flex justify-content-center" data-index="{{this.index}}"
+                            <div class="col lineage-node" data-index="{{index}}" data-level="{{level}}"
                                 data-conquered="{{conquered}}" data-available="{{available}}" data-cost="{{cost}}">
-                                <img src="/assets/lineages/frame/{{../../playerLineage}}/{{this.index}}.png"
+                                <img src="/assets/lineages/frame/{{lineage_id}}/{{index}}.png"
                                     class="img-fluid {{#unless available}}unavailable{{else}}acds-clickable{{/unless}} {{#unless conquered}}unconquered{{/unless}}">
-                                <div class="acds-tooltip px-3 py-2">
-                                    <span class="title text-center h3">{{#unless
-                                        available}}????????????{{else}}{{this.name}}{{/unless}}</span>
-                                    <br>
-                                    Custo: <span class="cost">{{#unless
-                                        available}}?{{else}}{{this.cost}}{{/unless}}</span>
-                                    <p>Tipo: <span class="type">{{#unless
-                                            available}}?{{else}}{{this.type}}{{/unless}}</span></p>
-                                    <p class="description">{{#unless
-                                        available}}????????????{{else}}{{this.description}}{{/unless}}</p>
-                                    <span class="footer"
-                                        style="color: {{#unless available}}red{{else}}{{#if conquered}}green{{else}}yellow{{/if}}{{/unless}}">
-                                        {{#unless
-                                        available}}Você não possui os requerimentos para essa
-                                        habilidade.{{else}}{{#if conquered}}Você possui essa habilidade.{{else}}Você
-                                        ainda não possui essa habilidade.{{/if}}{{/unless}}
-                                    </span>
-                                </div>
+                                {{> lineage_node_tooltip this}}
                             </div>
                             {{/each}}
                         </div>
@@ -62,8 +46,35 @@
         </div>
         {{> header_footer targetPage=1}}
 
-        <!--Toasts and Modals-->
+        {{!Toasts and Modals}}
         {{> failuretoast}}
+
+        {{!Templates}}
+        <template id="lineageNodeTooltipTemplate">
+            {{> lineage_node_tooltip}}
+        </template>
+
+        <div class="modal fade" id="selectNode" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Selecionar Habilidade</h5>
+                    </div>
+                    <div id="selectNodeContainer" class="modal-body">
+                        {{> loading}}
+                        <div class="container-fluid">
+                            <div class="row nodes text-center justify-content-center">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="selectNodeCloseButton" type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 

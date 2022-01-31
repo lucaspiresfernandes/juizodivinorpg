@@ -18,6 +18,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const playerID = req.params.id;
 
+    const isAdmin = (await con('player').select('admin').where('player_id', playerID).first()).admin;
+
+    if (isAdmin) return res.status(404).send();
+
     const results = await Promise.all([
         con('player_info').select('value as name')
             .where('player_id', playerID)
@@ -28,13 +32,9 @@ router.get('/:id', async (req, res) => {
         con('player_attribute_status').select('attribute_status_id', 'value')
             .where('player_id', playerID)
             .orderBy('attribute_status_id'),
-        con('player_lineage_node').select('player.lineage_id', 'lineage_node.index', 'lineage_node.level')
-            .join('player', 'player_lineage_node.player_id', 'player.player_id')
-            .join('lineage_node', function () {
-                this.on('lineage_node.lineage_id', 'player.lineage_id')
-                    .on('lineage_node.index', 'player_lineage_node.index');
-            })
-            .where('player.player_id', playerID)
+        con('player_lineage_node').select('player_lineage_node.lineage_id', 'lineage_node.index', 'lineage_node.level')
+            .join('lineage_node', builder => builder.on('lineage_node.lineage_id', 'player_lineage_node.lineage_id')
+                .on('lineage_node.index', 'player_lineage_node.index'))
             .orderBy('lineage_node.level', 'DESC')
             .orderBy('date_conquered', 'DESC').first(),
         con('config').select('value').where('key', 'portrait_environment').first()
@@ -59,7 +59,7 @@ router.post('/environment', jsonParser, async (req, res) => {
 
         for (let i = 0; i < players.length; i++)
             portraitRooms = portraitRooms.to(`portrait${players[i].player_id}`);
-            
+
         await con('config').update('value', environment)
             .where('key', 'portrait_environment');
 

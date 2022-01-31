@@ -197,37 +197,44 @@ router.get('/2', async (req, res) => {
     if (isAdmin) return res.redirect('/sheet/admin/2');
 
     try {
-        const playerLineageID = (await con('player').select('lineage_id')
-            .where('player_id', playerID).first())?.lineage_id || null;
+        const playerLineage = await con('lineage').select('lineage.lineage_id', 'lineage.divine')
+            .join('player', 'player.lineage_id', 'lineage.lineage_id')
+            .where('player.player_id', playerID).first();
+        const playerLineageID = playerLineage.lineage_id || null;
+
         const results = await Promise.all([
             (async () => {
                 const queries = await Promise.all([
                     con('lineage_node').select().where('lineage_id', playerLineageID).orderBy('index'),
-                    con('player_lineage_node').select('index').where('player_id', playerID),
+                    con('player_lineage_node').select().where('player_id', playerID).join('lineage_node', builder => builder
+                        .on('lineage_node.lineage_id', 'player_lineage_node.lineage_id')
+                        .on('lineage_node.index', 'player_lineage_node.index')),
                     con('lineage_node').max('level as max_level').first()
                 ]);
 
                 const lineageNodes = queries[0];
-                const playerConqueredNodes = queries[1].map(c => c.index);
+                const playerNodes = queries[1];
+                const playerNodesIndex = queries[1].map(c => c.index);
                 const numLevels = queries[2].max_level;
                 const rows = [];
                 for (let i = 0; i < numLevels; i++) rows.push([]);
 
                 await Promise.all(lineageNodes.map(async node => {
+                    const playerNode = playerNodes.find(pNode => pNode.index === node.index);
+                    if (playerNode && playerNode.lineage_id !== node.lineage_id) node = playerNode;
+
                     const level = parseInt(node.level);
                     rows[numLevels - level].push(node);
 
-                    //All of the nodes connected to the current node.
                     const connections = await con('lineage_node_connection').select('index')
                         .where('lineage_id', playerLineageID)
                         .andWhere('next_index', node.index);
 
-                    node.conquered = playerConqueredNodes.includes(node.index);
-                    //A node is available if all of its previous connected nodes are conquered.
+                    node.conquered = playerNode !== undefined;
                     node.available = true;
                     for (const connection of connections) {
-                        if (!playerConqueredNodes.includes(connection.index)) {
-                            node.available = node.level === 0 || connections.length === 0;
+                        if (!playerNodesIndex.includes(connection.index)) {
+                            node.available = node.level === 1;
                             break;
                         }
                     }
@@ -241,7 +248,7 @@ router.get('/2', async (req, res) => {
         res.render('sheet2', {
             playerID,
             nodeRows: results[0],
-            playerLineage: playerLineageID,
+            playerLineage,
             playerScore: results[1].score
         });
     }
@@ -664,7 +671,7 @@ router.post('/equipment', jsonParser, async (req, res) => {
         res.send();
         if (visible !== undefined) {
             const equipmentName = (await con('equipment').select('name').where('equipment_id', equipmentID).first()).name;
-            emitToAllPlayers(visible ? 'equipment added' : 'equipment removed', { equipmentID, name: equipmentName });
+            await emitToAllPlayers(visible ? 'equipment added' : 'equipment removed', { equipmentID, name: equipmentName });
         }
         let skill_name;
         if (skill_id) {
@@ -935,7 +942,7 @@ router.post('/item', jsonParser, async (req, res) => {
         res.send();
         if (visible !== undefined) {
             const itemName = (await con('item').select('name').where('item_id', itemID).first()).name;
-            emitToAllPlayers(visible ? 'item added' : 'item removed', { itemID, name: itemName });
+            await emitToAllPlayers(visible ? 'item added' : 'item removed', { itemID, name: itemName });
         }
         emitToAllPlayers('item changed', { itemID, name });
     }
@@ -1056,7 +1063,7 @@ router.post('/player/lineage', jsonParser, async (req, res) => {
             con('player').update('lineage_id', lineageID).where('player_id', playerID),
             con('player_lineage_node').where('player_id', playerID).del(),
         ]);
-        await con('player_lineage_node').insert({ player_id: playerID, index: 1 });
+        await con('player_lineage_node').insert({ lineage_id: lineageID, player_id: playerID, index: 1 });
         res.send();
         io.to(`player${playerID}`).to(`portrait${playerID}`).emit('lineage change', { lineageID });
     }
@@ -1068,18 +1075,20 @@ router.post('/player/lineage', jsonParser, async (req, res) => {
 
 router.post('/player/lineage/node', jsonParser, async (req, res) => {
     const playerID = req.session.playerID;
-    const index = parseInt(req.body.index);
+    const index = req.body.index;
+    let nodeLineageID = req.body.lineageID;
 
     if (!playerID || !index) return res.status(401).send();
 
     try {
-        await con('player_lineage_node').insert({ player_id: playerID, index });
         const player = await con('player').select('lineage_id', 'score').where('player_id', playerID).first();
-        const lineageID = player.lineage_id;
+        const playerLineageID = player.lineage_id;
+        if (!nodeLineageID) nodeLineageID = playerLineageID;
         const oldScore = player.score;
+        await con('player_lineage_node').insert({ lineage_id: nodeLineageID, player_id: playerID, index });
 
         const lineageNode = await con('lineage_node').select('cost', 'level')
-            .where('lineage_id', lineageID).andWhere('index', index).first();
+            .where('lineage_id', nodeLineageID).andWhere('index', index).first();
         const newScore = oldScore - lineageNode.cost;
 
         const newNodes = [];
@@ -1089,14 +1098,14 @@ router.post('/player/lineage/node', jsonParser, async (req, res) => {
                 const conqueredNodes = (await con('player_lineage_node').select('index')
                     .where('player_id', playerID)).map(node => node.index);
                 const newlyConqueredSubsequentsNode = await con('lineage_node_connection').select()
-                    .where('lineage_node_connection.lineage_id', lineageID).andWhere('lineage_node_connection.index', index)
+                    .where('lineage_node_connection.lineage_id', playerLineageID).andWhere('lineage_node_connection.index', index)
                     .join('lineage_node', builder => builder
                         .on('lineage_node.lineage_id', 'lineage_node_connection.lineage_id')
                         .andOn('lineage_node.index', 'lineage_node_connection.next_index')
                     );
 
                 for (const node of newlyConqueredSubsequentsNode) {
-                    const connectedNodes = await con('lineage_node_connection').select('index').where('lineage_id', lineageID)
+                    const connectedNodes = await con('lineage_node_connection').select('index').where('lineage_id', playerLineageID)
                         .andWhere('next_index', node.index);
                     let available = true;
                     for (const connection of connectedNodes) {
@@ -1117,6 +1126,13 @@ router.post('/player/lineage/node', jsonParser, async (req, res) => {
         console.error(err);
         res.status(500).send();
     }
+});
+
+router.get('/lineage/node', async (req, res) => {
+    const index = parseInt(req.query.index);
+    if (isNaN(index)) return res.status(401).send();
+    const nodes = await con('lineage_node').select().where('index', index);
+    res.send({ nodes });
 });
 //#endregion
 

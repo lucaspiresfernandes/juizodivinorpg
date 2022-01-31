@@ -73,14 +73,6 @@
     background-size: 100% 100%;
 }
 
-#lineageGraph img {
-    -webkit-user-drag: none;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-
 .unconquered {
     filter: brightness(50%);
 }
@@ -89,23 +81,29 @@
     filter: brightness(25%);
 }
 
+.lineage-node {
+    position: relative;
+}
+
 .lineage-node .acds-tooltip {
+    visibility: hidden;
     opacity: 0;
     background: #111;
     border-radius: 8px;
-    position: fixed;
-    right: 50px;
-    bottom: 50px;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 3;
-    max-width: 250px;
     transition: all 0.15s ease-in;
 }
 
 .acds-tooltip .description {
-    color: #999;
+    color: #CCC;
 }
 
 .lineage-node img:hover+.acds-tooltip {
+    visibility: visible;
     opacity: 1;
     transition: all 0.3s 0.3s ease-out;
 }
@@ -122,7 +120,10 @@
     color: rgb(185, 185, 185);
 }
 
-label.info-field {
+label.info-field,
+#lineageGraph img,
+#selectNodeContainer img {
+    -webkit-user-drag: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

@@ -61,33 +61,31 @@ const $mainContainer = $('#mainContainer');
 
 const queue = [];
 let showingDice = false;
-let showingResult = false;
 let currentData = null;
 const newResultTimeout = 900;
 
 socket.on('dice roll', showDiceRoll);
 socket.on('dice result', onDiceResult);
 
-function onDiceResult(data) {
+async function onDiceResult(data) {
     if (currentData) return queue.push(data);
 
     if (!showingDice) {
         showDiceRoll();
-        return setTimeout(() => onDiceResult(data), newResultTimeout);
+        await global.sleep(newResultTimeout);
+        onDiceResult(data);
     }
 
     showDiceResult(data);
-    setTimeout(() => {
-        hideDiceResult(() => {
-            hideDiceRoll(() => {
-                const next = queue.shift();
-                if (next) {
-                    showDiceRoll();
-                    setTimeout(() => onDiceResult(next), newResultTimeout);
-                }
-            });
-        });
-    }, 3000);
+    await global.sleep(3000);
+    await hideDiceResult();
+    await hideDiceRoll();
+
+    const next = queue.shift();
+    if (next) {
+        showDiceRoll();
+        setTimeout(() => onDiceResult(next), newResultTimeout);
+    }
 }
 
 function showDiceRoll() {
@@ -101,20 +99,21 @@ function showDiceRoll() {
 
 const diceHideTimeout = parseFloat(getComputedStyle(dice)
     .getPropertyValue('transition-duration')) * 1000;
-function hideDiceRoll(onHiddenCallback) {
-    if (!showingDice) return;
-    $dice.removeClass('show');
-    setTimeout(() => {
-        $mainContainer.removeClass('show');
-        showingDice = false;
-        currentData = null;
-        if (onHiddenCallback) onHiddenCallback();
-    }, diceHideTimeout);
+
+function hideDiceRoll() {
+    return new Promise(resolve => {
+        if (!showingDice) return resolve();
+        $dice.removeClass('show');
+        setTimeout(() => {
+            $mainContainer.removeClass('show');
+            showingDice = false;
+            currentData = null;
+            resolve();
+        }, diceHideTimeout);
+    });
 }
 
 function showDiceResult(data) {
-    if (showingResult) return;
-
     currentData = data;
 
     const roll = data.results[0].roll;
@@ -124,17 +123,16 @@ function showDiceResult(data) {
         $description.addClass('critical');
         //TODO: find better details.
     }
-    showingResult = true;
     $result.text(roll).fadeIn('slow', () => $description.text(successType.description).fadeIn('slow'));
 }
 
-function hideDiceResult(onHiddenCallback) {
-    if (!showingResult) return;
-    $description.fadeOut('fast', () => $description.text('').removeClass('critical'));
-    $result.fadeOut('fast', () => {
-        $result.text('').removeClass('critical');
-        showingResult = false;
-        if (onHiddenCallback) onHiddenCallback();
+function hideDiceResult() {
+    return new Promise(resolve => {
+        $description.fadeOut('fast', () => $description.text('').removeClass('critical'));
+        $result.fadeOut('fast', () => {
+            $result.text('').removeClass('critical');
+            resolve();
+        });
     });
 }
 
