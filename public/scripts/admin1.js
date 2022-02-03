@@ -13,7 +13,11 @@ $('#changeEnvironment').click(async ev => {
 async function playerLineageChange(ev) {
     const lineageID = parseInt($(ev.target).val());
     const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
-    try { await axios.post('/sheet/player/lineage', { lineageID, playerID }) }
+    try {
+        await axios.post('/sheet/player/lineage', { lineageID, playerID });
+        const img = $(`.acds-player-container[data-player-id="${playerID}"] .avatar-container .lineage`);
+        img.data('lineage', lineageID).attr('src', lineageID ? `/assets/lineages/frameless/${lineageID}/1.png` : '');
+    }
     catch (err) { showFailureToastMessage(err) }
 }
 
@@ -187,12 +191,24 @@ socket.on('class change', content => {
     container.find('.class-name').text(className);
 })
 
-socket.on('score change', content => {
+socket.on('lineage node change', content => {
+    const newIndex = content.index;
+    const newLevel = content.level;
     const playerID = content.playerID;
     const newScore = content.newScore;
 
     const container = $(`.acds-player-container[data-player-id="${playerID}"`);
     container.find('.player-score').val(newScore);
+
+    const img = container.find('.avatar-container .lineage');
+
+    const lineageID = img.data('lineage');
+    const oldLevel = img.data('level');
+
+    if (newLevel >= oldLevel) {
+        img.attr('src', `/assets/lineages/frameless/${lineageID}/${newIndex}.png`);
+        img.data('level', newLevel);
+    }
 });
 
 function showAvatar(container, attrStatusID = 0) {

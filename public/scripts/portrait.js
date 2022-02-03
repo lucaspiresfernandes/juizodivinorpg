@@ -176,7 +176,9 @@ socket.on('lineage change', content => {
     img.data('lineage', lineageID);
     img.prop('hidden', !lineageID);
 
-    img.attr('src', `/assets/lineages/frameless/${lineageID}/1.png`);
+    if (lineageID)
+        return img.attr('src', `/assets/lineages/frameless/${lineageID}/1.png`);
+    img.attr('src', '');
 });
 
 socket.on('lineage node change', content => {

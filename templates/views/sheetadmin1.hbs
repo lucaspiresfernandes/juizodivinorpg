@@ -31,11 +31,16 @@
         <div class="row justify-content-center">
             {{#each characters}}
             {{#with this}}
-            <div class="col-5 m-2 text-center acds-player-container" data-player-id="{{playerID}}"
+            <div class="col-12 col-md m-2 text-center acds-player-container" data-player-id="{{playerID}}"
                 data-attribute-status="{{attributeStatus}}">
                 <div class="row">
                     <div class="col">
-                        <img class="img-fluid avatar">
+                        <div class="avatar-container">
+                            <img class="img-fluid avatar">
+                            <img class="img-fluid lineage" data-lineage="{{player.lineage_id}}"
+                                data-level="{{player.level}}" {{#if player.lineage_id}}
+                                src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" {{/if}}>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -187,10 +192,10 @@
         </div>
         <div class="row my-3 text-center acds-container">
             <div class="col">
-                <div class="row my-3 h1 text-center">
-                    <div class="col">Utilidades</div>
+                <div class="row mt-2 text-center">
+                    <div class="col h2">Utilidades</div>
+                    <hr>
                 </div>
-                <hr>
                 <div class="row my-4 text-center">
                     <div class="col">
                         <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
@@ -216,12 +221,12 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col">
-                <div class="row my-3">
+                <div class="row">
                     <div class="col">
-                        <div class="row h1 text-center">
-                            <div class="col">Anotações</div>
+                        <div class="row mt-2 text-center">
+                            <div class="col h2">Anotações</div>
+                            <hr>
                         </div>
-                        <hr>
                         <div class="row">
                             <div class="col">
                                 {{#with adminNotes}}

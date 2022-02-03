@@ -320,7 +320,16 @@ router.get('/admin/1', async (req, res) => {
                     .leftJoin('class', 'class.class_id', 'player.class_id')
                     .where('player.player_id', playerID).first(),
 
-                //Player Latest Status: 8
+                //Player Lineage Node: 8
+                con('player_lineage_node').select('lineage_node.index', 'lineage_node.level')
+                    .join('lineage_node', builder => builder
+                        .on('lineage_node.lineage_id', 'player_lineage_node.lineage_id')
+                        .on('lineage_node.index', 'player_lineage_node.index'))
+                    .where('player_id', playerID)
+                    .orderBy('lineage_node.level', 'DESC')
+                    .orderBy('date_conquered', 'DESC').first(),
+
+                //Player Latest Status: 9
                 con('player_attribute_status').select('attribute_status_id', 'value')
                     .where('player_id', playerID)
             ]);
@@ -334,8 +343,8 @@ router.get('/admin/1', async (req, res) => {
                 equipments: results[4],
                 items: results[5],
                 lineage: results[6],
-                player: results[7],
-                attributeStatus: JSON.stringify(results[8])
+                player: { ...results[7], ...results[8] },
+                attributeStatus: JSON.stringify(results[9])
             };
         }));
 
@@ -1067,7 +1076,8 @@ router.post('/player/lineage', jsonParser, async (req, res) => {
             con('player').update('lineage_id', lineageID).where('player_id', playerID),
             con('player_lineage_node').where('player_id', playerID).del(),
         ]);
-        await con('player_lineage_node').insert({ lineage_id: lineageID, player_id: playerID, index: 1 });
+        if (lineageID)
+            await con('player_lineage_node').insert({ lineage_id: lineageID, player_id: playerID, index: 1 });
         res.send();
         io.to(`player${playerID}`).to(`portrait${playerID}`).emit('lineage change', { lineageID });
     }
@@ -1123,7 +1133,7 @@ router.post('/player/lineage/node', jsonParser, async (req, res) => {
             })()
         ]);
         res.send({ newNodes, newScore });
-        io.to('admin').emit('score change', { playerID, newScore });
+        io.to('admin').emit('lineage node change', { playerID, index, level: lineageNode.level, newScore });
         io.to(`portrait${playerID}`).emit('lineage node change', { index, level: lineageNode.level });
     }
     catch (err) {

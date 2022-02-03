@@ -35,6 +35,7 @@ router.get('/:id', async (req, res) => {
         con('player_lineage_node').select('player_lineage_node.lineage_id', 'lineage_node.index', 'lineage_node.level')
             .join('lineage_node', builder => builder.on('lineage_node.lineage_id', 'player_lineage_node.lineage_id')
                 .on('lineage_node.index', 'player_lineage_node.index'))
+            .where('player_id', playerID)
             .orderBy('lineage_node.level', 'DESC')
             .orderBy('date_conquered', 'DESC').first(),
         con('config').select('value').where('key', 'portrait_environment').first()
