@@ -22,12 +22,12 @@
         $('.lineage-node img:first, .lineage-node img:last').click(defaultLineageNodeImageClick);
         $('.lineage-node img:not(:last):not(:first)').click(async ev => {
             const currentNode = $(ev.target);
-            const parent = currentNode.parents('.lineage-node');
-            const currentNodeTooltip = parent.find('.acds-tooltip');
-            const index = parent.data('index');
-            const conquered = parent.data('conquered');
-            const available = parent.data('available');
-            const cost = parent.data('cost');
+            const currentNodeContainer = currentNode.parents('.lineage-node');
+            const currentNodeTooltip = currentNodeContainer.find('.acds-tooltip');
+            const index = currentNodeContainer.data('index');
+            const conquered = currentNodeContainer.data('conquered');
+            const available = currentNodeContainer.data('available');
+            const cost = currentNodeContainer.data('cost');
             const playerScore = $('#playerScore');
             const currentScore = playerScore.data('score');
 
@@ -56,12 +56,12 @@
                                 index,
                                 lineageID: node.lineage_id
                             });
-                            currentNode.attr('src', `/assets/lineages/frame/${node.lineage_id}/${index}.png`);
-                            currentNodeTooltip.find('.title').text(node.name);
+
+                            currentNodeContainer.data('cost', node.cost).data('conquered', true);
                             currentNodeTooltip.find('.type').text(node.type);
                             currentNodeTooltip.find('.cost').text(node.cost);
                             currentNodeTooltip.find('.description').text(node.description);
-                            currentNodeTooltip.find('.footer').text('Você ainda não possui essa habilidade.').css('color', 'yellow');
+                            currentNodeTooltip.find('.footer').text('Você possui essa habilidade.').css('color', 'green');
 
                             updateLineageTable(currentNode, response.data.newNodes, response.data.newScore);
                         }

@@ -221,7 +221,11 @@ router.get('/2', async (req, res) => {
 
                 await Promise.all(lineageNodes.map(async node => {
                     const playerNode = playerNodes.find(pNode => pNode.index === node.index);
-                    if (playerNode && playerNode.lineage_id !== node.lineage_id) node = playerNode;
+                    if (playerNode && playerNode.lineage_id !== node.lineage_id) {
+                        node.description = playerNode.description;
+                        node.type = playerNode.type;
+                        node.cost = playerNode.cost;
+                    }
 
                     const level = parseInt(node.level);
                     rows[numLevels - level].push(node);
@@ -1131,7 +1135,10 @@ router.post('/player/lineage/node', jsonParser, async (req, res) => {
 router.get('/lineage/node', async (req, res) => {
     const index = parseInt(req.query.index);
     if (isNaN(index)) return res.status(401).send();
-    const nodes = await con('lineage_node').select().where('index', index);
+    const nodes = await con('lineage_node').select('lineage_node.name', 'lineage_node.cost', 'lineage_node.description',
+        'lineage_node.type', 'lineage_node.lineage_id')
+        .join('lineage', 'lineage.lineage_id', 'lineage_node.lineage_id')
+        .where('lineage_node.index', index).andWhere('lineage.divine', false);
     res.send({ nodes });
 });
 //#endregion
