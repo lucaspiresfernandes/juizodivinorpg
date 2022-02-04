@@ -45,8 +45,9 @@ router.get('/1', async (req, res) => {
                 'attribute_status.name as attribute_status_name', 'player_attribute_status.value as attribute_status_value')
                 .join('player_attribute', 'player_attribute.attribute_id', 'attribute.attribute_id')
                 .join('attribute_status', 'attribute_status.attribute_id', 'attribute.attribute_id')
-                .join('player_attribute_status',
-                    'player_attribute_status.attribute_status_id', 'attribute_status.attribute_status_id')
+                .join('player_attribute_status', builder => builder
+                    .on('player_attribute_status.attribute_status_id', 'attribute_status.attribute_status_id')
+                    .on('player_attribute_status.player_id', 'player_attribute.player_id'))
                 .where('player_attribute.player_id', playerID).then(attributesQuery => {
                     const attributes = [];
                     const instantiatedIDs = new Map();

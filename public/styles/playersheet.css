@@ -25,12 +25,16 @@
     color: black;
 }
 
-.progress {
+.attribute-container .progress {
     height: 40px;
 }
 
+.attribute-container .dice {
+    max-height: 40px;
+}
+
 #avatar {
-    max-height: 375px;
+    max-height: 400px;
     min-width: 100px;
     min-height: 100px;
 }
@@ -44,8 +48,8 @@
     max-height: 50px;
 }
 
-.equipment-row img {
-    max-height: 1.75rem;
+.equipment-row .dice {
+    max-height: 2rem;
 }
 
 .equipment-row .current-ammo {
@@ -56,15 +60,7 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.avatar-container .dice {
-    max-height: 75px;
-}
-
-.attribute-container .dice {
-    max-height: 40px;
-}
-
-.item-row td .quantity {
+.item-row .quantity {
     max-width: 3rem;
 }
 
