@@ -80,3 +80,10 @@
     top: 35%;
     transform: translateX(-50%);
 }
+
+#curseListTable tr .level,
+#equipmentListTable tr .attacks,
+#equipmentListTable tr .ammo {
+    width: 2rem;
+    text-align: center;
+}

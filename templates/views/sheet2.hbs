@@ -14,6 +14,89 @@
         <div class="row display-5 text-center">
             <div class="col">Perfil de {{playerrole}}</div>
         </div>
+        <div class="row my-5">
+            <div class="col">
+                <div class="row text-center">
+                    <div class="col mt-2 offset-3 h2 text-center">Maldições</div>
+                    <div class="col-3 align-self-center">
+                        <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
+                            data-bs-target="#addCurse">
+                    </div>
+                    <hr>
+                </div>
+                <div class="row text-center justify-content-center">
+                    {{#each characteristics}}
+                    {{#with this}}
+                    <div class="col-3 mb-2 h4 characteristic" data-characteristic-id="{{characteristic_id}}">
+                        <div class="row">
+                            <div class="col">
+                                {{name}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col remaining">
+                                {{remaining_value}}
+                            </div>
+                        </div>
+                    </div>
+                    {{/with}}
+                    {{/each}}
+                    <hr>
+                </div>
+                <div class="row justify-content-center">
+                    {{#each curses}}
+                    {{#with this}}
+                    <div class="curse-container col col-md-6 acds-container m-3 text-center curse"
+                        data-curse-id="{{curse_id}}">
+                        <div class="row mt-2 main">
+                            <div class="col">
+                                <p class="name h3">{{name}}</p>
+                                <p>Custo: <span class="level">{{level}}</span> </p>
+                                <p class="description">{{description}}</p>
+                            </div>
+                        </div>
+                        <div class="row mb-2 focus" data-characteristic_id="{{characteristic_id}}" {{#unless
+                            characteristic_id}}hidden{{/unless}}>
+                            <div class="col">
+                                <span class="name h6">{{focus.name}}</span>:
+                                <span class="description">{{focus.description}}</span>
+                            </div>
+                        </div>
+                        {{#unless characteristic_id}}
+                        <div class="row my-2 focuses">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        Selecione o foco:
+                                        <select class="form-control acds-element">
+                                            {{#each focuses}}
+                                            {{#with this}}
+                                            <option value="{{characteristic_id}}" title="{{description}}">{{name}}
+                                            </option>
+                                            {{/with}}
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col description">
+                                        {{focuses.0.description}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn btn-dark">Aplicar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/unless}}
+                    </div>
+                    {{/with}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
         <div class="row my-3" {{#unless playerLineage.lineage_id}}hidden{{/unless}} id="lineageContainer"
             data-lineage-id="{{playerLineage.lineage_id}}" data-divine="{{playerLineage.divine}}">
             <div class="col">
@@ -53,6 +136,42 @@
         <template id="lineageNodeTooltipTemplate">
             {{> lineage_node_tooltip}}
         </template>
+
+        <div class="modal fade" id="addCurse" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Adicionar Maldição</h5>
+                    </div>
+                    <div id="addCurseContainer" class="modal-body">
+                        {{> loading}}
+                        <div class="container-fluid text-center">
+                            <div class="row">
+                                <div class="col">
+                                    <select id="addCurseList" class="form-select acds-element">
+                                        {{#each availableCurses}}
+                                        {{#with this}}
+                                        <option value="{{curse_id}}" data-description="{{description}}">{{name}}
+                                        </option>
+                                        {{/with}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row h6 mt-3">
+                                <div class="col curse-description"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="addCurseButton" class="btn btn-primary" {{#unless
+                            availableCurses}}disabled{{/unless}}>Adicionar</button>
+                        <button id="addCurseCloseButton" type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="selectNode" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">

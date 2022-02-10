@@ -23,6 +23,38 @@ VALUES
     ('Tamanho', TRUE),
     ('Deslocamento', FALSE);
 
+CREATE TABLE `curse` (
+    `curse_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `description` MEDIUMTEXT NOT NULL,
+    `level` INT UNSIGNED NOT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(`curse_id`)
+);
+
+CREATE TABLE `curse_characteristic` (
+    `characteristic_id` INT UNSIGNED NOT NULL,
+    CONSTRAINT `fk_curse_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO
+    `curse_characteristic` (`characteristic_id`)
+VALUES
+    (1),
+    (2),
+    (3),
+    (4),
+    (5);
+
+CREATE TABLE `curse_focus` (
+    `curse_id` INT UNSIGNED NOT NULL,
+    `characteristic_id` INT UNSIGNED NOT NULL,
+    `description` MEDIUMTEXT NOT NULL,
+    PRIMARY KEY(`curse_id`, `characteristic_id`),
+    CONSTRAINT `fk_curse_focus_curse_id` FOREIGN KEY (`curse_id`) REFERENCES `curse`(`curse_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_curse_focus_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE `specialization` (
     `specialization_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
@@ -706,11 +738,21 @@ CREATE TABLE `player_lineage_node` (
 CREATE TABLE `player_characteristic` (
     `player_id` INT UNSIGNED NOT NULL,
     `characteristic_id` INT UNSIGNED NOT NULL,
-    `value` bigint NOT NULL,
+    `value` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`player_id`, `characteristic_id`),
     CONSTRAINT `uk_player_id_characteristic_id` UNIQUE (`player_id`, `characteristic_id`),
     CONSTRAINT `fk_player_characteristic_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE `player_curse` (
+    `player_id` INT UNSIGNED NOT NULL,
+    `curse_id` INT UNSIGNED NOT NULL,
+    `characteristic_id` INT UNSIGNED NULL,
+    PRIMARY KEY(`player_id`, `curse_id`),
+    CONSTRAINT `fk_player_curse_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_player_curse_curse_id` FOREIGN KEY (`curse_id`) REFERENCES `curse`(`curse_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_player_curse_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `curse_characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `player_skill` (

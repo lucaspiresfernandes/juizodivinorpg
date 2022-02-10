@@ -1,0 +1,24 @@
+<tr data-curse-id="{{curse_id}}">
+    <td>
+        <button class="acds-element" onclick="curseDeleteClick(event)"><i class="bi bi-trash"></i></button>
+    </td>
+    <td>
+        <input class="name acds-element acds-bottom-text" type="text" value="{{name}}" onchange="curseChange(event)"
+            data-key="name">
+    </td>
+    <td>
+        <input class="description acds-element acds-bottom-text" type="text" value="{{description}}" data-key="description"
+            onchange="curseChange(event)">
+    </td>
+    <td>
+        <input class="level acds-element acds-bottom-text" type="text" value="{{level}}" data-key="level"
+            onchange="curseChange(event)">
+    </td>
+    <td>
+        <input class="visible form-check-input" type="checkbox" onchange="curseVisibleChange(event)" {{#if
+            visible}}checked{{/if}}>
+    </td>
+    <td>
+        <button class="btn btn-sm btn-dark" onclick="curseFocusUpdateClick(event)">Atualizar Focos</button>
+    </td>
+</tr>

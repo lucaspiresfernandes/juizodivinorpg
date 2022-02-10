@@ -558,11 +558,11 @@ const addSkillList = $('#addSkillList');
             skillTable.append(container);
 
             addSkillList.find(`option[value="${skillID}"]`).remove();
-            addSkillButton.prop('disabled', addSkillList.children().length === 0);
         }
         catch (err) {
             showFailureToastMessage(err);
         }
+        addSkillButton.prop('disabled', addSkillList.children().length === 0);
         addSkillModal.hide();
     });
 

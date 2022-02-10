@@ -1,3 +1,118 @@
+//Curses
+{
+    const addCurseList = $('#addCurseList');
+    const description = $('#addCurseContainer').find('.curse-description');
+    description.text(addCurseList.find('option:selected').data('description'));
+    const addCurseModal = new bootstrap.Modal($('#addCurse')[0]);
+    const addCurseButton = $('#addCurseButton');
+    const addCurseCloseButton = $('#addCurseCloseButton');
+    const addCurseContainer = $('#addCurseContainer');
+    const addLoading = addCurseContainer.find('.loading');
+    const curseList = $('');
+
+    $('#addCurse').on('hidden.bs.modal', () => {
+        description.text(addCurseList.find('option:selected').data('description'));
+        addCurseContainer.show();
+        addCurseCloseButton.prop('disabled', false);
+        addLoading.hide();
+    });
+
+    addCurseList.change(ev => {
+        description.text($(ev.target).data('description'));
+    });
+
+    addCurseButton.click(async ev => {
+        addCurseContainer.hide();
+        addCurseButton.prop('disabled', true);
+        addCurseCloseButton.prop('disabled', true);
+        addLoading.show();
+
+        const curseID = parseInt(addCurseList.val());
+
+        try {
+            const response = await axios.put('/sheet/player/curse', { curseID });
+            const curse = response.data.curse;
+
+            //TODO: add curse to list
+
+            addCurseList.find(`option[value="${curseID}"]`).remove();
+
+        } catch (err) { showFailureToastMessage(err) }
+        addCurseButton.prop('disabled', addCurseList.children().length === 0);
+        addCurseModal.hide();
+    });
+
+    $('.focuses select').change(ev => {
+        const parent = $(ev.target).parents('.focuses');
+        const description = $(ev.target).find('option:selected').attr('title');
+        parent.find('.description').text(description || '');
+    });
+
+    $('.focuses button').click(async ev => {
+        if (!confirm('Tem certeza que quer aplicar o foco? Você não poderá mudar depois.')) return;
+        try {
+            const container = $(ev.target).parents('.curse-container');
+            const focusesContainer = $(ev.target).parents('.focuses');
+            const opt = focusesContainer.find('select option:selected');
+            
+            const curseID = container.data('curse-id');
+            const characteristicID = parseInt(opt.val());
+            const name = opt.text();
+            const description = opt.attr('title');
+
+            await axios.post('/sheet/player/curse', { curseID, characteristicID });
+
+            const focus = container.find('.focus');
+            focus.data('characteristic-id', characteristicID);
+            focus.find('.name').text(name);
+            focus.find('.description').text(description);
+            focus.prop('hidden', false);
+            focusesContainer.remove();
+
+        } catch (err) { showFailureToastMessage(err) }
+    });
+
+    socket.on('curse added', content => {
+        const curseID = content.curseID;
+        const name = content.name;
+        const contentDescription = content.description;
+
+        if (curseList.find('tr').filter((i, el) => $(el).data('curse-id') === curseID).length > 0 ||
+            addCurseList.find(`option[value="${curseID}"]`).length > 0) return;
+
+        const opt = $(`<option value="${curseID}" data-description="${contentDescription}">${name}</option>`);
+        addCurseList.append(opt);
+        addCurseButton.prop('disabled', false);
+        description.text(addCurseList.find('option:selected').data('description'));
+    });
+
+    socket.on('curse removed', content => {
+        const curseID = content.curseID;
+        addCurseList.find(`option[value="${curseID}"]`).remove();
+        addCurseButton.prop('disabled', addCurseList.children().length === 0);
+        description.text(addCurseList.find('option:selected').data('description') || '');
+    });
+
+    socket.on('curse changed', content => {
+        const curseID = content.curseID;
+        const name = content.name;
+        const contentDescription = content.description;
+
+        const row = curseList.find('tr').filter((i, el) => $(el).data('curse-id') === curseID);
+        if (row.length > 0) {
+            if (name) row.find('.name').text(name);
+            if (contentDescription) row.find('.description').text(contentDescription);
+        }
+        else {
+            const opt = addCurseList.find(`option[value="${curseID}"]`);
+            if (name) opt.text(name);
+            if (contentDescription) opt.data('description', contentDescription);
+        }
+        description.text(addCurseList.find('option:selected').data('description') || '');
+    });
+}
+
+//Lineage
 {
     const nodes = $('#lineageGraph .lineage-node');
 

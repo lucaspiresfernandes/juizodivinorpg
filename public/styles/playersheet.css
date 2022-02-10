@@ -140,3 +140,13 @@ label.info-field,
 #diceResultDescription.show {
     opacity: 1;
 }
+
+.main .description,
+.focuses .description {
+    color: rgb(220, 220, 220);
+}
+
+.focus .name,
+.remaining {
+    color: red;
+}

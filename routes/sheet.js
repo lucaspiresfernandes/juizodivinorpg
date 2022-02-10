@@ -201,7 +201,7 @@ router.get('/2', async (req, res) => {
         const playerLineage = await con('lineage').select('lineage.lineage_id', 'lineage.divine')
             .join('player', 'player.lineage_id', 'lineage.lineage_id')
             .where('player.player_id', playerID).first();
-        const playerLineageID = playerLineage.lineage_id || null;
+        const playerLineageID = playerLineage?.lineage_id || null;
 
         const results = await Promise.all([
             (async () => {
@@ -247,14 +247,57 @@ router.get('/2', async (req, res) => {
                 return rows;
             })(),
 
-            con('player').select('score').where('player_id', playerID).first()
-        ]);
+            con('player').select('score').where('player_id', playerID).first(),
 
+            (async () => {
+                const characteristics = await con('curse_characteristic').select('characteristic.characteristic_id', 'characteristic.name',
+                    'player_characteristic.value as remaining_value')
+                    .join('characteristic', 'curse_characteristic.characteristic_id', 'characteristic.characteristic_id')
+                    .join('player_characteristic', 'player_characteristic.characteristic_id', 'characteristic.characteristic_id')
+                    .where('player_characteristic.player_id', playerID);
+
+                await Promise.all(characteristics.map(async char => {
+                    const curses = await con('player_curse').select('curse.level')
+                        .join('curse', 'curse.curse_id', 'player_curse.curse_id')
+                        .where('player_curse.characteristic_id', char.characteristic_id);
+                    for (const curse of curses) {
+                        char.remaining_value -= curse.level;
+                    }
+                }));
+
+                return characteristics;
+            })(),
+
+            (async () => {
+                const curses = await con('player_curse').select('curse.curse_id', 'curse.name', 'curse.description',
+                    'curse.level', 'player_curse.characteristic_id')
+                    .join('curse', 'curse.curse_id', 'player_curse.curse_id')
+                    .where('player_curse.player_id', playerID);
+
+                await Promise.all(curses.map(async curse => {
+                    const query = con('curse_focus').select('curse_focus.description',
+                        'curse_focus.characteristic_id', 'characteristic.name')
+                        .join('characteristic', 'characteristic.characteristic_id', 'curse_focus.characteristic_id')
+                        .where('curse_id', curse.curse_id);
+                    if (curse.characteristic_id)
+                        return curse.focus = await query.andWhere('characteristic.characteristic_id', curse.characteristic_id).first();
+                    curse.focuses = await query;
+                }));
+                return curses;
+            })(),
+
+            con('curse').select().where('visible', true)
+                .whereNotIn('curse_id', con('player_curse').select('curse_id').where('player_id', playerID))
+                .orderBy('name'),
+        ]);
         res.render('sheet2', {
             playerID,
             nodeRows: results[0],
             playerLineage,
-            playerScore: results[1].score
+            playerScore: results[1].score,
+            characteristics: results[2],
+            curses: results[3],
+            availableCurses: results[4]
         });
     }
     catch (err) {
@@ -397,7 +440,14 @@ router.get('/admin/2', async (req, res) => {
         con('characteristic').select(),
 
         //Combat Specializations: 5
-        con('skill').select('skill.name', 'skill.skill_id')
+        con('skill').select('skill.name', 'skill.skill_id'),
+
+        //Focus Characteristics: 6
+        con('curse_characteristic').select('characteristic.characteristic_id', 'characteristic.name')
+            .join('characteristic', 'characteristic.characteristic_id', 'curse_characteristic.characteristic_id'),
+
+        //Curses
+        con('curse').select()
     ];
 
     try {
@@ -409,6 +459,8 @@ router.get('/admin/2', async (req, res) => {
             specializations: results[3],
             characteristics: results[4],
             combatSpecializations: results[5],
+            focusCharacteristics: results[6],
+            cursesList: results[7],
         });
     }
     catch (err) {
@@ -684,7 +736,8 @@ router.post('/equipment', jsonParser, async (req, res) => {
         }).where('equipment_id', equipmentID);
         res.send();
         if (visible !== undefined) {
-            const equipmentName = (await con('equipment').select('name').where('equipment_id', equipmentID).first()).name;
+            const equipmentName = name ? name :
+                (await con('equipment').select('name').where('equipment_id', equipmentID).first()).name;
             await emitToAllPlayers(visible ? 'equipment added' : 'equipment removed', { equipmentID, name: equipmentName });
         }
         let skill_name;
@@ -955,7 +1008,8 @@ router.post('/item', jsonParser, async (req, res) => {
         }).where('item_id', itemID);
         res.send();
         if (visible !== undefined) {
-            const itemName = (await con('item').select('name').where('item_id', itemID).first()).name;
+            const itemName = name ? name :
+                (await con('item').select('name').where('item_id', itemID).first()).name;
             await emitToAllPlayers(visible ? 'item added' : 'item removed', { itemID, name: itemName });
         }
         emitToAllPlayers('item changed', { itemID, name });
@@ -996,6 +1050,163 @@ router.post('/player/extrainfo', jsonParser, async (req, res) => {
         res.send();
     }
     catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.get('/curse/focus', async (req, res) => {
+    const curseID = req.query.curseID;
+
+    if (!curseID) return res.status(401).send();
+
+    try {
+        const focuses = await con('curse_focus').select('characteristic_id', 'description').where('curse_id', curseID);
+        res.send({ focuses });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.put('/curse', jsonParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const isAdmin = req.session.isAdmin;
+    const name = req.body.name;
+    const description = req.body.description;
+    const level = req.body.level;
+    const focuses = req.body.focuses;
+
+    if (!playerID || !isAdmin) return res.status(401).send();
+
+    try {
+        const curseID = (await con('curse').insert({
+            name, description, level, visible: false
+        }))[0];
+
+        await Promise.all(focuses.map(focus => con('curse_focus').insert({
+            curse_id: curseID,
+            characteristic_id: focus.characteristicID,
+            description: focus.description
+        })));
+
+        res.send({ curseID });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.post('/curse', jsonParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const isAdmin = req.session.isAdmin;
+    const curseID = req.body.curseID;
+    const name = req.body.name;
+    const description = req.body.description;
+    const level = req.body.level;
+    const visible = req.body.visible;
+    const focuses = req.body.focuses;
+
+    if (!playerID || !isAdmin || !curseID) return res.status(401).send();
+
+    try {
+        if (name || description || level || visible !== undefined) {
+            await con('curse').update({
+                name, description, level, visible
+            }).where('curse_id', curseID);
+        }
+
+        if (focuses) {
+            await Promise.all(focuses.map(focus => con('curse_focus').update({
+                description: focus.description
+            }).where('curse_id', curseID).andWhere('characteristic_id', focus.characteristicID)));
+        }
+
+        if (visible !== undefined) {
+            const curse = await con('curse').select('name', 'description').where('curse_id', curseID).first();
+            await emitToAllPlayers(visible ? 'curse added' : 'curse removed', {
+                curseID,
+                name: curse.name, description: curse.description
+            });
+        }
+        emitToAllPlayers('curse changed', { curseID, name, description, level });
+
+        res.send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.delete('/curse', jsonParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const isAdmin = req.session.isAdmin;
+    const curseID = req.body.curseID;
+
+    if (!playerID || !isAdmin) return res.status(401).send();
+
+    try {
+        await con('curse').where('curse_id', curseID).del();
+        res.send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.put('/player/curse', jsonParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const curseID = req.body.curseID;
+
+    if (!playerID || !curseID) return res.status(401).send();
+
+    try {
+        await con('player_curse').insert({
+            player_id: playerID,
+            curse_id: curseID,
+            characteristic_id: null
+        });
+
+        const curse = await con('curse').select('curse_id', 'name', 'description', 'level')
+            .where('curse_id', curseID).first();
+
+        curse.focus = await con('curse_focus').select('characteristic_id', 'description')
+            .where('curse_id', curseID);
+
+        res.send({ curse });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.post('/player/curse', jsonParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const characteristicID = req.body.characteristicID;
+    const curseID = req.body.curseID;
+
+    if (!playerID || !characteristicID || !curseID) return res.status(401).send();
+
+    try {
+        await con('player_curse').update({
+            characteristic_id: characteristicID
+        }).where('player_id', playerID).andWhere('curse_id', curseID);
+        res.send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
+
+router.delete('/player/curse', jsonParser, async (req, res) => {
+    const playerID = req.session.playerID;
+    const curseID = req.body.curseID;
+
+    if (!playerID || !curseID) return res.status(401).send();
+    try {
+        await con('player_curse').where('player_id', playerID).andWhere('curse_id', curseID).del();
+        res.send();
+    } catch (err) {
         console.error(err);
         res.status(500).send();
     }

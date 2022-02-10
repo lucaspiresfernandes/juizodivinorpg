@@ -113,6 +113,39 @@
                 </div>
             </div>
         </div>
+        <div class="row my-3 acds-container">
+            <div class="col">
+                <div class="row">
+                    <div class="col offset-3 h2 mt-2 text-center">Maldições</div>
+                    <div class="col-3 align-self-center">
+                        <input class="btn btn-dark" type="button" value="+" data-bs-toggle="modal"
+                            data-bs-target="#createCurse">
+                    </div>
+                    <hr>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="table-responsive">
+                            <table class="table table-dark align-middle">
+                                <thead>
+                                    <th scope="col"></th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">Descrição</th>
+                                    <th scope="col">Nível</th>
+                                    <th scope="col">Visível</th>
+                                    <th scope="col">Foco</th>
+                                </thead>
+                                <tbody id="curseListTable">
+                                    {{#each cursesList}}
+                                    {{> admin2_curse_row this}}
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {{> header_footer targetPage=1}}
     </div>
 
@@ -125,6 +158,9 @@
     </template>
     <template id="itemRowTemplate">
         {{> admin2_item_row}}
+    </template>
+    <template id="curseRowTemplate">
+        {{> admin2_curse_row}}
     </template>
 
     {{> failuretoast}}
@@ -300,6 +336,106 @@
                             </div>
                             <div class="col align-self-center">
                                 <button id="createItemCloseButton" type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createCurse" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Criar Maldição</h5>
+                    </div>
+                    <div class="modal-body text-center" id="createCurseContainer">
+                        {{> loading}}
+                        <div class="container-fluid">
+                            <div class="row mb-5">
+                                <div class="col">
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <input id="createCurseName" type="text" placeholder="Nome"
+                                                class="acds-element form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <textarea class="acds-element form-control" id="createCurseDescription"
+                                                placeholder="Descrição" rows="3" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <input id="createCurseLevel" type="text" placeholder="Nível"
+                                                class="acds-element form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{#each focusCharacteristics}}
+                            {{#with this}}
+                            <div class="row my-2">
+                                <div class="col">
+                                    <label for="fDesc{{@index}}">Descrição de Foco ({{name}})</label>
+                                    <textarea id="fDesc{{@index}}" class="acds-element form-control focus-description"
+                                        data-characteristic-id="{{characteristic_id}}" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            {{/with}}
+                            {{/each}}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col align-self-center">
+                                <button type="submit" id="createCurseButton" class="btn btn-primary">Criar</button>
+                            </div>
+                            <div class="col align-self-center">
+                                <button id="createCurseCloseButton" type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editCurse" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Focos de Maldição</h5>
+                    </div>
+                    <div class="modal-body text-center" id="editCurseContainer">
+                        {{> loading}}
+                        <div class="container-fluid">
+                            {{#each focusCharacteristics}}
+                            {{#with this}}
+                            <div class="row my-2">
+                                <div class="col">
+                                    <label for="fDesc{{@index}}">Descrição de Foco ({{name}})</label>
+                                    <textarea id="fDesc{{@index}}" class="acds-element form-control focus-description"
+                                        data-characteristic-id="{{characteristic_id}}" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            {{/with}}
+                            {{/each}}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col align-self-center">
+                                <button type="submit" id="editCurseButton" class="btn btn-primary">Editar</button>
+                            </div>
+                            <div class="col align-self-center">
+                                <button id="editCurseCloseButton" type="button" class="btn btn-secondary"
                                     data-bs-dismiss="modal">Fechar</button>
                             </div>
                         </div>
