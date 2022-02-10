@@ -32,6 +32,89 @@ async function onPlayerScoreChanged(ev) {
     catch (err) { showFailureToastMessage(err) }
 }
 
+{
+    const list = $('#initiativeList');
+    let currentIndex = -1;
+    const players = $('.acds-player-container');
+    for (let i = 0; i < players.length; i++) {
+        const player = players.eq(i);
+        list.append($(`<li>${player.find('.player-info[name="Nome"]').text()}</li>`));
+    }
+    Sortable.create(list[0], { animation: 150 });
+
+    $('.initiative-button').click(ev => {
+        const children = list.children();
+        if (children.length < 2) {
+            return;
+        }
+
+        const coef = $(ev.target).data('coef');
+        currentIndex += coef;
+        let previousIndex = currentIndex - 1;
+        let nextIndex = currentIndex + 1;
+
+        if (currentIndex < 0) {
+            currentIndex = children.length - 1;
+            previousIndex = 0;
+        }
+        else if (currentIndex >= children.length) {
+            currentIndex = 0;
+            nextIndex = children.length - 1;
+        }
+
+        const child = children.eq(currentIndex);
+        child.addClass('active');
+        const upChild = children.eq(previousIndex);
+        upChild.removeClass('active');
+        const downChild = children.eq(nextIndex);
+        downChild.removeClass('active');
+    });
+
+    $('.initiative-clear-button').click(ev => {
+        list.find('li.active').removeClass('active');
+        list.find('li.enemy').remove();
+        $('.round').val(1);
+        currentIndex = -1;
+    });
+
+    $('#addEnemy').click(ev => {
+        const input = $(`<input class="name acds-element acds-bottom-text text-center" 
+        value="Inimigo ${list.children().length}"></input>`);
+        const btn = $(`<button class="ms-1 btn btn-secondary btn-sm">-</button>`);
+        btn.click(enemyRemove);
+        const li = $('<li class="enemy"></li>').append(input, btn);
+        list.append(li);
+    });
+
+    function enemyRemove(ev) {
+        $(ev.target).parent().remove();
+        if (currentIndex > -1) {
+            list.children().eq(currentIndex).addClass('active');
+        }
+    }
+}
+
+
+$('#addNPC').click(ev => {
+    const list = $('#npcList');
+    list.append($(`<li>
+        <input class="name acds-element acds-bottom-text" value="NPC ${list.children().length}"></input>
+        <input type="number" class="health acds-element acds-bottom-text" value="0"></input>
+        <button class="btn btn-secondary btn-sm" onclick="$(event.target).parent().remove()">-</button>
+    </li>`));
+});
+
+{
+    const fastDiceModal = new bootstrap.Modal($('#fastDiceRoll')[0]);
+    $('#fastDiceRoll').on('hidden.bs.modal', () => $('#fastDiceRollValue').val(1));
+    
+    $('#fastDiceRollButton').click(ev => {
+        fastDiceModal.hide();
+        const value = parseInt($('#fastDiceRollValue').val()) || 1;
+        rollDice(value);
+    });
+}
+
 socket.on('info changed', content => {
     const playerID = content.playerID;
     const infoID = content.infoID;
@@ -167,9 +250,10 @@ socket.on('dice result', content => {
         return roll;
     });
 
+    const wrapper = $('.table-wrapper.dice-wrapper');
     const diceList = $('#diceList');
     const children = diceList.children();
-    if (children.length > 10) children[children.length - 1].remove();
+    if (children.length > 6) children[0].remove();
 
     const msg = $(`<li><span style='color:red;'>${playerName}</span>
     rolou
@@ -180,7 +264,8 @@ socket.on('dice result', content => {
     if (results.length > 1) msg.append(` Soma: 
     <span style='color:lightgreen;'>${results.reduce((a, b) => a + b, 0)}</span>.`)
 
-    diceList.prepend(msg);
+    diceList.append(msg);
+    wrapper.scrollTop(wrapper[0].scrollHeight);
 });
 
 socket.on('class change', content => {

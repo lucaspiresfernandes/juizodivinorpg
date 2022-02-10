@@ -749,6 +749,7 @@ CREATE TABLE `player_curse` (
     `player_id` INT UNSIGNED NOT NULL,
     `curse_id` INT UNSIGNED NOT NULL,
     `characteristic_id` INT UNSIGNED NULL,
+    `date_acquired` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(`player_id`, `curse_id`),
     CONSTRAINT `fk_player_curse_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_curse_curse_id` FOREIGN KEY (`curse_id`) REFERENCES `curse`(`curse_id`) ON DELETE CASCADE ON UPDATE CASCADE,

@@ -1,16 +1,16 @@
 //Curses
+const addCurseList = $('#addCurseList');
+const addCurseButton = $('#addCurseButton');
+const description = $('#addCurseContainer').find('.curse-description');
+description.text(addCurseList.find('option:selected').data('description'));
 {
-    const addCurseList = $('#addCurseList');
-    const description = $('#addCurseContainer').find('.curse-description');
-    description.text(addCurseList.find('option:selected').data('description'));
     const addCurseModal = new bootstrap.Modal($('#addCurse')[0]);
-    const addCurseButton = $('#addCurseButton');
     const addCurseCloseButton = $('#addCurseCloseButton');
     const addCurseContainer = $('#addCurseContainer');
     const addLoading = addCurseContainer.find('.loading');
 
     $('#addCurse').on('hidden.bs.modal', () => {
-        description.text(addCurseList.find('option:selected').data('description'));
+        description.text(addCurseList.find('option:selected').data('description') || '');
         addCurseContainer.show();
         addCurseCloseButton.prop('disabled', false);
         addLoading.hide();
@@ -32,50 +32,24 @@
             const response = await axios.put('/sheet/player/curse', { curseID });
             const curse = response.data.curse;
 
-            //TODO: add curse to list
+            const container = $($('#curseContainerTemplate').html());
+            container.data('curse-id', curse.curse_id);
+            const main = container.find('.main');
+            main.find('.name').text(curse.name);
+            main.find('.level').text(curse.level).data('level', curse.level);
+            main.find('.description').text(curse.description);
+            const focuses = container.find('.focuses');
+            const select = focuses.find('select');
+            for (const focus of curse.focuses) {
+                select.append($(`<option value="${focus.characteristic_id}" title="${focus.description}">${focus.name}</option>`));
+            }
+            focuses.find('.description').text(curse.focuses[0].description);
 
             addCurseList.find(`option[value="${curseID}"]`).remove();
-
+            $('#playerCurses').append(container);
         } catch (err) { showFailureToastMessage(err) }
         addCurseButton.prop('disabled', addCurseList.children().length === 0);
         addCurseModal.hide();
-    });
-
-    $('.focuses select').change(ev => {
-        const parent = $(ev.target).parents('.focuses');
-        const description = $(ev.target).find('option:selected').attr('title');
-        parent.find('.description').text(description || '');
-    });
-
-    $('.focuses button').click(async ev => {
-        if (!confirm('Tem certeza que quer aplicar o foco? Você não poderá mudar depois.')) return;
-
-        const container = $(ev.target).parents('.curse-container');
-        const lv = container.find('.main .level');
-        const current = $(`.characteristic-container[data-characteristic-id="${characteristicID}"] .remaining`);
-        const newVal = current.data('value') - lv.data('level');
-        const focusesContainer = $(ev.target).parents('.focuses');
-        const opt = focusesContainer.find('select option:selected');
-
-        const curseID = container.data('curse-id');
-        const characteristicID = parseInt(opt.val());
-        const name = opt.text();
-        const description = opt.attr('title');
-
-        if (newVal < 0) return alert('Pontos de atributo insuficientes.');
-
-        try {
-            await axios.post('/sheet/player/curse', { curseID, characteristicID });
-
-            const focus = container.find('.focus');
-            focus.data('characteristic-id', characteristicID);
-            focus.find('.name').text(name);
-            focus.find('.description').text(description);
-            current.text(newVal).data('value', newVal);
-            focusesContainer.remove();
-            focus.prop('hidden', false);
-
-        } catch (err) { showFailureToastMessage(err) }
     });
 
     socket.on('curse added', content => {
@@ -118,6 +92,70 @@
         }
         description.text(addCurseList.find('option:selected').data('description') || '');
     });
+}
+
+async function onCurseDelete(ev) {
+    if (!confirm('Tem certeza que quer remover essa maldição?')) return;
+
+    const container = $(ev.target).parents('.curse-container');
+    const curseID = container.data('curse-id');
+    const main = container.find('.main');
+    const name = main.find('.name').text();
+    const txtDesc = main.find('.description').text();
+
+    try {
+        await axios.delete('/sheet/player/curse', { data: { curseID } });
+
+        const focus = container.find('.focus');
+        if (!focus.prop('hidden')) {
+            const characteristicID = focus.data('characteristic-id');
+            const remaining = $(`.characteristic-container[data-characteristic-id="${characteristicID}"] .remaining`);
+            remaining.data('value', remaining.data('value') + main.find('.level').data('level')).text(remaining.data('value'));
+        }
+
+        if (addCurseList.find(`option[value="${curseID}"]`).length === 0)
+            addCurseList.append($(`<option value="${curseID}" data-description="${txtDesc}">${name}</option>`));
+        container.remove();
+        addCurseButton.prop('disabled', false);
+        description.text(addCurseList.find('option:selected').data('description'));
+    } catch (err) { showFailureToastMessage(err) }
+}
+
+async function onCurseApply(ev) {
+    if (!confirm('Tem certeza que quer aplicar o foco? Você não poderá mudar depois.')) return;
+
+    const container = $(ev.target).parents('.curse-container');
+    const focusesContainer = $(ev.target).parents('.focuses');
+    const opt = focusesContainer.find('select option:selected');
+
+    const curseID = container.data('curse-id');
+    const characteristicID = parseInt(opt.val());
+    const name = opt.text();
+    const description = opt.attr('title');
+    const lv = container.find('.main .level');
+    const current = $(`.characteristic-container[data-characteristic-id="${characteristicID}"] .remaining`);
+    const newVal = current.data('value') - lv.data('level');
+
+    if (newVal < 0) return alert('Pontos de atributo insuficientes.');
+
+    try {
+        await axios.post('/sheet/player/curse', { curseID, characteristicID });
+
+        const focus = container.find('.focus');
+        focus.data('characteristic-id', characteristicID);
+        focus.find('.name').text(name);
+        focus.find('.description').text(description);
+        current.text(newVal).data('value', newVal);
+        focusesContainer.remove();
+        focus.prop('hidden', false);
+
+    } catch (err) { showFailureToastMessage(err) }
+}
+
+function onCurseSelectChange(ev) {
+    const parent = $(ev.target).parents('.focuses');
+    const description = $(ev.target).find('option:selected').attr('title');
+    parent.find('.description').text(description || '');
 }
 
 //Lineage

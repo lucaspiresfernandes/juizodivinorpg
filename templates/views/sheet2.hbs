@@ -43,56 +43,9 @@
                     {{/each}}
                     <hr>
                 </div>
-                <div class="row justify-content-center">
+                <div class="row justify-content-center" id="playerCurses">
                     {{#each curses}}
-                    {{#with this}}
-                    <div class="curse-container col col-md-6 acds-container m-3 text-center curse"
-                        data-curse-id="{{curse_id}}">
-                        <div class="row mt-2 main">
-                            <div class="col">
-                                <p class="name h3">{{name}}</p>
-                                <p>Grau <span class="level" data-level="{{level}}">{{level}}</span> </p>
-                                <p class="description">{{description}}</p>
-                            </div>
-                        </div>
-                        <div class="row mb-2 focus" data-characteristic_id="{{characteristic_id}}" {{#unless
-                            characteristic_id}}hidden{{/unless}}>
-                            <div class="col">
-                                <span class="name h6">{{focus.name}}</span>:
-                                <span class="description">{{focus.description}}</span>
-                            </div>
-                        </div>
-                        {{#unless characteristic_id}}
-                        <div class="row my-2 focuses">
-                            <div class="col">
-                                <div class="row">
-                                    <div class="col">
-                                        Selecione o foco:
-                                        <select class="form-control acds-element">
-                                            {{#each focuses}}
-                                            {{#with this}}
-                                            <option value="{{characteristic_id}}" title="{{description}}">{{name}}
-                                            </option>
-                                            {{/with}}
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row my-3">
-                                    <div class="col description">
-                                        {{focuses.0.description}}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <button class="btn btn-dark">Aplicar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {{/unless}}
-                    </div>
-                    {{/with}}
+                    {{> curse_container this}}
                     {{/each}}
                 </div>
             </div>
@@ -135,6 +88,10 @@
         {{!Templates}}
         <template id="lineageNodeTooltipTemplate">
             {{> lineage_node_tooltip}}
+        </template>
+
+        <template id="curseContainerTemplate">
+            {{> curse_container}}
         </template>
 
         <div class="modal fade" id="addCurse" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">

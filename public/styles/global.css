@@ -114,3 +114,12 @@ a:active, .btn-link:active {
 #generalDiceRoll img {
     max-height: 75px;
 }
+
+#diceResultDescription {
+    opacity: 0;
+    transition: 1s;
+}
+
+#diceResultDescription.show {
+    opacity: 1;
+}

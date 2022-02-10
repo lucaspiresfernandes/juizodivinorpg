@@ -583,6 +583,23 @@ router.post('/player/characteristic', jsonParser, async (req, res) => {
             .where('player_id', playerID)
             .andWhere('characteristic_id', charID);
 
+        const affectedCurses = await con('player_curse').select('curse.curse_id', 'curse.level')
+            .join('curse', 'curse.curse_id', 'player_curse.curse_id')
+            .where('player_id', playerID).where('characteristic_id', charID)
+            .orderBy('date_acquired', 'DESC');
+
+        let auxVal = value;
+        for (const curse of affectedCurses) {
+            auxVal -= curse.level;
+        }
+
+        await Promise.all(affectedCurses.map(curse => {
+            if (auxVal < 0) {
+                auxVal += curse.level;
+                return con('player_curse').where('player_id', playerID).andWhere('curse_id', curse.curse_id).del();
+            }
+        }));
+
         const updatedSkills = await updateSkills(playerID, clause => clause
             .where('skill.characteristic_id', charID)
             .andWhere('player_skill.player_id', playerID));
@@ -1170,7 +1187,9 @@ router.put('/player/curse', jsonParser, async (req, res) => {
         const curse = await con('curse').select('curse_id', 'name', 'description', 'level')
             .where('curse_id', curseID).first();
 
-        curse.focus = await con('curse_focus').select('characteristic_id', 'description')
+        curse.focuses = await con('curse_focus').select('curse_focus.characteristic_id', 'curse_focus.description',
+            'characteristic.name')
+            .join('characteristic', 'characteristic.characteristic_id', 'curse_focus.characteristic_id')
             .where('curse_id', curseID);
 
         res.send({ curse });

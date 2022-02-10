@@ -86,6 +86,7 @@
             const sum = results.reduce((a, b) => a + b, 0);
 
             loading.hide();
+            diceResultDescription.show();
             diceResultContent.text(sum).fadeIn('slow', () => {
                 if (results.length <= 1) return;
                 diceResultDescription.text(results.join(' + ')).addClass('show');

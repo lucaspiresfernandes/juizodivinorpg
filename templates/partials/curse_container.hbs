@@ -1,0 +1,50 @@
+<div class="curse-container col col-md-6 acds-container m-3 text-center curse" data-curse-id="{{curse_id}}">
+    <div class="row mt-2 main">
+        <div class="col">
+            <p class="name h3">{{name}}</p>
+            <p>Grau <span class="level" data-level="{{level}}">{{level}}</span> </p>
+            <p class="description">{{description}}</p>
+        </div>
+    </div>
+    <div class="row mb-2 focus" data-characteristic-id="{{characteristic_id}}" {{#unless
+        characteristic_id}}hidden{{/unless}}>
+        <div class="col">
+            <span class="name h6">{{focus.name}}</span>:
+            <span class="description">{{focus.description}}</span>
+        </div>
+    </div>
+    {{#unless characteristic_id}}
+    <div class="row my-2 focuses">
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    Selecione o foco:
+                    <select class="form-control acds-element" onchange="onCurseSelectChange(event)">
+                        {{#each focuses}}
+                        {{#with this}}
+                        <option value="{{characteristic_id}}" title="{{description}}">{{name}}
+                        </option>
+                        {{/with}}
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="row my-3">
+                <div class="col description">
+                    {{focuses.0.description}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" onclick="onCurseApply(event)">Aplicar Foco</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/unless}}
+    <div class="row my-2">
+        <div class="col">
+            <button class="btn btn-dark btn-sm" onclick="onCurseDelete(event)">Remover Maldição</button>
+        </div>
+    </div>
+</div>

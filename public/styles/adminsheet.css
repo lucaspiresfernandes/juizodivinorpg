@@ -7,46 +7,47 @@
     color: white;
 }
 
-.table-wrapper {
-    overflow: auto;
-    display: inline-block;
-    max-height: 280px;
+.wrapper {
+    overflow-y: auto;
+    max-height: 260px;
 }
 
-.table-wrapper .dice-list {
+.wrapper .list {
     background-color: #111;
-}
-
-.sortable {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    width: 60%;
-}
-
-.sortable li {
-    margin-top: 3rem !important;
-    margin-bottom: 3rem !important;
-    padding: 0.4em;
-    padding-left: 1.5em;
-    font-size: 1.4em;
-    height: 18px;
-    user-select: none;
-}
-
-.sortable li span {
-    position: absolute;
-    margin-left: -1.3em;
-}
-
-.dice-list {
+    border-radius: 0;
+    min-height: 250px;
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-.dice-list>li {
+.wrapper::-webkit-scrollbar,
+.wrapper::-webkit-scrollbar {
+    width: 0;
+}
+
+.wrapper .list>li {
     padding: 0.5rem 1rem;
+}
+
+.initiative-list li.active,
+.initiative-list li.active input {
+    background-color: #333 !important;
+}
+
+.npc-list li input.name,
+.initiative-list li input {
+    max-width: 40%;
+}
+
+.npc-list li input.name,
+.npc-list li input.health,
+.initiative-list li input {
+    background-color: #111 !important;
+}
+
+.npc-list li input.health {
+    max-width: 3em;
 }
 
 .dice-list>li:nth-child(odd) {
@@ -55,6 +56,10 @@
 
 .class-name {
     color: red;
+}
+
+.round {
+    max-width: 3rem;
 }
 
 .player-score {

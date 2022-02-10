@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="/styles/adminsheet.css">
     <script src="/scripts/admin1.js" defer></script>
     <script>socket.emit('room:join', 'admin');</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"
+        integrity="sha512-zYXldzJsDrNKV+odAwFYiDXV2Cy37cwizT+NkuiPGsa9X1dOz04eHvUWVuxaJ299GvcJT31ug2zO4itXBjFx4w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -190,30 +194,108 @@
             {{/with}}
             {{/each}}
         </div>
-        <div class="row my-3 text-center acds-container">
-            <div class="col">
+        <div class="row my-3 text-center">
+            <div class="col mx-2">
                 <div class="row mt-2 text-center">
-                    <div class="col h2">Utilidades</div>
+                    <div class="col h2">Rolagem</div>
                     <hr>
                 </div>
-                <div class="row my-4 text-center">
-                    <div class="col">
-                        <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
-                            data-bs-target="#generalDiceRoll">
-                    </div>
-                </div>
-                <div class="row my-4">
-                    <div class="col">
+                <div class="row mb-3 justify-content-center">
+                    <div class="col col-sm-6 col-md-4 col-lg-3">
                         <div class="row">
-                            <div class="col">
-
+                            <div class="col h5">
+                                Geral
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col mx-3 acds-container table-wrapper">
-                                <ul id="diceList" class="dice-list">
-                                </ul>
+                            <div class="col">
+                                <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
+                                    data-bs-target="#generalDiceRoll">
                             </div>
+                        </div>
+                    </div>
+                    <div class="col col-sm-6 col-md-4 col-lg-3">
+                        <div class="row h5">
+                            <div class="col">
+                                Rápido
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
+                                    data-bs-target="#fastDiceRoll">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col mx-2">
+                <div class="row">
+                    <div class="col offset-3 h2 mt-2 text-center">Combate</div>
+                    <div class="col-3 align-self-center">
+                        <input id="addEnemy" class="btn btn-dark" type="button" value="+">
+                    </div>
+                    <hr>
+                </div>
+                <div class="row my-2">
+                    <div class="col">
+                        Rodada: <input class="h4 acds-element acds-bottom-text round" type="number" value="1">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="wrapper w-100 acds-container">
+                            <ul id="initiativeList" class="list initiative-list text-center">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center mt-2">
+                    <div class="col col-md-4">
+                        <button class="btn btn-secondary initiative-button" data-coef="-1">Anterior</button>
+                    </div>
+                    <div class="col col-md-4">
+                        <button class="btn btn-secondary initiative-clear-button" data-coef="1">Limpar</button>
+                    </div>
+                    <div class="col col-md-4">
+                        <button class="btn btn-secondary initiative-button" data-coef="1">Próximo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col mx-2">
+                <div class="row mt-2 text-center">
+                    <div class="col h2">Histórico</div>
+                    <hr>
+                </div>
+                <div class="row">
+                    <div class="col">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="wrapper w-100 acds-container">
+                            <ul id="diceList" class="list dice-list">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col mx-2">
+                <div class="row">
+                    <div class="col offset-3 h2 mt-2 text-center">NPCs</div>
+                    <div class="col-3 align-self-center">
+                        <input id="addNPC" class="btn btn-dark" type="button" value="+">
+                    </div>
+                    <hr>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="wrapper w-100 acds-container">
+                            <ul id="npcList" class="list npc-list text-center">
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -221,20 +303,17 @@
         </div>
         <div class="row my-3 acds-container">
             <div class="col">
-                <div class="row">
+                <div class="row mt-2 text-center">
+                    <div class="col h2">
+                        <label for="adminAnotations">Anotações</label>
+                    </div>
+                    <hr>
+                </div>
+                <div class="row mb-3">
                     <div class="col">
-                        <div class="row mt-2 text-center">
-                            <div class="col h2">Anotações</div>
-                            <hr>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                {{#with adminNotes}}
-                                <textarea id="adminAnotations" class="form-control acds-element"
-                                    rows="20">{{value}}</textarea>
-                                {{/with}}
-                            </div>
-                        </div>
+                        {{#with adminNotes}}
+                        <textarea id="adminAnotations" class="form-control acds-element" rows="10">{{value}}</textarea>
+                        {{/with}}
                     </div>
                 </div>
             </div>
@@ -253,6 +332,40 @@
     {{> failuretoast}}
     {{> generaldice}}
     {{> diceroll}}
+
+    <div class="modal fade" id="fastDiceRoll" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rolagem Rápida</h5>
+                    </div>
+                    <form onsubmit="event.preventDefault()">
+                        <div class="modal-body text-center" id="fastDiceRollContainer">
+                            {{> loading}}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+                                        Valor
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-3">
+                                        <input id="fastDiceRollValue" class="acds-element form-control" type="number"
+                                            value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" id="fastDiceRollButton" class="btn btn-primary">Rolar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </form>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
