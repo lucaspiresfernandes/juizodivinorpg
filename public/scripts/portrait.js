@@ -121,7 +121,6 @@ function showDiceResult(data) {
     if (successType.isCritical) {
         $result.addClass('critical');
         $description.addClass('critical');
-        //TODO: find better details.
     }
     $result.text(roll).fadeIn('slow', () => $description.text(successType.description).fadeIn('slow'));
 }

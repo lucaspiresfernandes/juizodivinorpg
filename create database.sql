@@ -724,7 +724,6 @@ CREATE TABLE `player` (
     CONSTRAINT `fk_player_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Represent a lineage node conquered by a player.
 CREATE TABLE `player_lineage_node` (
     `player_id` INT UNSIGNED NOT NULL,
     `lineage_id` INT UNSIGNED NOT NULL,
@@ -840,14 +839,13 @@ VALUES
         'Desarmado',
         'Luta',
         2,
-        '1d3+DB',
+        '1d3',
         'Toque',
         '1',
         '-',
         TRUE
     );
 
--- TODO: insert equipments
 CREATE TABLE `player_equipment` (
     `player_id` INT UNSIGNED NOT NULL,
     `equipment_id` INT UNSIGNED NOT NULL,
@@ -888,7 +886,6 @@ CREATE TABLE `item` (
     PRIMARY KEY (`item_id`)
 );
 
--- TODO: insert items.
 CREATE TABLE `player_item` (
     `player_id` INT UNSIGNED NOT NULL,
     `item_id` INT UNSIGNED NOT NULL,

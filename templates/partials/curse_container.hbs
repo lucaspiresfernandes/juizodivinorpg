@@ -1,4 +1,4 @@
-<div class="curse-container col col-md-6 acds-container m-3 text-center curse" data-curse-id="{{curse_id}}">
+<div class="px-3 curse-container col-12 col-md-5 m-2 acds-container text-center curse" data-curse-id="{{curse_id}}">
     <div class="row mt-2 main">
         <div class="col">
             <p class="name h3">{{name}}</p>
@@ -16,8 +16,8 @@
     {{#unless characteristic_id}}
     <div class="row my-2 focuses">
         <div class="col">
-            <div class="row">
-                <div class="col">
+            <div class="row justify-content-center">
+                <div class="col col-sm-8 col-md-6">
                     Selecione o foco:
                     <select class="form-control acds-element" onchange="onCurseSelectChange(event)">
                         {{#each focuses}}
