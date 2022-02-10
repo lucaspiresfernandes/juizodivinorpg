@@ -8,7 +8,6 @@
     const addCurseCloseButton = $('#addCurseCloseButton');
     const addCurseContainer = $('#addCurseContainer');
     const addLoading = addCurseContainer.find('.loading');
-    const curseList = $('');
 
     $('#addCurse').on('hidden.bs.modal', () => {
         description.text(addCurseList.find('option:selected').data('description'));
@@ -50,24 +49,31 @@
 
     $('.focuses button').click(async ev => {
         if (!confirm('Tem certeza que quer aplicar o foco? Você não poderá mudar depois.')) return;
-        try {
-            const container = $(ev.target).parents('.curse-container');
-            const focusesContainer = $(ev.target).parents('.focuses');
-            const opt = focusesContainer.find('select option:selected');
-            
-            const curseID = container.data('curse-id');
-            const characteristicID = parseInt(opt.val());
-            const name = opt.text();
-            const description = opt.attr('title');
 
+        const container = $(ev.target).parents('.curse-container');
+        const lv = container.find('.main .level');
+        const current = $(`.characteristic-container[data-characteristic-id="${characteristicID}"] .remaining`);
+        const newVal = current.data('value') - lv.data('level');
+        const focusesContainer = $(ev.target).parents('.focuses');
+        const opt = focusesContainer.find('select option:selected');
+
+        const curseID = container.data('curse-id');
+        const characteristicID = parseInt(opt.val());
+        const name = opt.text();
+        const description = opt.attr('title');
+
+        if (newVal < 0) return alert('Pontos de atributo insuficientes.');
+
+        try {
             await axios.post('/sheet/player/curse', { curseID, characteristicID });
 
             const focus = container.find('.focus');
             focus.data('characteristic-id', characteristicID);
             focus.find('.name').text(name);
             focus.find('.description').text(description);
-            focus.prop('hidden', false);
+            current.text(newVal).data('value', newVal);
             focusesContainer.remove();
+            focus.prop('hidden', false);
 
         } catch (err) { showFailureToastMessage(err) }
     });
@@ -97,11 +103,13 @@
         const curseID = content.curseID;
         const name = content.name;
         const contentDescription = content.description;
+        const level = content.level;
 
-        const row = curseList.find('tr').filter((i, el) => $(el).data('curse-id') === curseID);
-        if (row.length > 0) {
-            if (name) row.find('.name').text(name);
-            if (contentDescription) row.find('.description').text(contentDescription);
+        const container = $(`.curse-container[data-curse-id="${curseID}"] .main`);
+        if (container.length > 0) {
+            if (name) container.find('.name').text(name);
+            if (contentDescription) container.find('.description').text(contentDescription);
+            if (level) container.find('.level').text(level);
         }
         else {
             const opt = addCurseList.find(`option[value="${curseID}"]`);

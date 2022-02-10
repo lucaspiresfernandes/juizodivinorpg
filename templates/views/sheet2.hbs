@@ -27,14 +27,14 @@
                 <div class="row text-center justify-content-center">
                     {{#each characteristics}}
                     {{#with this}}
-                    <div class="col-3 mb-2 h4 characteristic" data-characteristic-id="{{characteristic_id}}">
+                    <div class="col-3 mb-2 h4 characteristic-container" data-characteristic-id="{{characteristic_id}}">
                         <div class="row">
                             <div class="col">
                                 {{name}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col remaining">
+                            <div class="col remaining" data-value="{{remaining_value}}">
                                 {{remaining_value}}
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                         <div class="row mt-2 main">
                             <div class="col">
                                 <p class="name h3">{{name}}</p>
-                                <p>Custo: <span class="level">{{level}}</span> </p>
+                                <p>Custo: <span class="level" data-level="{{level}}">{{level}}</span> </p>
                                 <p class="description">{{description}}</p>
                             </div>
                         </div>
