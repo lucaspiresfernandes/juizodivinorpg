@@ -7,7 +7,7 @@ const path = require('path');
 
 router.get('/:attrStatusID', async (req, res) => {
     const playerID = req.query.playerID || req.session.playerID;
-    const attrStatusID = req.params.attrStatusID || null;
+    const attrStatusID = parseInt(req.params.attrStatusID) || null;
 
     if (!playerID) return res.status(401).send();
 
@@ -41,7 +41,7 @@ router.post('/', jsonParser, async (req, res) => {
             const id = avatar.attribute_status_id;
             const obj = data.find(av => av.attribute_status_id == id);
 
-            if (!id || !obj) throw new Error();
+            if (!obj) throw new Error();
 
             const link = obj.link || null;
 
@@ -50,6 +50,8 @@ router.post('/', jsonParser, async (req, res) => {
                 .where('attribute_status_id', id)
                 .andWhere('player_id', playerID);
         }));
+
+        res.send();
     }
     catch (err) {
         console.error(err);
