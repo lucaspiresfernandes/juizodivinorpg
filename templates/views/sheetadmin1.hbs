@@ -233,7 +233,23 @@
                 <div class="row">
                     <div class="col offset-3 h2 mt-2 text-center">Combate</div>
                     <div class="col-3 align-self-center">
-                        <input id="addEnemy" class="btn btn-dark" type="button" value="+">
+                        <div class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                +
+                            </button>
+                            <ul id="initiativeDropdown" class="dropdown-menu dropdown-menu-dark">
+                                {{#each characters}}
+                                <li><button class="dropdown-item btn btn-dark" data-player-id="{{playerID}}"
+                                        onclick="onAddToList(event)">{{info.value}}</button></li>
+                                {{/each}}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><button class="dropdown-item btn btn-dark"
+                                        onclick="onAddToList(event)">Novo...</button></li>
+                            </ul>
+                        </div>
                     </div>
                     <hr>
                 </div>
@@ -333,7 +349,7 @@
     {{> generaldice}}
     {{> diceroll}}
 
-    <div class="modal fade" id="fastDiceRoll" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="fastDiceRoll" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form autocomplete="off" onsubmit="event.preventDefault(); this.reset();">
@@ -352,7 +368,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-3">
                                         <input id="fastDiceRollValue" class="acds-element form-control" type="number"
-                                            value="1">
+                                            value="">
                                     </div>
                                 </div>
                             </div>

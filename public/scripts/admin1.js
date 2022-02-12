@@ -34,66 +34,78 @@ async function onPlayerScoreChanged(ev) {
 
 {
     const list = $('#initiativeList');
-    let currentIndex = -1;
-    const players = $('.acds-player-container');
-    for (let i = 0; i < players.length; i++) {
-        const player = players.eq(i);
-        list.append($(`<li>${player.find('.player-info[name="Nome"]').text()}</li>`));
-    }
     Sortable.create(list[0], { animation: 150 });
+    const detachedPlayerButtons = new Map();
+    const dropdown = $('#initiativeDropdown');
+
+    let currentIndex = -1;
 
     $('.initiative-button').click(ev => {
         const children = list.children();
-        if (children.length < 2) {
-            return;
-        }
-
         const coef = $(ev.target).data('coef');
+
+        let previousIndex = currentIndex;
         currentIndex += coef;
-        let previousIndex = currentIndex - 1;
-        let nextIndex = currentIndex + 1;
 
         if (currentIndex < 0) {
             currentIndex = children.length - 1;
-            previousIndex = 0;
         }
         else if (currentIndex >= children.length) {
             currentIndex = 0;
-            nextIndex = children.length - 1;
         }
 
-        const child = children.eq(currentIndex);
-        child.addClass('active');
-        const upChild = children.eq(previousIndex);
-        upChild.removeClass('active');
-        const downChild = children.eq(nextIndex);
-        downChild.removeClass('active');
+        children.eq(previousIndex).removeClass('active');
+        children.eq(currentIndex).addClass('active');
     });
 
     $('.initiative-clear-button').click(ev => {
-        list.find('li.active').removeClass('active');
-        list.find('li.enemy').remove();
+        list.empty();
+        for (const btn of detachedPlayerButtons.values()) {
+            dropdown.prepend(btn);
+        }
         $('.round').val(1);
         currentIndex = -1;
     });
 
-    $('#addEnemy').click(ev => {
-        const input = $(`<input class="name acds-element acds-bottom-text text-center" 
-        value="Inimigo ${list.children().length}"></input>`);
-        const btn = $(`<button class="ms-1 btn btn-secondary btn-sm">-</button>`);
-        btn.click(enemyRemove);
-        const li = $('<li class="enemy"></li>').append(input, btn);
-        list.append(li);
-    });
+    function onAddToList(ev) {
+        const originBtn = $(ev.target);
 
-    function enemyRemove(ev) {
-        $(ev.target).parent().remove();
-        if (currentIndex > -1) {
-            list.children().eq(currentIndex).addClass('active');
+        const playerID = originBtn.data('player-id');
+        const name = playerID ? originBtn.text() : `NPC_${list.children().filter('.npc').length}`;
+
+        const input = $(`<input class="name acds-element acds-bottom-text text-center" 
+        value="${name}"></input>`);
+        const btn = $(`<button class="ms-1 btn btn-secondary btn-sm">-</button>`);
+        const li = $('<li></li>').append(input, btn);
+
+        if (playerID) {
+            detachedPlayerButtons.set(playerID, originBtn.detach());
+            li.addClass('player');
         }
+        else {
+            li.addClass('npc');
+        }
+
+        btn.click(() => {
+            if (playerID) {
+                dropdown.prepend(detachedPlayerButtons.get(playerID));
+            }
+
+            list.children().eq(currentIndex).removeClass('active');
+            const index = li.index();
+            li.remove();
+            if (index < currentIndex) {
+                currentIndex--;
+                if (currentIndex < 0) {
+                    currentIndex = 0;
+                }
+            }
+            list.children().eq(currentIndex).addClass('active');
+        });
+
+        list.append(li);
     }
 }
-
 
 $('#addNPC').click(ev => {
     const list = $('#npcList');
@@ -105,13 +117,24 @@ $('#addNPC').click(ev => {
 });
 
 {
-    const fastDiceModal = new bootstrap.Modal($('#fastDiceRoll')[0]);
-    $('#fastDiceRoll').on('hidden.bs.modal', () => $('#fastDiceRollValue').val(1));
+    let fastDiceRollSource = false;
+    const fastDiceRoll = $('#fastDiceRoll');
+    const fastDiceRollModal = new bootstrap.Modal(fastDiceRoll[0]);
+    fastDiceRoll.on('hidden.bs.modal', () => $('#fastDiceRollValue').val(''));
+    fastDiceRoll.on('shown.bs.modal', () => $('#fastDiceRollValue').focus());
     
+    diceRoll.on('hidden.bs.modal', () => {
+        if (fastDiceRollSource) {
+            fastDiceRollModal.show();
+            fastDiceRollSource = false;
+        }
+    });
+
     $('#fastDiceRollButton').click(ev => {
-        fastDiceModal.hide();
+        fastDiceRollModal.hide();
         const value = parseInt($('#fastDiceRollValue').val()) || 1;
-        rollDice(value);
+        fastDiceRollSource = true;
+        rollDice(value, 20, true, true);
     });
 }
 

@@ -585,7 +585,7 @@ router.post('/player/characteristic', jsonParser, async (req, res) => {
 
         const affectedCurses = await con('player_curse').select('curse.curse_id', 'curse.level')
             .join('curse', 'curse.curse_id', 'player_curse.curse_id')
-            .where('player_id', playerID).where('characteristic_id', charID)
+            .where('player_id', playerID).andWhere('characteristic_id', charID)
             .orderBy('date_acquired', 'DESC');
 
         let auxVal = value;
@@ -596,7 +596,8 @@ router.post('/player/characteristic', jsonParser, async (req, res) => {
         await Promise.all(affectedCurses.map(curse => {
             if (auxVal < 0) {
                 auxVal += curse.level;
-                return con('player_curse').where('player_id', playerID).andWhere('curse_id', curse.curse_id).del();
+                return con('player_curse').update({ characteristic_id: null })
+                    .where('player_id', playerID).andWhere('curse_id', curse.curse_id);
             }
         }));
 

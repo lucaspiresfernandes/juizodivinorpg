@@ -21,7 +21,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button id="diceRollCloseButton" type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
@@ -30,14 +31,12 @@
 <script>
     const diceRoll = $('#diceRoll');
     const diceRollModal = new bootstrap.Modal(diceRoll[0]);
-    const diceResultContent = $('#diceResultContent');
-    diceResultContent.hide();
-    const diceResultDescription = $('#diceResultDescription');
-    diceResultDescription.hide();
+    $('#diceResultContent').hide();
+    $('#diceResultDescription').hide();
 
-    $('#diceRoll').on('hidden.bs.modal', ev => {
-        diceResultContent.text('').hide().removeClass('critical');
-        diceResultDescription.text('Placeholder').hide().removeClass('critical show');
+    diceRoll.on('hidden.bs.modal', ev => {
+        $('#diceResultContent').text('').hide().removeClass('critical');
+        $('#diceResultDescription').text('Placeholder').hide().removeClass('critical show');
     });
 
     async function rollDice(num, diceNum = 20, showBranches = true) {
@@ -57,6 +56,10 @@
             const roll = result.roll;
             const successType = result.successType;
             loading.hide();
+
+            const diceResultContent = $('#diceResultContent');
+            const diceResultDescription = $('#diceResultDescription');
+
             diceResultDescription.show();
             let prefix = '';
             if (successType.isCritical) {
@@ -68,6 +71,8 @@
 
             diceResultContent.text(roll).fadeIn('slow', () =>
                 diceResultDescription.text(description).addClass('show'));
+
+            $('#diceRollCloseButton').focus();
         }
         catch (err) {
             showFailureToastMessage(err);
@@ -86,11 +91,17 @@
             const sum = results.reduce((a, b) => a + b, 0);
 
             loading.hide();
+
+            const diceResultContent = $('#diceResultContent');
+            const diceResultDescription = $('#diceResultDescription');
+
             diceResultDescription.show();
             diceResultContent.text(sum).fadeIn('slow', () => {
                 if (results.length <= 1) return;
                 diceResultDescription.text(results.join(' + ')).addClass('show');
             });
+
+            $('#diceRollCloseButton').focus();
         }
         catch (err) {
             showFailureToastMessage(err);
