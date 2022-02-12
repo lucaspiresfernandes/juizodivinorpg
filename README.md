@@ -8,14 +8,6 @@ Juízo Divino RPG foi desenvolvido da seguinte forma:
 
 O sistema usa APIs de terceiros, como a Random.org, responsável por gerar números aleatórios.
 
-As variáveis de ambiente são:
-  - PORT: A porta a ser vinculada.
-  - DATABASE_URL: A URL do banco de dados MySQL.
-  - EXPRESS_SESSION_SECRET: Um hash ou secret para os cookies de sessão.
-  - RANDOM_ORG_KEY (Opcional): A chave para uso do Random.org. Caso não exista ou seja inválida, o sistema gerará números pseudo-aleatórios.
-
-O SQL para criar o banco de dados está nomeado como "create database.sql", e pode ser tanto executado como importado pra criar o ambiente.
-
 ## Imagens
 ### Login
 ![image](https://user-images.githubusercontent.com/71353674/152211073-1d759c9e-1a70-44ed-a48f-538ec751db8d.png)
@@ -25,8 +17,8 @@ O SQL para criar o banco de dados está nomeado como "create database.sql", e po
 
 ### Ficha do Jogador
 ![localhost_3000_sheet_1](https://user-images.githubusercontent.com/71353674/152212081-71310cc4-117c-4393-8fa3-e506629797ea.png)
-OBS: A página 2 da Ficha do Jogador ainda está em desenvolvimento.
+![juizodivino herokuapp com_sheet_2](https://user-images.githubusercontent.com/71353674/153723235-09ce4c1f-99bd-4c9e-8cc0-ddf4af67db1a.png)
 
 ### Ficha do Mestre (Administrador)
-![localhost_3000_sheet_admin_1](https://user-images.githubusercontent.com/71353674/152212147-39b0ac11-608f-4541-ac21-48d3b872e6ea.png)
+![juizodivino herokuapp com_sheet_admin_1](https://user-images.githubusercontent.com/71353674/153723250-e47681b5-31c4-432b-8ce3-5a7e4666c2eb.png)
 ![localhost_3000_sheet_admin_2](https://user-images.githubusercontent.com/71353674/152212163-5e96b512-769b-4a1e-aa52-c0a760a2dd9d.png)
