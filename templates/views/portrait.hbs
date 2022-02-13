@@ -2,54 +2,47 @@
 <html lang="en">
 
 <head>
-    {{> head title="Portrait"}}
-    <script>socket.emit('room:join', 'portrait' + '{{playerID}}');</script>
+    {{> head title="Portrait" ignore_bootstrap=1 ignore_axios=1}}
+    <script>socket.emit('room:join', 'portrait' + '{{playerID}}'); const playerID = {{ playerID }};</script>
     <link rel="stylesheet" href="/styles/portrait.css">
     <script src="/scripts/portrait.js" defer></script>
 </head>
 
-<body style="background-color: transparent !important;" data-status-state="{{statusState}}"
-    data-player-id="{{playerID}}">
-    <div class="container">
-        <div class="main shadow" id="mainContainer">
-            <img id="background" src="/assets/avatar_bg.png" class="bottom">
+<body data-status-state="{{statusState}}">
+    <div class="container shadow" id="mainContainer">
+        <img id="background" src="/assets/avatar_bg.png" class="bottom">
 
-            <img src="/assets/frame_upside.png" class="bottom">
+        <img src="/assets/frame_upside.png" class="frame frame-up bottom">
 
-            <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="bottom"
-                data-lineage="{{player.lineage_id}}" data-level="{{player.level}}" {{#unless
-                player.lineage_id}}hidden{{/unless}}>
+        <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="bottom"
+            data-lineage="{{player.lineage_id}}" data-level="{{player.level}}" {{#unless
+            player.lineage_id}}hidden{{/unless}}>
 
-            <img id="avatar" class="middle" style="display: none;">
+        <img id="avatar" class="middle" style="display: none;">
 
-            <img src="/assets/frame_bottom.png" class="top">
-            <img src="/assets/energy_placeholder.png" class="top energy-container">
-            <div class="text">
-                <div class="energy top">{{attributes.2.value}}</div>
-            </div>
+        <img src="/assets/frame_bottom.png" class="frame frame-down top">
+        <div class="energy-container">
+            <div class="energy top">{{attributes.2.value}}</div>
         </div>
     </div>
 
-    <div class="container switchable">
-        <div id="idleText" class="text" {{#if onCombat}}style="display: none;" {{/if}}>
-            <div class="name top">{{name}}</div>
-        </div>
-        <div id="combatText" class="text" {{#unless onCombat}}style="display: none;" {{/unless}}>
+    <div class="container" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
+        <div class="name top">{{name}}</div>
+    </div>
+
+    <div class="container" id="combatText" {{#unless onCombat}}style="display: none;" {{/unless}}>
+        <div class="combat">
             <div class="health top">{{attributes.0.value}}/{{attributes.0.total_value}}</div>
             <div class="sanity top">{{attributes.1.value}}/{{attributes.1.total_value}}</div>
         </div>
     </div>
 
-    <div class="container">
-        <div class="main" style="top: 20px; left: 20px;">
-            <div class="dice">
-                <video height="240" muted class="popout">
-                    <source src="/assets/dice_animation.webm">
-                </video>
-                <div class="result" style="display: none;">18</div>
-                <div class="description" style="display: none;">SUCESSO</div>
-            </div>
-        </div>
+    <div class="container dice">
+        <video height="240" muted class="popout">
+            <source src="/assets/dice_animation.webm">
+        </video>
+        <div class="result" style="display: none;">20</div>
+        <div class="description" style="display: none;">Placeholder</div>
     </div>
 </body>
 

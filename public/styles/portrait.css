@@ -6,7 +6,12 @@
 }
 
 body {
+    background-color: transparent !important;
     font-family: bebas-neue-pro, sans-serif;
+}
+
+.container {
+    position: relative;
 }
 
 .popout {
@@ -29,19 +34,8 @@ body {
     transition: all 0.5s ease-out;
 }
 
-.container .main,
-.container .text div {
-    position: absolute;
-}
-
-.container .main {
-    top: -70px;
-    left: -25px;
-}
-
-img {
-    height: 500px;
-    position: absolute;
+.critical {
+    text-shadow: 0 0 10px #DD0F0F, 0 0 30px #DD0F0F, 0 0 50px #DD0F0F !important;
 }
 
 .top {
@@ -56,84 +50,11 @@ img {
     z-index: -1000;
 }
 
-.name {
-    left: 350px;
-    top: 220px;
-
-    line-height: 100%;
-
-    max-width: 150px;
-
-    color: white;
-
-    font-size: 84px;
-    font-style: italic;
-
-    text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.75);
-
-    transform: translate(-50%, -50%);
-}
-
-.energy-container {
-    top: -5px;
-    left: 5px;
-}
-
-.health,
-.sanity {
-    left: 290px;
-    font-size: 96px;
-    font-style: italic;
-    max-width: 250px;
-    color: white;
-}
-
-.health {
-    top: 115px;
-    text-shadow: 0 0 10px #df3d60, 0 0 30px #df3d60, 0 0 50px #df3d60;
-}
-
-.sanity {
-    top: 215px;
-    text-shadow: 0 0 10px #7e3ddf, 0 0 30px #7e3ddf, 0 0 50px #7e3ddf;
-}
-
-.energy {
-    top: 402px;
-    left: 85px;
-    transform: translate(-50%, -50%);
-
-    color: #27ffbe;
-
-    font-size: 56px;
-    text-shadow: 0 0 20px #00ffff, 0 0 50px #00ffff;
-}
-
-.result {
-    font-size: 96px;
-    color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-shadow: 0 0 10px #DDAF0F, 0 0 30px #DDAF0F, 0 0 50px #DDAF0F;
-}
-
-.description {
-    font-size: 52px;
-    color: white;
-    position: absolute;
-    top: 94%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-shadow: 0 0 10px #DDAF0F, 0 0 30px #DDAF0F, 0 0 50px #DDAF0F;
-}
-
-.critical {
-    text-shadow: 0 0 10px #DD0F0F, 0 0 30px #DD0F0F, 0 0 50px #DD0F0F !important;
-}
-
 #background {
+    position: absolute;
+    top: 70px;
+    left: 35px;
+    max-height: 450px;
     filter: brightness(10%);
 }
 
@@ -145,11 +66,126 @@ img {
     filter: saturate(100000%) hue-rotate(172deg) brightness(50%);
 }
 
+.frame {
+    position: absolute;
+    max-height: 300px;
+}
+
+.frame-up {
+    top: 0;
+    left: 0;
+}
+
+.frame-down {
+    top: 285px;
+    left: 0;
+}
+
 #lineage {
     position: absolute;
-    top: 90px;
-    left: 140px;
-    transform: rotate(35deg);
+    top: 150px;
+    left: 300px;
+    transform: translate(-50%, -50%) rotate(45deg);
     width: 250px;
     height: 250px;
+}
+
+#avatar {
+    position: absolute;
+    width: 340px;
+    max-height: 550px;
+}
+
+.energy-container {
+    position: absolute;
+    top: 375px;
+    left: 25px;
+    background-image: url(/assets/energy_placeholder.png);
+    background-size: 100% 100%;
+    width: 200px;
+    height: 200px;
+}
+
+.energy-container .energy {
+    position: absolute;
+
+    top: 47%;
+    left: 47%;
+    transform: translate(-50%, -50%);
+
+    color: #27ffbe;
+
+    font-size: 56px;
+    text-shadow: 0 0 20px #00ffff, 0 0 50px #00ffff;
+}
+
+.name {
+    position: absolute;
+    left: 360px;
+    top: 300px;
+
+    max-width: 5em;
+
+    color: white;
+
+    font-size: 82px;
+    font-style: italic;
+
+    text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.75);
+
+    transform: translateY(-50%);
+}
+
+.container .combat {
+    top: 300px;
+    left: 360px;
+    position: absolute;
+    transform: translateY(-50%);
+    width: auto;
+}
+
+.health,
+.sanity {
+    font-size: 84px;
+    font-style: italic;
+    max-width: 250px;
+    color: white;
+}
+
+.health {
+    text-shadow: 0 0 10px #df3d60, 0 0 30px #df3d60, 0 0 50px #df3d60;
+}
+
+.sanity {
+    text-shadow: 0 0 10px #7e3ddf, 0 0 30px #7e3ddf, 0 0 50px #7e3ddf;
+}
+
+.dice video {
+    position: absolute;
+    top: 100px;
+    left: 65px;
+}
+
+.dice .result {
+    position: absolute;
+    top: 220px;
+    left: 185px;
+
+    font-size: 84px;
+    color: white;
+
+    transform: translate(-50%, -50%);
+    text-shadow: 0 0 10px #DDAF0F, 0 0 30px #DDAF0F, 0 0 50px #DDAF0F;
+}
+
+.dice .description {
+    position: absolute;
+    top: 340px;
+    left: 185px;
+
+    font-size: 63px;
+    color: white;
+
+    transform: translate(-50%, -50%);
+    text-shadow: 0 0 10px #DDAF0F, 0 0 30px #DDAF0F, 0 0 50px #DDAF0F;
 }

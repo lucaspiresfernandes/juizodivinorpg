@@ -1,4 +1,3 @@
-const playerID = $(document.body).data('player-id');
 const attributes = {
     '1': $('.health'),
     '2': $('.sanity'),
@@ -165,7 +164,10 @@ function showAvatar(id = 0) {
 $avatar.on('load', () => {
     $background.removeClass('dying weakening');
     $avatar.removeClass('unconscious');
-    if (avatarStateChangeFunc) avatarStateChangeFunc();
+    if (avatarStateChangeFunc) {
+        avatarStateChangeFunc();
+        avatarStateChangeFunc = undefined;
+    }
     $avatar.fadeIn('fast');
 });
 
@@ -173,11 +175,8 @@ socket.on('lineage change', content => {
     const lineageID = content.lineageID;
     const img = $('#lineage');
     img.data('lineage', lineageID);
-    img.prop('hidden', !lineageID);
-
-    if (lineageID)
-        return img.attr('src', `/assets/lineages/frameless/${lineageID}/1.png`);
-    img.attr('src', '');
+    img.prop('hidden', lineageID === undefined);
+    img.attr('src', lineageID ? `/assets/lineages/frameless/${lineageID}/1.png` : '');
 });
 
 socket.on('lineage node change', content => {
@@ -197,5 +196,7 @@ socket.on('lineage node change', content => {
 
 {
     const array = $('body').data('status-state');
-    showAvatar(array.find(attr => attr.value)?.attribute_status_id || 0);
+    let attr = array.find(attr => attr.value);
+    if (!attr) attr = { attribute_status_id: 0 };
+    showAvatar(attr.attribute_status_id);
 }
