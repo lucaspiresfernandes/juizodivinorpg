@@ -63,7 +63,7 @@ async function onPlayerScoreChanged(ev) {
         for (const btn of detachedPlayerButtons.values()) {
             dropdown.prepend(btn);
         }
-        $('.round').val(1);
+        $('#combatRound').val(1);
         currentIndex = -1;
     });
 

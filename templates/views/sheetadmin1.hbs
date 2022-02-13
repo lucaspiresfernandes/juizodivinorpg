@@ -202,8 +202,8 @@
             {{/each}}
         </div>
         <div class="row my-3 text-center">
-            <div class="col-12 col-lg m-2">
-                <div class="row mt-2 text-center">
+            <div class="col-12 col-lg my-2">
+                <div class="row mx-2 text-center">
                     <div class="col h2">Rolagem</div>
                     <hr>
                 </div>
@@ -236,9 +236,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg m-2">
-                <div class="row">
-                    <div class="col offset-3 h2 mt-2 text-center">Combate</div>
+            <div class="col-12 col-lg my-2">
+                <div class="row mx-2">
+                    <div class="col offset-3 h2 text-center">Combate</div>
                     <div class="col-3 align-self-center">
                         <div class="dropdown">
                             <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -262,7 +262,8 @@
                 </div>
                 <div class="row my-2">
                     <div class="col">
-                        Rodada: <input class="h4 acds-element acds-bottom-text round" type="number" value="1">
+                        <label class="h5" for="combatRound">Rodada: </label>
+                        <input id="combatRound" class="h4 acds-element acds-bottom-text" type="number" value="1">
                     </div>
                 </div>
                 <div class="row">
@@ -278,7 +279,7 @@
                         <button class="btn btn-sm btn-secondary initiative-button" data-coef="-1">Anterior</button>
                     </div>
                     <div class="col">
-                        <button class="btn btn-sm btn-secondary initiative-clear-button" data-coef="1">Limpar</button>
+                        <button class="btn btn-sm btn-secondary initiative-clear-button">Limpar</button>
                     </div>
                     <div class="col">
                         <button class="btn btn-sm btn-secondary initiative-button" data-coef="1">Próximo</button>
@@ -287,15 +288,12 @@
             </div>
         </div>
         <div class="row my-3">
-            <div class="col-12 col-lg m-2">
-                <div class="row mt-2 text-center">
-                    <div class="col h2">Histórico</div>
-                    <hr>
-                </div>
-                <div class="row">
-                    <div class="col">
-
+            <div class="col-12 col-lg my-3">
+                <div class="row text-center mx-2">
+                    <div class="col h2">
+                        Histórico
                     </div>
+                    <hr>
                 </div>
                 <div class="row">
                     <div class="col">
@@ -306,9 +304,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg m-2">
-                <div class="row">
-                    <div class="col offset-3 h2 mt-2 text-center">NPCs</div>
+            <div class="col-12 col-lg my-3">
+                <div class="row mx-2">
+                    <div class="col offset-3 h2 text-center">NPCs</div>
                     <div class="col-3 align-self-center">
                         <input id="addNPC" class="btn btn-dark" type="button" value="+">
                     </div>

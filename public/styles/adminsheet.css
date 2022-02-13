@@ -70,8 +70,8 @@
     color: red;
 }
 
-.round {
-    max-width: 3rem;
+#combatRound {
+    max-width: 4rem;
 }
 
 .player-score {
@@ -81,21 +81,18 @@
 
 .avatar-container {
     position: relative;
-    height: 250px;
 }
 
 .avatar-container .avatar {
-    position: absolute;
     max-height: 250px;
-    transform: translateX(-50%);
 }
 
 .avatar-container .lineage {
     position: absolute;
-    max-height: 100px;
+    max-height: 80px;
     left: 90%;
-    top: 35%;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #curseListTable tr .level,
