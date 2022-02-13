@@ -35,161 +35,168 @@
         <div class="row justify-content-center">
             {{#each characters}}
             {{#with this}}
-            <div class="col-12 col-md m-2 text-center acds-player-container" data-player-id="{{playerID}}"
+            <div class="col-12 col-md-6 col-lg-4 text-center player-container" data-player-id="{{playerID}}"
                 data-attribute-status="{{attributeStatus}}">
-                <div class="row">
+                <div class="row my-2 mx-md-1 acds-player-container">
                     <div class="col">
-                        <div class="avatar-container">
-                            <img class="img-fluid avatar">
-                            <img class="img-fluid lineage" data-lineage="{{player.lineage_id}}"
-                                data-level="{{player.level}}" {{#if player.lineage_id}}
-                                src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" {{/if}}>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col h3 player-info" data-info-id="{{info.info_id}}" name="{{info.name}}">
-                        {{info.value}}
-                    </div>
-                </div>
-                <div class="row my-1">
-                    <div class="col">
-                        <div class="row my-1">
+                        <div class="row">
                             <div class="col">
-                                Classe: <span class="class-name">{{#if
-                                    player.class_name}}{{player.class_name}}{{else}}Nenhuma{{/if}}</span>
+                                <div class="avatar-container">
+                                    <img class="img-fluid avatar">
+                                    <img class="img-fluid lineage" data-lineage="{{player.lineage_id}}"
+                                        data-level="{{player.level}}" {{#if player.lineage_id}}
+                                        src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png"
+                                        {{/if}}>
+                                </div>
                             </div>
                         </div>
-                        <div class="row my-1">
-                            <div class="col d-flex justify-content-center">
-                                <label for="playerLineage{{@index}}"><span
-                                        class="mx-2 align-self-center">Linhagem:</span></label>
-                                <select id="playerLineage{{@index}}" class="acds-element text-center w-50"
-                                    onchange="playerLineageChange(event);">
-                                    <option value="0" {{#unless player}}selected{{/unless}}>Nenhuma</option>
-                                    {{#each lineage}}
-                                    {{#with this}}
-                                    <option value="{{lineage_id}}" {{#ifEquals ../player.lineage_id
-                                        lineage_id}}selected{{/ifEquals}}>{{name}}</option>
-                                    {{/with}}
-                                    {{/each}}
-                                </select>
+                        <div class="row">
+                            <div class="col h3 player-info" data-info-id="{{info.info_id}}" name="{{info.name}}">
+                                {{info.value}}
                             </div>
                         </div>
                         <div class="row my-1">
                             <div class="col">
-                                Pontos de Linhagem: <input
-                                    class="acds-bottom-text acds-element player-score text-center" type="number"
-                                    value="{{player.score}}" onchange="onPlayerScoreChanged(event);">
+                                <div class="row my-1">
+                                    <div class="col">
+                                        Classe: <span class="class-name">{{#if
+                                            player.class_name}}{{player.class_name}}{{else}}Nenhuma{{/if}}</span>
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col d-flex justify-content-center">
+                                        <label for="playerLineage{{@index}}"><span
+                                                class="mx-2 align-self-center">Linhagem:</span></label>
+                                        <select id="playerLineage{{@index}}" class="acds-element text-center w-50"
+                                            onchange="playerLineageChange(event);">
+                                            <option value="0" {{#unless player}}selected{{/unless}}>Nenhuma</option>
+                                            {{#each lineage}}
+                                            {{#with this}}
+                                            <option value="{{lineage_id}}" {{#ifEquals ../player.lineage_id
+                                                lineage_id}}selected{{/ifEquals}}>{{name}}</option>
+                                            {{/with}}
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col">
+                                        Pontos de Linhagem: <input
+                                            class="acds-bottom-text acds-element player-score text-center" type="number"
+                                            value="{{player.score}}" onchange="onPlayerScoreChanged(event);">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    {{#each attributes}}
-                    {{#with this}}
-                    <div class="col">
+                        <hr>
                         <div class="row">
-                            <div class="col h4 player-attribute" style="color: #{{fill_color}};"
-                                data-attribute-id="{{attribute_id}}">
-                                {{value}}/{{total_value}}
+                            {{#each attributes}}
+                            {{#with this}}
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col h4 player-attribute" style="color: #{{fill_color}};"
+                                        data-attribute-id="{{attribute_id}}">
+                                        {{value}}/{{total_value}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        {{name}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/with}}
+                            {{/each}}
+                        </div>
+                        <hr>
+                        <div class="row">
+                            {{#each specs}}
+                            {{#with this}}
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col h4 player-spec" data-spec-id="{{spec_id}}">
+                                        {{value}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        {{name}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/with}}
+                            {{/each}}
+                        </div>
+                        <hr>
+                        <div class="row">
+                            {{#each characteristics}}
+                            {{#with this}}
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col h4 player-characteristic"
+                                        data-characteristic-id="{{characteristic_id}}">
+                                        {{value}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        {{name}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/with}}
+                            {{/each}}
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col h3">
+                                Equipamentos
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                {{name}}
+                                <div class="table-responsive">
+                                    <table class="table table-dark">
+                                        <thead>
+                                            <th scope="col">Usando</th>
+                                            <th scope="col">Nome</th>
+                                            <th scope="col">Dano</th>
+                                            <th scope="col">Alcance</th>
+                                            <th scope="col">Ataques</th>
+                                        </thead>
+                                        <tbody class="player-equipment-table">
+                                            {{#each equipments}}
+                                            {{> admin_equipment_row this}}
+                                            {{/each}}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {{/with}}
-                    {{/each}}
-                </div>
-                <hr>
-                <div class="row">
-                    {{#each specs}}
-                    {{#with this}}
-                    <div class="col">
+                        <hr>
                         <div class="row">
-                            <div class="col h4 player-spec" data-spec-id="{{spec_id}}">
-                                {{value}}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                {{name}}
-                            </div>
-                        </div>
-                    </div>
-                    {{/with}}
-                    {{/each}}
-                </div>
-                <hr>
-                <div class="row">
-                    {{#each characteristics}}
-                    {{#with this}}
-                    <div class="col">
-                        <div class="row">
-                            <div class="col h4 player-characteristic" data-characteristic-id="{{characteristic_id}}">
-                                {{value}}
+                            <div class="col h3">
+                                Inventário
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                {{name}}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-borderless">
+                                        <tbody class="player-item-table">
+                                            {{#each items}}
+                                            {{#with this}}
+                                            {{> admin_item_row this}}
+                                            {{/with}}
+                                            {{/each}}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    {{/with}}
-                    {{/each}}
                 </div>
-                <hr>
-                <div class="row">
-                    <div class="col h3">
-                        Equipamentos
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="table-responsive">
-                            <table class="table table-dark" style="--bs-table-bg: rgb(63, 68, 74);">
-                                <thead>
-                                    <th scope="col">Usando</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Dano</th>
-                                    <th scope="col">Alcance</th>
-                                    <th scope="col">Ataques</th>
-                                </thead>
-                                <tbody class="player-equipment-table">
-                                    {{#each equipments}}
-                                    {{> admin_equipment_row this}}
-                                    {{/each}}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col h3">
-                        Inventário
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="table-responsive">
-                            <table class="table table-sm table-borderless">
-                                <tbody class="player-item-table">
-                                    {{#each items}}
-                                    {{#with this}}
-                                    {{> admin_item_row this}}
-                                    {{/with}}
-                                    {{/each}}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+
             </div>
             {{/with}}
             {{/each}}

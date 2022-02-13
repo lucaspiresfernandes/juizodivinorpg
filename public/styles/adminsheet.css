@@ -1,3 +1,15 @@
+.acds-player-container {
+    background-color: rgb(53, 58, 64);
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    border-radius: 20px;
+}
+
+.acds-player-container .table-dark {
+    --bs-table-bg: rgb(53, 58, 64);
+}
+
 .acds-container .dice {
     max-height: 75px;
 }

@@ -12,10 +12,10 @@ $('#changeEnvironment').click(async ev => {
 
 async function playerLineageChange(ev) {
     const lineageID = parseInt($(ev.target).val());
-    const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
+    const playerID = $(ev.target).parents('.player-container').data('player-id');
     try {
         await axios.post('/sheet/player/lineage', { lineageID, playerID });
-        const img = $(`.acds-player-container[data-player-id="${playerID}"] .avatar-container .lineage`);
+        const img = $(`.player-container[data-player-id="${playerID}"] .avatar-container .lineage`);
         img.data('lineage', lineageID).attr('src', lineageID ? `/assets/lineages/frameless/${lineageID}/1.png` : '');
     }
     catch (err) { showFailureToastMessage(err) }
@@ -27,7 +27,7 @@ async function onPlayerScoreChanged(ev) {
         value = 0;
         $(ev.target).val(value);
     }
-    const playerID = $(ev.target).parents('.acds-player-container').data('player-id');
+    const playerID = $(ev.target).parents('.player-container').data('player-id');
     try { await axios.post('/sheet/player/score', { value, playerID }) }
     catch (err) { showFailureToastMessage(err) }
 }
@@ -143,7 +143,7 @@ socket.on('info changed', content => {
     const infoID = content.infoID;
     const value = content.value;
 
-    $(`.acds-player-container[data-player-id="${playerID}"] 
+    $(`.player-container[data-player-id="${playerID}"] 
     .player-info[data-info-id="${infoID}"]`).text(value);
 });
 
@@ -153,12 +153,12 @@ socket.on('attribute changed', content => {
     const newValue = content.value;
     const newTotalValue = content.totalValue;
 
-    $(`.acds-player-container[data-player-id="${playerID}"] 
+    $(`.player-container[data-player-id="${playerID}"] 
     .player-attribute[data-attribute-id="${attrID}"]`).text(`${newValue}/${newTotalValue}`);
 });
 
 socket.on('attribute status changed', content => {
-    const container = $(`.acds-player-container[data-player-id="${content.playerID}"]`);
+    const container = $(`.player-container[data-player-id="${content.playerID}"]`);
     const array = container.data('attribute-status');
 
     const updatedAttrStatus = array.find(attr => attr.attribute_status_id === content.attrStatusID);
@@ -175,7 +175,7 @@ socket.on('spec changed', content => {
     const specID = content.specID;
     const value = content.value;
 
-    $(`.acds-player-container[data-player-id="${playerID}"] 
+    $(`.player-container[data-player-id="${playerID}"] 
     .player-spec[data-spec-id="${specID}"]`).text(value);
 });
 
@@ -184,7 +184,7 @@ socket.on('characteristic changed', content => {
     const charID = content.charID;
     const value = content.value;
 
-    $(`.acds-player-container[data-player-id="${playerID}"] 
+    $(`.player-container[data-player-id="${playerID}"] 
     .player-characteristic[data-characteristic-id="${charID}"]`).text(value);
 });
 
@@ -205,13 +205,13 @@ socket.on('equipment added', content => {
     row.find('.range').text(range);
     row.find('.attacks').text(attacks);
 
-    $(`.acds-player-container[data-player-id="${playerID}"] .player-equipment-table`).append(row);
+    $(`.player-container[data-player-id="${playerID}"] .player-equipment-table`).append(row);
 });
 
 socket.on('equipment deleted', content => {
     const playerID = content.playerID;
     const equipmentID = content.equipmentID;
-    $(`.acds-player-container[data-player-id="${playerID}"] 
+    $(`.player-container[data-player-id="${playerID}"] 
     .player-equipment[data-equipment-id="${equipmentID}"]`).remove();
 });
 
@@ -220,7 +220,7 @@ socket.on('equipment changed', content => {
     const equipmentID = content.equipmentID;
     const using = content.using;
 
-    $(`.acds-player-container[data-player-id="${playerID}"] 
+    $(`.player-container[data-player-id="${playerID}"] 
     .player-equipment[data-equipment-id="${equipmentID}"] .using`).attr('class', using ? 'bi-check' : 'bi-x');
 });
 
@@ -235,13 +235,13 @@ socket.on('item added', content => {
     row.data('item-id', itemID);
     row.find('.name.description').text(name).attr('title', `${description} (${quantity})`);
 
-    $(`.acds-player-container[data-player-id="${playerID}"] .player-item-table`).append(row);
+    $(`.player-container[data-player-id="${playerID}"] .player-item-table`).append(row);
 });
 
 socket.on('item deleted', content => {
     const playerID = content.playerID;
     const itemID = content.itemID;
-    $(`.acds-player-container[data-player-id="${playerID}"]
+    $(`.player-container[data-player-id="${playerID}"]
     .player-item[data-item-id="${itemID}"]`).remove();
 });
 
@@ -251,13 +251,13 @@ socket.on('item changed', content => {
     const description = content.description;
     const quantity = content.quantity;
 
-    $(`.acds-player-container[data-player-id="${playerID}"]
+    $(`.player-container[data-player-id="${playerID}"]
     .player-item[data-item-id="${itemID}"]`).attr('title', `${description} (${quantity})`);
 });
 
 socket.on('dice result', content => {
     const playerID = content.playerID;
-    const playerName = $(`.acds-player-container[data-player-id="${playerID}"]
+    const playerName = $(`.player-container[data-player-id="${playerID}"]
     .player-info[name="Nome"]`).text() || 'Desconhecido';
 
     const dices = content.dices.map(dice => {
@@ -295,7 +295,7 @@ socket.on('class change', content => {
     const playerID = content.playerID;
     const className = content.className;
 
-    const container = $(`.acds-player-container[data-player-id="${playerID}"`);
+    const container = $(`.player-container[data-player-id="${playerID}"`);
     container.find('.class-name').text(className);
 })
 
@@ -305,7 +305,7 @@ socket.on('lineage node change', content => {
     const playerID = content.playerID;
     const newScore = content.newScore;
 
-    const container = $(`.acds-player-container[data-player-id="${playerID}"`);
+    const container = $(`.player-container[data-player-id="${playerID}"`);
     container.find('.player-score').val(newScore);
 
     const img = container.find('.avatar-container .lineage');
@@ -344,7 +344,7 @@ function showAvatar(container, attrStatusID = 0) {
 }
 
 {
-    const containers = $('.acds-player-container');
+    const containers = $('.player-container');
     for (let i = 0; i < containers.length; i++) {
         const container = containers.eq(i);
         const attr = container.data('attribute-status').find(attr => attr.value === 1);

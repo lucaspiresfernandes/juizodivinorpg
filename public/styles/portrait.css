@@ -83,15 +83,15 @@ body {
 
 #lineage {
     position: absolute;
-    top: 150px;
+    top: 200px;
     left: 300px;
-    transform: translate(-50%, -50%) rotate(45deg);
-    width: 250px;
-    height: 250px;
+    transform: translate(-50%, -50%) rotate(35deg);
+    max-width: 200px;
 }
 
 #avatar {
     position: absolute;
+    top: 5px;
     width: 340px;
     max-height: 550px;
 }
