@@ -34,7 +34,7 @@ async function onPlayerScoreChanged(ev) {
 
 {
     const list = $('#initiativeList');
-    Sortable.create(list[0], { animation: 150 });
+    Sortable.create(list[0], { animation: 150, onUpdate: ev => currentIndex = ev.newIndex });
     const detachedPlayerButtons = new Map();
     const dropdown = $('#initiativeDropdown');
 
