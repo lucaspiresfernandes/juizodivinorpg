@@ -6,7 +6,7 @@ const jsonParser = express.json();
 
 router.get('/', (req, res) => {
     if (req.session.playerID) return res.redirect('/sheet/1');
-    res.render('login');
+    res.render('home');
 });
 
 router.post('/', jsonParser, async (req, res) => {

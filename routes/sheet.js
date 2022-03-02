@@ -14,7 +14,7 @@ router.get('/leave', async (req, res) => {
             console.error(err);
             return res.status(500).send();
         }
-        res.redirect('/login');
+        res.redirect('/');
     });
 });
 

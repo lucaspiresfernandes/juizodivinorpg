@@ -65,7 +65,7 @@
 
             let responseElement;
             try {
-                const response = await axios.post('/login', { username, password });
+                const response = await axios.post('/', { username, password });
 
                 responseElement = $('<p style="color: green;" class="h4">Logado com sucesso! ' +
                     'Redirecionando para a ficha...</p>');

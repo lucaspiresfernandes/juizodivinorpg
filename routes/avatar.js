@@ -41,12 +41,9 @@ router.post('/', jsonParser, async (req, res) => {
             const id = avatar.attribute_status_id;
             const obj = data.find(av => av.attribute_status_id == id);
 
-            if (!obj) throw new Error();
-
-            const link = obj.link || null;
-
+            if (!obj) return;
             return con('player_avatar')
-                .update({ 'link': link })
+                .update({ link: obj.link || null })
                 .where('attribute_status_id', id)
                 .andWhere('player_id', playerID);
         }));

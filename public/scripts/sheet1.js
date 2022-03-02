@@ -98,20 +98,17 @@ $("#playerClassSelect").change(async ev => {
         uploadAvatarContainer.hide();
         loading.show();
 
-        console.log('creating avatars');
         const avatars = $('.avatar-field').map((i, el) => {
             const avatar = $(el);
             let id = avatar.data('avatar-id') || null;
             return { attribute_status_id: id, link: avatar.val() };
         }).get();
 
-        console.log('axios');
         try {
             await axios.post('/avatar', { avatars });
             findAvatar();
         }
         catch (err) { showFailureToastMessage(err) }
-        console.log('hideee');
         uploadAvatarModal.hide();
     });
 }

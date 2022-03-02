@@ -66,7 +66,7 @@ async function registerPlayerData(playerID) {
         con('characteristic').select('characteristic_id'),
         con('attribute').select('attribute_id'),
         con('attribute_status').select('attribute_status_id'),
-        con('skill').select('skill_id', 'mandatory'),
+        con('skill').select('skill_id', 'mandatory').where('mandatory', true),
         con('spec').select('spec_id'),
         con('info').select('info_id'),
         con('extra_info').select('extra_info_id'),
@@ -78,51 +78,63 @@ async function registerPlayerData(playerID) {
         { player_id: playerID, attribute_status_id: 5 },
         { player_id: playerID, attribute_status_id: 6 }]),
 
-        ...results[0].map(char => con('player_characteristic').insert({
-            player_id: playerID,
-            characteristic_id: char.characteristic_id,
-            value: 0
+        con('player_characteristic').insert(results[0].map(char => {
+            return {
+                player_id: playerID,
+                characteristic_id: char.characteristic_id,
+                value: 0
+            };
         })),
 
-        ...results[1].map(attr => con('player_attribute').insert({
-            player_id: playerID,
-            attribute_id: attr.attribute_id,
-            value: 0,
-            max_value: 0,
-            extra_value: 0
+        con('player_attribute').insert(results[1].map(attr => {
+            return {
+                player_id: playerID,
+                attribute_id: attr.attribute_id,
+                value: 0,
+                max_value: 0,
+                extra_value: 0
+            };
         })),
 
-        ...results[2].map(attrStatus => con('player_attribute_status').insert({
-            player_id: playerID,
-            attribute_status_id: attrStatus.attribute_status_id,
-            value: false
+        con('player_attribute_status').insert(results[2].map(attrStatus => {
+            return {
+                player_id: playerID,
+                attribute_status_id: attrStatus.attribute_status_id,
+                value: false
+            };
         })),
 
-        ...results[3].map(skill => {
-            if (skill.mandatory) return con('player_skill').insert({
+        con('player_skill').insert(results[3].map(skill => {
+            return {
                 player_id: playerID,
                 skill_id: skill.skill_id,
                 value: 0,
                 extra_value: 0
-            });
-        }),
-
-        ...results[4].map(spec => con('player_spec').insert({
-            player_id: playerID,
-            spec_id: spec.spec_id,
-            value: 0
+            };
         })),
 
-        ...results[5].map(info => con('player_info').insert({
-            player_id: playerID,
-            info_id: info.info_id,
-            value: ''
+        con('player_spec').insert(results[4].map(spec => {
+            return {
+                player_id: playerID,
+                spec_id: spec.spec_id,
+                value: 0
+            };
         })),
 
-        ...results[6].map(extraInfo => con('player_extra_info').insert({
-            player_id: playerID,
-            extra_info_id: extraInfo.extra_info_id,
-            value: ''
+        con('player_info').insert(results[5].map(info => {
+            return {
+                player_id: playerID,
+                info_id: info.info_id,
+                value: ''
+            };
+        })),
+
+        con('player_extra_info').insert(results[6].map(extraInfo => {
+            return {
+                player_id: playerID,
+                extra_info_id: extraInfo.extra_info_id,
+                value: ''
+            };
         })),
 
         con('player_equipment').insert({

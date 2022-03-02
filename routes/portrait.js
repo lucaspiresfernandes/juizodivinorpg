@@ -6,8 +6,7 @@ const io = require('../server').io;
 
 router.get('/', async (req, res) => {
     const players = await con('player_info').select('player_info.value',
-        'player_info.player_id')
-        .where('player_info.info_id', 1);
+        'player_info.player_id').where('player_info.info_id', 1);
 
     for (const player of players)
         if (!player.value) player.value = 'Desconhecido';

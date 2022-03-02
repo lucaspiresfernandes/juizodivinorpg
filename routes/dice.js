@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const RandomOrg = require('random-org');
-const apiKey = process.env.RANDOM_ORG_KEY || 'unkown';
-const random = new RandomOrg({ apiKey: apiKey });
+const random = new RandomOrg({ apiKey: process.env.RANDOM_ORG_KEY || 'unkown' });
 const io = require('../server').io;
 const jsonParser = express.json();
 

@@ -24,7 +24,7 @@ const publicPath = path.join(__dirname, './public');
 
 app.set('view engine', 'hbs');
 app.set('views', viewsPath);
-hbsutils.registerWatchedPartials(partialsPath, { precompile: true });
+hbsutils.registerPartials(partialsPath, { precompile: true });
 app.use(express.static(publicPath));
 app.use(expressSession({
     secret: process.env.EXPRESS_SESSION_SECRET || 'unkown',
@@ -44,18 +44,10 @@ registerHelpers();
 
 module.exports.io = io;
 
-
-app.get('/', (req, res) => {
-    if (req.session.playerID) return res.redirect('/sheet/1');
-    res.redirect('/login');
-});
-
 const routes = require('./routes');
 for (const route of routes) app.use(route.url, route.ref);
 
-app.get('*', (req, res) => {
-    res.status(404).end();
-});
+app.get('*', (req, res) => res.status(404).send());
 
 module.exports.start = () => {
     server.listen(port, () => {
