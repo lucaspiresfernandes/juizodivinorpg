@@ -138,9 +138,9 @@ findAvatar();
 
 //Attributes
 {
-    const containers = $('.attribute-container');
+    const attributeContainer = $('.attribute-container');
 
-    containers.find('.attribute-max').change(async ev => {
+    attributeContainer.find('.attribute-max').change(async ev => {
         const container = $(ev.target).parents('.attribute-container');
         const bar = container.find('.progress-bar');
         const attributeID = container.data('attribute-id');
@@ -164,22 +164,21 @@ findAvatar();
             showFailureToastMessage(err);
         }
     });
-    containers.find('.dice').click(ev =>
-        rollDice(parseInt($('.spec-container input[name="Exposição Pavorosa"]').val()), 100, false));
-    containers.find('.attribute-button').click(async ev => {
-        let coef = $(ev.target).data('coefficient');
-        const container = $(ev.target).parents('.attribute-container');
-        const bar = container.find('.progress-bar');
-        const attributeID = container.data('attribute-id');
 
-        if (ev.shiftKey) coef *= 10;
+    attributeContainer.find('.progress').click(async ev => {
+        const container = $(ev.target).parents('.attribute-container');
+        const attributeID = container.data('attribute-id');
+        const bar = container.find('.progress-bar');
 
         const cur = bar.data('current');
         const total = bar.data('total');
+        const newValue = parseInt(prompt('Digite o novo valor do atributo:', cur));
 
-        const newCur = global.clamp(cur + coef, 0, total);
+        if (!newValue) return;
 
-        if (cur === newCur) return;
+        const newCur = global.clamp(newValue, 0, total);
+
+        if (newCur === cur) return;
 
         try {
             await axios.post('/sheet/player/attribute', { attributeID, value: newCur });
@@ -189,6 +188,9 @@ findAvatar();
             showFailureToastMessage(err);
         }
     });
+
+    attributeContainer.find('.dice').click(ev =>
+        rollDice(parseInt($('.spec-container input[name="Exposição Pavorosa"]').val()), 100, false));
 }
 
 //Attribute Status
