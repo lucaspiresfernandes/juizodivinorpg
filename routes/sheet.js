@@ -593,13 +593,15 @@ router.post('/player/characteristic', jsonParser, async (req, res) => {
             auxVal -= curse.level;
         }
 
-        await Promise.all(affectedCurses.map(curse => {
-            if (auxVal < 0) {
-                auxVal += curse.level;
-                return con('player_curse').update({ characteristic_id: null })
-                    .where('player_id', playerID).andWhere('curse_id', curse.curse_id);
-            }
-        }));
+        if (auxVal < 0) {
+            await Promise.all(affectedCurses.map(curse => {
+                if (auxVal < 0) {
+                    auxVal += curse.level;
+                    return con('player_curse').update({ characteristic_id: null })
+                        .where('player_id', playerID).andWhere('curse_id', curse.curse_id);
+                }
+            }));
+        }
 
         const updatedSkills = await updateSkills(playerID, clause => clause
             .where('skill.characteristic_id', charID)

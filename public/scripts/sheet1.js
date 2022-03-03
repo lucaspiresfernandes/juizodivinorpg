@@ -138,6 +138,7 @@ findAvatar();
 
 //Attributes
 {
+    let attrDataTimeout = 0;
     const attributeContainer = $('.attribute-container');
 
     attributeContainer.find('.attribute-max').change(async ev => {
@@ -165,29 +166,35 @@ findAvatar();
         }
     });
 
-    attributeContainer.find('.progress').click(async ev => {
+    attributeContainer.find('.attribute-button').click(ev => {
+        let coef = $(ev.target).data('coefficient');
+
+        if (ev.shiftKey) coef *= 10;
+
         const container = $(ev.target).parents('.attribute-container');
         const attributeID = container.data('attribute-id');
         const bar = container.find('.progress-bar');
 
         const cur = bar.data('current');
         const total = bar.data('total');
-        const newValue = parseInt(prompt('Digite o novo valor do atributo:', cur));
+        const newCur = global.clamp(cur + coef, 0, total);
 
-        if (!newValue) return;
+        if (cur === newCur) return;
 
-        const newCur = global.clamp(newValue, 0, total);
-
-        if (newCur === cur) return;
-
-        try {
-            await axios.post('/sheet/player/attribute', { attributeID, value: newCur });
-            resolveAttributeBar(container, { newCur });
-        }
-        catch (err) {
-            showFailureToastMessage(err);
-        }
+        sendAttributeData(attributeID, newCur);
+        resolveAttributeBar(container, { newCur });
     });
+
+    function sendAttributeData(attributeID, value) {
+        if (attrDataTimeout) {
+            clearTimeout(attrDataTimeout);
+        }
+        attrDataTimeout = setTimeout(() => {
+            try { axios.post('/sheet/player/attribute', { attributeID, value }) }
+            catch (err) { showFailureToastMessage(err) }
+            attrDataTimeout = 0;
+        }, 1500);
+    }
 
     attributeContainer.find('.dice').click(ev =>
         rollDice(parseInt($('.spec-container input[name="Exposição Pavorosa"]').val()), 100, false));

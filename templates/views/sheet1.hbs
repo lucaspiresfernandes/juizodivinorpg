@@ -103,7 +103,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        <div class="progress acds-clickable" style="background-color: #{{bg_color}};">
+                                        <div class="progress" style="background-color: #{{bg_color}};">
                                             <div role="progressbar" class="progress-bar" name="{{name}}"
                                                 data-current="{{value}}" data-max="{{max_value}}"
                                                 data-extra="{{extra_value}}" data-total="{{total_value}}"
@@ -118,9 +118,17 @@
                                     {{/if}}
                                 </div>
                                 <div class="row justify-content-center mt-2">
+                                    <div class="col col-lg-3">
+                                        <button class="btn btn-dark w-100 attribute-button"
+                                            data-coefficient="-1">-</button>
+                                    </div>
                                     <div class="col col-lg-2 text-center align-self-center">
                                         <label class="h5 attribute-description"
                                             for="attribute{{@index}}">{{value}}/{{total_value}}</label>
+                                    </div>
+                                    <div class="col col-lg-3">
+                                        <button class="btn btn-dark w-100 attribute-button"
+                                            data-coefficient="1">+</button>
                                     </div>
                                 </div>
                                 <div class="row">
