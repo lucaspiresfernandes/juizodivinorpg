@@ -1383,6 +1383,22 @@ router.get('/lineage/node', async (req, res) => {
         .where('lineage_node.index', index).andWhere('lineage.divine', false);
     res.send({ nodes });
 });
+
+router.delete('/player', jsonParser, async (req, res) => {
+    const playerID = req.body.playerID;
+    const isAdmin = req.session.isAdmin;
+
+    if (!playerID || !isAdmin) return res.status(401).send();
+
+    try {
+        await con('player').where('player_id', playerID).del();
+        res.send();
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+});
 //#endregion
 
 //#region Utils

@@ -35,12 +35,13 @@
         <div class="row justify-content-center">
             {{#each characters}}
             {{#with this}}
-            <div class="col-12 col-md-6 col-lg-4 text-center player-container" data-player-id="{{playerID}}"
+            <div class="col-12 col-md-6 col-xl-4 text-center player-container" data-player-id="{{playerID}}"
                 data-attribute-status="{{attributeStatus}}">
-                <div class="row my-2 mx-md-1 acds-player-container">
+                <div class="row my-2 mx-md-1 acds-player-container h-100">
                     <div class="col">
                         <div class="row">
                             <div class="col">
+                                <button class="btn btn-dark btn-sm mt-2 delete-player">Apagar</button>
                                 <div class="avatar-container">
                                     <img class="img-fluid avatar">
                                     <img class="img-fluid lineage" data-lineage="{{player.lineage_id}}"

@@ -1,3 +1,16 @@
+$('.player-container button.delete-player').click(async ev => {
+    const container = $(ev.target).parents('.player-container');
+    const name = container.find('.player-info').text().trim();
+
+    if (!confirm(`Tem certeza que deseja apagar o jogador ${name}? Essa ação é irreversível.`)) return;
+    
+    try {
+        await axios.delete('/sheet/player', { data: { playerID: container.data('player-id') } });
+        container.remove();
+    }
+    catch (err) { showFailureToastMessage(err) }
+});
+
 $('#adminAnotations').change(async ev => {
     const value = $(ev.target).val();
     try { await axios.post('/sheet/player/note', { value }) }
@@ -122,7 +135,7 @@ $('#addNPC').click(ev => {
     const fastDiceRollModal = new bootstrap.Modal(fastDiceRoll[0]);
     fastDiceRoll.on('hidden.bs.modal', () => $('#fastDiceRollValue').val(''));
     fastDiceRoll.on('shown.bs.modal', () => $('#fastDiceRollValue').focus());
-    
+
     diceRoll.on('hidden.bs.modal', () => {
         if (fastDiceRollSource) {
             fastDiceRollModal.show();
