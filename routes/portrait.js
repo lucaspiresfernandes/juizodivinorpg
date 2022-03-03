@@ -17,7 +17,11 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const playerID = req.params.id;
 
-    const isAdmin = (await con('player').select('admin').where('player_id', playerID).first()).admin;
+    const query = await con('player').select('admin').where('player_id', playerID).first();
+
+    if (!query) return res.status(404).send();
+
+    const isAdmin = query.admin;
 
     if (isAdmin) return res.status(404).send();
 

@@ -129,9 +129,9 @@
 
 {
     const attributes = {
-        '1': $('.health'),
-        '2': $('.sanity'),
-        '3': $('.energy')
+        1: $('.health'),
+        2: $('.sanity'),
+        3: $('.energy')
     };
 
     socket.on('attribute changed', content => {
