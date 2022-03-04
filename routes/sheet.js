@@ -256,13 +256,16 @@ router.get('/2', async (req, res) => {
                     .join('player_characteristic', 'player_characteristic.characteristic_id', 'characteristic.characteristic_id')
                     .where('player_characteristic.player_id', playerID);
 
-                await Promise.all(characteristics.map(async char => {
-                    const curses = await con('player_curse').select('curse.level')
+                await Promise.all(characteristics.map(char => {
+                    return con('player_curse').select('curse.level')
                         .join('curse', 'curse.curse_id', 'player_curse.curse_id')
-                        .where('player_curse.characteristic_id', char.characteristic_id);
-                    for (const curse of curses) {
-                        char.remaining_value -= curse.level;
-                    }
+                        .where('player_curse.characteristic_id', char.characteristic_id)
+                        .then(curses => {
+                            for (const curse of curses) {
+                                char.remaining_value -= curse.level;
+                            }
+                            return curses;
+                        });
                 }));
 
                 return characteristics;
@@ -603,9 +606,12 @@ router.post('/player/characteristic', jsonParser, async (req, res) => {
             }));
         }
 
-        const updatedSkills = await updateSkills(playerID, clause => clause
+        const skills = await con('skill').select('skill.skill_id', 'player_skill.value', 'skill.characteristic_id')
+            .join('player_skill', 'player_skill.skill_id', 'skill.skill_id')
             .where('skill.characteristic_id', charID)
-            .andWhere('player_skill.player_id', playerID));
+            .andWhere('player_skill.player_id', playerID);
+
+        const updatedSkills = await updateSkills(playerID, skills);
 
         const updatedAttributes = await updateAttributes(playerID, clause => clause.where(builder => builder
             .where('attribute.characteristic_id', charID)
@@ -1264,9 +1270,13 @@ router.post('/player/class', jsonParser, async (req, res) => {
         const newClass = await con('class').select('attribute_id', 'name')
             .where('class_id', newClassID).first();
 
-        const updatedSkills = await updateSkills(playerID, clause => clause
+        const skills = await con('class_skill').select('skill.skill_id', 'player_skill.value', 'skill.characteristic_id')
+            .join('skill', 'skill.skill_id', 'class_skill.skill_id')
+            .join('player_skill', 'player_skill.skill_id', 'skill.skill_id')
             .whereIn('class_skill.class_id', [oldClassID, newClassID])
-            .andWhere('player_skill.player_id', playerID));
+            .andWhere('player_skill.player_id', playerID);
+
+        const updatedSkills = await updateSkills(playerID, skills);
         const updatedAttributes = await updateAttributes(playerID, clause => clause
             .where(builder => builder
                 .whereIn('attribute.skill_id', updatedSkills.map(skill => skill.skillID))
@@ -1412,6 +1422,8 @@ async function updateAttributes(playerID, whereClause) {
         .join('player_attribute', 'player_attribute.attribute_id', 'attribute.attribute_id')
         .where(whereClause);
 
+    if (attributes.length === 0) return attributes;
+
     const charIDs = attributes.map(attr => attr.characteristic_id);
 
     const queries = await Promise.all([
@@ -1431,7 +1443,7 @@ async function updateAttributes(playerID, whereClause) {
     const playerClass = queries[1];
     const skills = queries[2];
 
-    return await Promise.all(attributes.map(async attr => {
+    return await Promise.all(attributes.map(attr => {
         const attributeID = attr.attribute_id;
 
         const charValue = characteristics.find(char => char.characteristic_id === attr.characteristic_id).value;
@@ -1445,61 +1457,66 @@ async function updateAttributes(playerID, whereClause) {
         const totalValue = attr.max_value + extraValue;
         const value = clamp(attr.value, 0, totalValue);
 
-        await con('player_attribute').update({ extra_value: extraValue, value })
+        return con('player_attribute').update({ extra_value: extraValue, value })
             .where('player_id', playerID)
-            .andWhere('attribute_id', attributeID);
-
-        io.to('admin').emit('attribute changed', {
-            playerID,
-            attributeID,
-            value,
-            totalValue
-        });
-        io.to(`portrait${playerID}`).emit('attribute changed', {
-            attributeID,
-            value,
-            totalValue
-        });
-
-        return { attributeID, extraValue };
+            .andWhere('attribute_id', attributeID).then(() => {
+                io.to('admin').emit('attribute changed', {
+                    playerID,
+                    attributeID,
+                    value,
+                    totalValue
+                });
+                io.to(`portrait${playerID}`).emit('attribute changed', {
+                    attributeID,
+                    value,
+                    totalValue
+                });
+                return { attributeID, extraValue };
+            });
     }));
 
 }
 
-async function updateSkills(playerID, whereClause) {
-    const skills = await con('class_skill').select('skill.skill_id', 'player_skill.value',
-        'skill.characteristic_id', 'player_skill.total_value')
-        .join('skill', 'skill.skill_id', 'class_skill.skill_id')
-        .join('player_skill', 'player_skill.skill_id', 'skill.skill_id')
-        .where(whereClause);
+async function updateSkills(playerID, skills) {
+    if (skills.length === 0) return skills;
 
-    const charList = await Promise.all(skills.map(skill => con('characteristic')
-        .select('characteristic.*', 'player_characteristic.value')
-        .join('skill', 'skill.characteristic_id', 'characteristic.characteristic_id')
-        .join('player_characteristic', 'player_characteristic.characteristic_id', 'characteristic.characteristic_id')
-        .where('skill.skill_id', skill.skill_id).first()
+    const charList = [];
+    const charMap = new Map();
+    await Promise.all(skills.map(skill => {
+        if (!charMap.has(skill.characteristic_id)) {
+            charMap.set(skill.characteristic_id, 'set');
+            return con('characteristic')
+                .select('characteristic.*', 'player_characteristic.value')
+                .join('skill', 'skill.characteristic_id', 'characteristic.characteristic_id')
+                .join('player_characteristic', 'player_characteristic.characteristic_id', 'characteristic.characteristic_id')
+                .where('skill.skill_id', skill.skill_id).andWhere('player_characteristic.player_id', playerID).first()
+                .then(res => charList.push(res));
+        }
+    }
     ));
 
-    const classSkills = (await con('class_skill').select('class_skill.skill_id')
+    const classSkillIDs = (await con('class_skill').select('class_skill.skill_id')
         .join('player', 'player.class_id', 'class_skill.class_id')
         .where('player.player_id', playerID)).map(cs => cs.skill_id);
 
-    return await Promise.all(skills.map(async skill => {
+    return await Promise.all(skills.map(skill => {
         const skillID = skill.skill_id;
         const charValue = charList.find(char => char.characteristic_id === skill.characteristic_id).value;
-        const extraValue = charValue + (classSkills.includes(skillID) ? classBonus : 0);
+        const extraValue = charValue + (classSkillIDs.includes(skillID) ? classBonus : 0);
         const totalValue = extraValue + skill.value;
 
-        await con('player_skill').update('extra_value', extraValue)
+        return con('player_skill').update('extra_value', extraValue)
             .where('player_id', playerID)
-            .andWhere('skill_id', skillID);
-        return { skillID, totalValue, extraValue };
+            .andWhere('skill_id', skillID).then(() => {
+                return { skillID, totalValue, extraValue }
+            });
     }));
 
 }
 
 async function emitToAllPlayers(ev, payload) {
     const players = await con('player').select('player_id');
+    if (players.length === 0) return;
     let portraitRooms = io;
     for (let i = 0; i < players.length; i++) {
         const id = players[i].player_id;
