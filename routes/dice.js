@@ -34,7 +34,7 @@ router.post('/', jsonParser, async (req, res) => {
     const results = new Array(dices.length);
 
     try {
-        await Promise.all(dices.map((dice, i) => {
+        await Promise.all(dices.map((dice, index) => {
             const numDices = parseInt(dice.n);
             const diceNumber = parseInt(dice.roll);
 
@@ -42,22 +42,22 @@ router.post('/', jsonParser, async (req, res) => {
                 throw new Error();
 
             if (numDices === 0 || diceNumber < 1) {
-                results[i] = { roll: diceNumber };
+                results[index] = { roll: diceNumber };
                 return;
             }
 
             if (diceNumber === 1) {
-                results[i] = { roll: numDices };
+                results[index] = { roll: numDices };
                 return;
             }
 
             return nextInt(numDices, numDices * diceNumber, 1).then(result => {
                 const roll = result.data.reduce((a, b) => a + b, 0);
-                results[i] = { roll };
-                const num = dices[i].num;
+                results[index] = { roll };
+                const num = dices[index].num;
                 if (num !== undefined) {
                     const resolver = resolveSuccessType[resolverKey];
-                    if (resolver) results[i].successType = resolver(num, roll);
+                    if (resolver) results[index].successType = resolver(num, roll);
                 }
             });
         }));

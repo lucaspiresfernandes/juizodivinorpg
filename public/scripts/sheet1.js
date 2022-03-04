@@ -620,7 +620,7 @@ async function skillChange(ev) {
 }
 
 function skillDiceClick(ev) {
-    rollDice(parseInt($(ev.target).parents('.skill-container').find('skill-total').text()));
+    rollDice(parseInt($(ev.target).parents('.skill-container').find('.total').text()));
 }
 
 //Items
