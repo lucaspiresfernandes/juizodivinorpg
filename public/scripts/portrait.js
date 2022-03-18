@@ -146,7 +146,7 @@
 
 socket.on('environment change', data => {
     const timeout = 100;
-    $('.container.switchable .text').fadeOut(timeout);
+    $('.container.switchable').fadeOut(timeout);
     setTimeout(() => {
         switch (data.mode) {
             case 'idle':

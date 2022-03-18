@@ -26,11 +26,11 @@
         </div>
     </div>
 
-    <div class="container" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
+    <div class="container switchable" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
         <div class="name top">{{name}}</div>
     </div>
 
-    <div class="container" id="combatText" {{#unless onCombat}}style="display: none;" {{/unless}}>
+    <div class="container switchable" id="combatText" {{#unless onCombat}}style="display: none;" {{/unless}}>
         <div class="combat">
             <div class="health top">{{attributes.0.value}}/{{attributes.0.total_value}}</div>
             <div class="sanity top">{{attributes.1.value}}/{{attributes.1.total_value}}</div>
