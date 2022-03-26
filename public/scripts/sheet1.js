@@ -193,7 +193,7 @@ findAvatar();
             try { axios.post('/sheet/player/attribute', { attributeID, value }) }
             catch (err) { showFailureToastMessage(err) }
             attrDataTimeout = 0;
-        }, 1500);
+        }, 750);
     }
 
     attributeContainer.find('.dice').click(ev =>

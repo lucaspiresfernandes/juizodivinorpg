@@ -74,7 +74,7 @@ VALUES
     ('Fortitude'),
     ('Avaliação'),
     ('Ciência'),
-    ('História'),
+    ('Cultura'),
     ('Investigação'),
     ('Medicina'),
     ('Misticismo'),
