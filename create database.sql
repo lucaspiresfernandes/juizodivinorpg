@@ -769,7 +769,6 @@ CREATE TABLE `player_skill` (
     `skill_id` INT UNSIGNED NOT NULL,
     `value` INT UNSIGNED NOT NULL,
     `extra_value` INT UNSIGNED NOT NULL,
-    `total_value` INT UNSIGNED GENERATED ALWAYS AS (`value` + `extra_value`) STORED,
     PRIMARY KEY (`player_id`, `skill_id`),
     CONSTRAINT `uk_player_id_skill_id` UNIQUE (`player_id`, `skill_id`),
     CONSTRAINT `fk_player_skill_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,

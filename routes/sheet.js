@@ -161,7 +161,6 @@ router.get('/1', async (req, res) => {
 					'skill.name',
 					'player_skill.value',
 					'specialization.name as specialization_name',
-					'player_skill.total_value',
 					'player_skill.extra_value'
 				)
 				.join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
@@ -179,6 +178,7 @@ router.get('/1', async (req, res) => {
 				.then((skills) => {
 					for (let i = 0; i < skills.length; i++) {
 						const skill = skills[i];
+						skill.total_value = skill.value + skill.extra_value;
 						const skillName = skill.name;
 						const specializationName = skill.specialization_name;
 						if (specializationName)
@@ -1788,9 +1788,16 @@ async function updateAttributes(playerID, whereClause) {
 			.where('player.player_id', playerID)
 			.first(),
 		con('skill')
-			.select('skill.skill_id', 'player_skill.total_value')
+			.select('skill.skill_id', 'player_skill.value', 'player_skill.extra_value')
 			.join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
-			.where('player_id', playerID),
+			.where('player_id', playerID)
+			.then(skills => {
+				skills = skills.map(skill => ({
+					skill_id: skill.skill_id,
+					total_value: skill.value + skill.extra_value
+				}));
+				return skills;
+			}),
 	]);
 
 	const characteristics = queries[0];
