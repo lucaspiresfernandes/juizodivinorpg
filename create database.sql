@@ -17,8 +17,7 @@ VALUES
     (2, 'Agilidade'),
     (3, 'Constituição'),
     (4, 'Intelecto'),
-    (5, 'Presença'),
-    (6, 'Sabedoria');
+    (5, 'Presença');
 
 CREATE TABLE `curse` (
     `curse_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -161,7 +160,7 @@ VALUES
         'b62323',
         NULL, -- 7,
         8,
-        '{skill}/2'
+        '{skill}'
     ),
     (
         2,
@@ -846,8 +845,9 @@ CREATE TABLE `spec` (
 INSERT INTO
     `spec` (`spec_id`, `name`)
 VALUES
-    (1, 'Descolamento'),
-    (2, 'Exposição Pavorosa');
+    (1, 'Deslocamento'),
+    (2, 'Sabedoria'),
+    (3, 'Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
     `player_id` INT UNSIGNED NOT NULL,
