@@ -799,8 +799,6 @@ CREATE TABLE `player_attribute` (
     `value` INT UNSIGNED NOT NULL,
     `max_value` INT UNSIGNED NOT NULL,
     `extra_value` INT UNSIGNED NOT NULL,
-    `total_value` INT UNSIGNED GENERATED ALWAYS AS (`max_value` + `extra_value`) STORED,
-    `coefficient` DECIMAL(15, 2) GENERATED ALWAYS AS (IFNULL((`value` / `total_value`) * 100, 0)) VIRTUAL,
     PRIMARY KEY (`player_id`, `attribute_id`),
     CONSTRAINT `uk_player_id_attribute_id` UNIQUE (`player_id`, `attribute_id`),
     CONSTRAINT `fk_player_attribute_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,

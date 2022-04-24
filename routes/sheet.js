@@ -58,8 +58,6 @@ router.get('/1', async (req, res) => {
 					'player_attribute.value',
 					'player_attribute.max_value',
 					'player_attribute.extra_value',
-					'player_attribute.total_value',
-					'player_attribute.coefficient',
 					'attribute_status.attribute_status_id',
 					'attribute_status.name as attribute_status_name',
 					'player_attribute_status.value as attribute_status_value'
@@ -87,6 +85,9 @@ router.get('/1', async (req, res) => {
 					const attributes = [];
 					const instantiatedIDs = new Map();
 					for (const attrQuery of attributesQuery) {
+						attrQuery.total_value = attrQuery.max_value + attrQuery.extra_value;
+						attrQuery.coefficient = (attrQuery.value / attrQuery.total_value * 100) || 0;
+
 						const statusObj = {
 							attribute_status_id: attrQuery.attribute_status_id,
 							name: attrQuery.attribute_status_name,
@@ -100,21 +101,13 @@ router.get('/1', async (req, res) => {
 						}
 
 						const newAttr = {
-							attribute_id: attrQuery.attribute_id,
-							name: attrQuery.name,
-							rollable: attrQuery.rollable,
-							bg_color: attrQuery.bg_color,
-							fill_color: attrQuery.fill_color,
-							value: attrQuery.value,
-							max_value: attrQuery.max_value,
-							extra_value: attrQuery.extra_value,
-							total_value: attrQuery.total_value,
-							coefficient: attrQuery.coefficient,
+							...attrQuery,
 							status: [statusObj],
 						};
 						attributes.push(newAttr);
 						instantiatedIDs.set(attrQuery.attribute_id, newAttr);
 					}
+					console.table(attributes);
 					return attributes;
 				}),
 
@@ -477,15 +470,20 @@ router.get('/admin/1', async (req, res) => {
 							'attribute.fill_color',
 							'player_attribute.value',
 							'player_attribute.max_value',
-							'player_attribute.extra_value',
-							'player_attribute.total_value'
+							'player_attribute.extra_value'
 						)
 						.join(
 							'player_attribute',
 							'attribute.attribute_id',
 							'player_attribute.attribute_id'
 						)
-						.where('player_attribute.player_id', playerID),
+						.where('player_attribute.player_id', playerID)
+						.then(attributes => attributes.map(attr => {
+							return {
+								...attr,
+								total_value: attr.max_value + attr.extra_value,
+							};
+						})),
 
 					//Specs: 2
 					con('spec')
@@ -501,7 +499,7 @@ router.get('/admin/1', async (req, res) => {
 							'equipment.kind',
 							'equipment.type',
 							'equipment.range',
-							'equipment.characteristic',
+							'equipment.characteristic'
 						)
 						.join(
 							'player_equipment',
@@ -1762,11 +1760,15 @@ async function updateAttributes(playerID, whereClause) {
 			'attribute.skill_id',
 			'attribute.operation',
 			'player_attribute.value',
-			'player_attribute.total_value',
 			'player_attribute.max_value'
 		)
 		.join('player_attribute', 'player_attribute.attribute_id', 'attribute.attribute_id')
-		.where(whereClause);
+		.where(whereClause).then(attributes => attributes.map(attr => {
+			return {
+				...attr,
+				total_value: attr.max_value + attr.extra_value,
+			};
+		}));
 
 	if (attributes.length === 0) return attributes;
 
@@ -1791,10 +1793,10 @@ async function updateAttributes(playerID, whereClause) {
 			.select('skill.skill_id', 'player_skill.value', 'player_skill.extra_value')
 			.join('player_skill', 'skill.skill_id', 'player_skill.skill_id')
 			.where('player_id', playerID)
-			.then(skills => {
-				skills = skills.map(skill => ({
+			.then((skills) => {
+				skills = skills.map((skill) => ({
 					skill_id: skill.skill_id,
-					total_value: skill.value + skill.extra_value
+					total_value: skill.value + skill.extra_value,
 				}));
 				return skills;
 			}),

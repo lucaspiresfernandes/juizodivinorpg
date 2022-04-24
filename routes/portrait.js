@@ -30,8 +30,11 @@ router.get('/:id', async (req, res) => {
             .where('player_id', playerID)
             .andWhere('info_id', 1)
             .first(),
-        con('player_attribute').select('value', 'total_value').where('player_id', playerID)
-            .orderBy('attribute_id'),
+        con('player_attribute').select('value', 'max_value', 'extra_value').where('player_id', playerID)
+            .orderBy('attribute_id').then(attributes => attributes.map(attr => ({
+                value: attr.value,
+                total_value: attr.max_value + attr.extra_value
+            }))),
         con('player_attribute_status').select('attribute_status_id', 'value')
             .where('player_id', playerID)
             .orderBy('attribute_status_id'),
