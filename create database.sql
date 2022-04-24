@@ -944,14 +944,6 @@ CREATE TABLE `player_note` (
     CONSTRAINT `fk_player_note_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `player_session` (
-    `sid` VARCHAR(255),
-    `sess` JSON NOT NULL,
-    `expired` DATETIME NOT NULL,
-    PRIMARY KEY (`sid`),
-    INDEX `player_session_expired_index` (`expired`)
-);
-
 CREATE TABLE `config` (
     `key` VARCHAR(255) NOT NULL,
     `value` VARCHAR(255) NULL,

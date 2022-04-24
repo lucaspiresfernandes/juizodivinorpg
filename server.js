@@ -6,8 +6,6 @@ const { Server } = require('socket.io');
 const hbs = require('hbs');
 const hbsutils = require('hbs-utils')(hbs);
 const expressSession = require('express-session');
-const SessionStore = require('connect-session-knex')(expressSession);
-const con = require('./utils/connection');
 
 const app = express();
 const server = http.createServer(app);
@@ -33,11 +31,7 @@ app.use(expressSession({
         maxAge: 86400000,
     },
     resave: true,
-    saveUninitialized: false,
-    store: new SessionStore({
-        tablename: 'player_session',
-        knex: con,
-    }),
+    saveUninitialized: false
 }));
 
 registerHelpers();
