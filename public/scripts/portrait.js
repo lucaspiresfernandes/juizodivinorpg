@@ -104,6 +104,7 @@
                 avatarStateChangeFunc = () => $avatar.addClass('unconscious');
                 break;
         }
+        $background.fadeOut('fast');
         $avatar.fadeOut('fast', () =>
             $avatar.attr('src', `/avatar/${id}?playerID=${playerID}&v=${Date.now()}`));
     }
@@ -115,7 +116,8 @@
             avatarStateChangeFunc();
             avatarStateChangeFunc = undefined;
         }
-        $avatar.fadeIn('fast');
+        $background.fadeIn(350);
+        $avatar.fadeIn(300);
     });
 
     const array = $('body').data('status-state');

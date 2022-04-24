@@ -268,12 +268,12 @@ const addEquipmentButton = $('#addEquipmentButton');
 
     const createEquipmentContainer = $('#createEquipmentContainer');
     const createEquipmentName = $('#createEquipmentName');
-    const createEquipmentType = $('#createEquipmentType');
     const createEquipmentDamage = $('#createEquipmentDamage');
+    const createEquipmentKind = $('#createEquipmentKind');
+    const createEquipmentType = $('#createEquipmentType');
     const createEquipmentRange = $('#createEquipmentRange');
-    const createEquipmentAttacks = $('#createEquipmentAttacks');
     const createEquipmentAmmo = $('#createEquipmentAmmo');
-    const createEquipmentSpecialization = $('#combatSpecializationList');
+    const createEquipmentCharacteristic = $('#createEquipmentCharacteristic');
     const createEquipmentButton = $('#createEquipmentButton');
     const createEquipmentCloseButton = $('#createEquipmentCloseButton');
     const addLoading = addEquipmentContainer.find('.loading');
@@ -311,13 +311,13 @@ const addEquipmentButton = $('#addEquipmentButton');
             newRow.data('equipment-id', equipmentID);
             newRow.find('.using').prop('checked', equipment.using);
             newRow.find('.name').text(equipment.name)
-            newRow.find('.skill-name').text(equipment.skill_name);
-            newRow.find('.type').text(equipment.type);
             newRow.find('.damage').text(equipment.damage);
+            newRow.find('.kind').text(equipment.kind);
+            newRow.find('.type').text(equipment.type);
             newRow.find('.range').text(equipment.range);
-            newRow.find('.attacks').text(equipment.attacks);
             newRow.find('.current-ammo').val(equipment.current_ammo);
             newRow.find('.max-ammo').text(equipment.ammo);
+            newRow.find('.characteristic').text(equipment.characteristic);
 
             addEquipmentList.find(`option[value="${equipmentID}"]`).remove();
             addEquipmentButton.prop('disabled', addEquipmentList.children().length === 0);
@@ -331,12 +331,12 @@ const addEquipmentButton = $('#addEquipmentButton');
 
     createEquipmentButton.click(async ev => {
         const name = createEquipmentName.val();
-        const skillID = createEquipmentSpecialization.val();
-        const type = createEquipmentType.val();
         const damage = createEquipmentDamage.val();
+        const kind = createEquipmentKind.val();
+        const type = createEquipmentType.val();
         const range = createEquipmentRange.val();
-        const attacks = createEquipmentAttacks.val();
         const ammo = createEquipmentAmmo.val();
+        const characteristic = createEquipmentCharacteristic.val();
 
         createEquipmentButton.prop('disabled', true);
         createEquipmentCloseButton.prop('disabled', true);
@@ -346,12 +346,12 @@ const addEquipmentButton = $('#addEquipmentButton');
         try {
             const response = await axios.put('/sheet/equipment', {
                 name,
-                skillID,
-                type,
                 damage,
+                kind,
+                type,
                 range,
-                attacks,
                 ammo,
+                characteristic,
                 visible: true
             });
             const id = response.data.equipmentID;
@@ -385,21 +385,21 @@ const addEquipmentButton = $('#addEquipmentButton');
     socket.on('equipment changed', content => {
         const equipmentID = content.equipmentID;
         const name = content.name;
-        const skill_name = content.skill_name;
-        const type = content.type;
         const damage = content.damage;
+        const kind = content.kind;
+        const type = content.type;
         const range = content.range;
-        const attacks = content.attacks;
         const ammo = content.ammo;
+        const characteristic = content.characteristic;
 
         const row = equipmentTable.find('tr').filter((i, el) => $(el).data('equipment-id') === equipmentID);
         if (row.length > 0) {
             if (name) row.find('.name').text(name);
-            if (skill_name) row.find('.skill-name').text(skill_name);
+            if (kind) row.find('.kind').text(kind);
             if (type) row.find('.type').text(type);
             if (damage) row.find('.damage').text(damage);
             if (range) row.find('.range').text(range);
-            if (attacks) row.find('.attacks').text(attacks);
+            if (characteristic) row.find('.characteristic').text(characteristic);
             if (ammo) row.find('.max-ammo').text(ammo);
         }
         else {
@@ -429,28 +429,15 @@ async function deleteEquipmentClick(ev) {
     }
 }
 
-async function equipmentUsingChange(ev) {
-    const using = $(ev.target).prop('checked');
-    const equipmentID = $(ev.target).parents('tr').data('equipment-id');
-    try { await axios.post('/sheet/player/equipment', { equipmentID, using }) }
-    catch (err) { showFailureToastMessage(err) }
-}
-
 async function equipmentAmmoChange(ev) {
     const $currentAmmo = $(ev.target);
     const value = parseInt($currentAmmo.val()) || 0;
     const row = $currentAmmo.parents('tr');
     const equipmentID = row.data('equipment-id');
-    const maxAmmo = parseInt(row.find('.max-ammo').text());
+    const maxAmmo = parseInt(row.find('.max-ammo').text().match(/[0-9]/)?.[0]);
 
-    if (isNaN(maxAmmo)) {
-        $currentAmmo.val('-');
-        return alert('Esse equipamento não possui munição.');
-    }
-    if (value > maxAmmo) {
-        $currentAmmo.val(maxAmmo);
-        return alert('Você não pode ter mais munição do que a capacidade do equipamento.');
-    }
+    if (isNaN(maxAmmo)) return $currentAmmo.val('-');
+    if (value > maxAmmo) return $currentAmmo.val(maxAmmo);
 
     $currentAmmo.val(value);
 
@@ -460,16 +447,13 @@ async function equipmentAmmoChange(ev) {
 
 async function equipmentDiceClick(ev) {
     const row = $(ev.target).parents('tr');
-    const using = row.find('.using').prop('checked');
-
-    if (!using) return alert('Você não está usando esse equipamento.');
 
     const ammoTxt = row.find('.current-ammo');
     let curAmmo = parseInt(ammoTxt.val());
-    const maxAmmo = parseInt(row.find('.max-ammo').text());
+    const maxAmmo = parseInt(row.find('.max-ammo').text().match(/[0-9]/)?.[0]);
 
     if (!isNaN(maxAmmo) && (isNaN(curAmmo) || curAmmo <= 0))
-        return alert('Você não tem munição para isso.');
+        return alert('Você não tem carga para usar essa arma.');
 
     const dices = resolveDices(row.find('.damage').text());
 

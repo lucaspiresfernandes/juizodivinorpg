@@ -15,12 +15,12 @@
 
     createEquipmentButton.click(async () => {
         const name = $('#createEquipmentName').val();
-        const skillID = parseInt($('#combatSpecializationList').val());
-        const type = $('#createEquipmentType').val();
         const damage = $('#createEquipmentDamage').val();
+        const kind = $('#createEquipmentKind').val();
+        const type = $('#createEquipmentType').val();
         const range = $('#createEquipmentRange').val();
-        const attacks = $('#createEquipmentAttacks').val();
         const ammo = $('#createEquipmentAmmo').val();
+        const characteristic = $('#createEquipmentCharacteristic').val();
 
         createEquipmentButton.prop('disabled', true);
         createEquipmentCloseButton.prop('disabled', true);
@@ -31,11 +31,11 @@
             const response = await axios.put('/sheet/equipment', {
                 name,
                 type,
-                skillID,
+                kind,
                 damage,
                 range,
-                attacks,
                 ammo,
+                characteristic,
                 visible: false
             });
             const id = response.data.equipmentID;
@@ -44,11 +44,11 @@
                 id,
                 name,
                 type,
-                skillID,
+                kind,
                 damage,
                 range,
-                attacks,
                 ammo,
+                characteristic,
                 visible: false
             });
         }
@@ -363,12 +363,12 @@ function addEquipment(equipment) {
     const row = $($('#equipmentRowTemplate').html());
     row.data('equipment-id', equipment.id);
     row.find('.name').val(equipment.name);
-    row.find('.specialization').val(equipment.skillID);
-    row.find('.type').val(equipment.type);
     row.find('.damage').val(equipment.damage);
+    row.find('.kind').val(equipment.kind);
+    row.find('.type').val(equipment.type);
     row.find('.range').val(equipment.range);
-    row.find('.attacks').val(equipment.attacks);
     row.find('.ammo').val(equipment.ammo);
+    row.find('.characteristic').val(equipment.characteristic);
     row.find('.visible').prop('checked', equipment.visible);
 
     $('#equipmentListTable').append(row);

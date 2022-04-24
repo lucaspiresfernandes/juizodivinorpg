@@ -1,43 +1,89 @@
-<tr data-equipment-id="{{equipment_id}}">
+<tr data-equipment-id='{{equipment_id}}'>
+	<td>
+		<button class='trash acds-element' onclick='equipmentDeleteClick(event)'><i
+				class='bi bi-trash'
+			></i></button>
+	</td>
+	<td>
+		<input
+			class='name acds-element acds-bottom-text'
+			type='text'
+			value='{{name}}'
+			onchange='equipmentChange(event);'
+			data-key='name'
+		/>
+	</td>
+	<td>
+		<input
+			class='damage acds-element acds-bottom-text'
+			type='text'
+			value='{{damage}}'
+			onchange='equipmentChange(event);'
+			data-key='damage'
+		/>
+	</td>
+	<td>
+		<select
+			class='kind acds-element'
+			value='{{kind}}'
+			onchange='equipmentChange(event);'
+			data-key='kind'
+		>
+			<option value='Improvisado' {{#ifEquals kind 'Improvisado'}}selected{{/ifEquals}}>Improvisado</option>
+			<option value='Comum' {{#ifEquals kind 'Comum'}}selected{{/ifEquals}}>Comum</option>
+			<option value='Complexo' {{#ifEquals kind 'Complexo'}}selected{{/ifEquals}}>Complexo</option>
+		</select>
+	</td>
+	<td>
+		<select
+			class='type acds-element'
+			value='{{type}}'
+			onchange='equipmentChange(event);'
+			data-key='type'
+		>
+			<option value='Leve' {{#ifEquals type 'Leve'}}selected{{/ifEquals}}>Leve</option>
+			<option value='Médio' {{#ifEquals type 'Médio'}}selected{{/ifEquals}}>Médio</option>
+			<option value='Pesado' {{#ifEquals type 'Pesado'}}selected{{/ifEquals}}>Pesado</option>
+			<option value='Disparo' {{#ifEquals type 'Disparo'}}selected{{/ifEquals}}>Disparo</option>
+		</select>
+	</td>
+	<td>
+		<select
+			class='range acds-element'
+			value='{{range}}'
+			onchange='equipmentChange(event);'
+			data-key='range'
+		>
+			<option value='Adjacente' {{#ifEquals range 'Adjacente'}}selected{{/ifEquals}}>Adjacente</option>
+			<option value='Curto' {{#ifEquals range 'Curto'}}selected{{/ifEquals}}>Curto</option>
+			<option value='Médio' {{#ifEquals range 'Médio'}}selected{{/ifEquals}}>Médio</option>
+			<option value='Longo' {{#ifEquals range 'Longo'}}selected{{/ifEquals}}>Longo</option>
+		</select>
+	</td>
+	<td>
+		<input
+			class='ammo acds-element acds-bottom-text'
+			type='text'
+			value='{{ammo}}'
+			onchange='equipmentChange(event);'
+			data-key='ammo'
+		/>
+	</td>
     <td>
-        <button class="trash acds-element" onclick="equipmentDeleteClick(event)"><i class="bi bi-trash"></i></button>
-    </td>
-    <td>
-        <input class="name acds-element acds-bottom-text" type="text" value="{{name}}"
-            onchange="equipmentChange(event);" data-key="name">
-    </td>
-    <td>
-        <select class="specialization acds-element" onchange="equipmentChange(event);" data-key="skillID">
-            {{#each combatSpecializations}}
-            {{#with this}}
-            <option value="{{skill_id}}" {{#ifEquals skill_id ../skill_id}} selected {{/ifEquals}}>
-                {{name}}</option>
-            {{/with}}
-            {{/each}}
-        </select>
-    </td>
-    <td>
-        <input class="type acds-element acds-bottom-text" type="text" value="{{type}}"
-            onchange="equipmentChange(event);" data-key="type">
-    </td>
-    <td>
-        <input class="damage acds-element acds-bottom-text" type="text" value="{{damage}}"
-            onchange="equipmentChange(event);" data-key="damage">
-    </td>
-    <td>
-        <input class="range acds-element acds-bottom-text" type="text" value="{{range}}"
-            onchange="equipmentChange(event);" data-key="range">
-    </td>
-    <td>
-        <input class="attacks acds-element acds-bottom-text" type="text" value="{{attacks}}"
-            onchange="equipmentChange(event);" data-key="attacks">
-    </td>
-    <td>
-        <input class="ammo acds-element acds-bottom-text" type="text" value="{{ammo}}"
-            onchange="equipmentChange(event);" data-key="ammo">
-    </td>
-    <td>
-        <input class="visible form-check-input" type="checkbox" onchange="equipmentVisibleChange(event)" {{#if
-            visible}}checked{{/if}}>
-    </td>
+		<input
+			class='characteristic acds-element acds-bottom-text'
+			type='text'
+			value='{{characteristic}}'
+			onchange='equipmentChange(event);'
+			data-key='characteristic'
+		/>
+	</td>
+	<td>
+		<input
+			class='visible form-check-input'
+			type='checkbox'
+			onchange='equipmentVisibleChange(event)'
+            {{#if visible}}checked{{/if}}
+		/>
+	</td>
 </tr>

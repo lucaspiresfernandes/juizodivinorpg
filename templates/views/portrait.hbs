@@ -12,19 +12,16 @@
     <div class="container shadow" id="mainContainer">
         <img id="background" src="/assets/avatar_bg.png" class="bottom">
 
-        <img src="/assets/frame_upside.png" class="frame frame-up bottom">
-
-        <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="bottom"
-            data-lineage="{{player.lineage_id}}" data-level="{{player.level}}" {{#unless
-            player.lineage_id}}hidden{{/unless}}>
-
         <img id="avatar" class="middle" style="display: none;">
 
-        <img src="/assets/frame_bottom.png" class="frame frame-down top">
         <div class="energy-container">
             <div class="energy top">{{attributes.2.value}}</div>
         </div>
     </div>
+
+    <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="middle"
+            data-lineage="{{player.lineage_id}}" data-level="{{player.level}}" {{#unless
+            player.lineage_id}}hidden{{/unless}}>
 
     <div class="container switchable" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
         <div class="name top">{{name}}</div>
@@ -38,7 +35,7 @@
     </div>
 
     <div class="container dice">
-        <video height="240" muted class="popout">
+        <video height="300" muted class="popout">
             <source src="/assets/dice_animation.webm">
         </video>
         <div class="result" style="display: none;">20</div>

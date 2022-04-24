@@ -137,13 +137,6 @@ async function registerPlayerData(playerID) {
             };
         })),
 
-        con('player_equipment').insert({
-            equipment_id: 1,
-            player_id: playerID,
-            using: false,
-            current_ammo: '-'
-        }),
-
         con('player_note').insert({
             player_id: playerID,
             value: ''

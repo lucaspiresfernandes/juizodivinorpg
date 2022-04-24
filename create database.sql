@@ -7,21 +7,18 @@ use juizodivinodb;
 CREATE TABLE `characteristic` (
     `characteristic_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
-    `rollable` BOOLEAN NOT NULL,
     PRIMARY KEY (`characteristic_id`)
 );
 
 INSERT INTO
-    `characteristic` (`name`, `rollable`)
+    `characteristic` (`characteristic_id`, `name`)
 VALUES
-    ('Força', TRUE),
-    ('Agilidade', TRUE),
-    ('Constituição', TRUE),
-    ('Intelecto', TRUE),
-    ('Presença', TRUE),
-    ('Sabedoria', TRUE),
-    ('Tamanho', TRUE),
-    ('Deslocamento', FALSE);
+    (1, 'Força'),
+    (2, 'Agilidade'),
+    (3, 'Constituição'),
+    (4, 'Intelecto'),
+    (5, 'Presença'),
+    (6, 'Sabedoria');
 
 CREATE TABLE `curse` (
     `curse_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -62,30 +59,30 @@ CREATE TABLE `specialization` (
 );
 
 INSERT INTO
-    `specialization` (`name`)
+    `specialization` (`specialization_id`, `name`)
 VALUES
-    ('Atletismo'),
-    ('Luta'),
-    ('Furtividade'),
-    ('Pilotagem'),
-    ('Pontaria'),
-    ('Prestidigitação'),
-    ('Reflexos'),
-    ('Fortitude'),
-    ('Avaliação'),
-    ('Ciência'),
-    ('Cultura'),
-    ('Investigação'),
-    ('Medicina'),
-    ('Misticismo'),
-    ('Percepção'),
-    ('Profissão'),
-    ('Afinidade Natural'),
-    ('Diplomacia'),
-    ('Enganação'),
-    ('Intimidação'),
-    ('Intuição'),
-    ('Vontade');
+    (1, 'Atletismo'),
+    (2, 'Luta'),
+    (3, 'Furtividade'),
+    (4, 'Pilotagem'),
+    (5, 'Pontaria'),
+    (6, 'Prestidigitação'),
+    (7, 'Reflexos'),
+    (8, 'Fortitude'),
+    (9, 'Avaliação'),
+    (10, 'Ciência'),
+    (11, 'Cultura'),
+    (12, 'Investigação'),
+    (13, 'Medicina'),
+    (14, 'Misticismo'),
+    (15, 'Percepção'),
+    (16, 'Profissão'),
+    (17, 'Afinidade Natural'),
+    (18, 'Diplomacia'),
+    (19, 'Enganação'),
+    (20, 'Intimidação'),
+    (21, 'Intuição'),
+    (22, 'Vontade');
 
 CREATE TABLE `skill` (
     `skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -100,34 +97,35 @@ CREATE TABLE `skill` (
 
 INSERT INTO
     `skill` (
+        `skill_id`,
         `specialization_id`,
         `characteristic_id`,
         `name`,
         `mandatory`
     )
 VALUES
-    (NULL, 1, 'Atletismo', TRUE),
-    (NULL, 1, 'Luta', TRUE),
-    (NULL, 2, 'Furtividade', TRUE),
-    (NULL, 2, 'Pilotagem', TRUE),
-    (NULL, 2, 'Pontaria', TRUE),
-    (NULL, 2, 'Prestidigitação', TRUE),
-    (NULL, 2, 'Reflexos', TRUE),
-    (NULL, 3, 'Fortitude', TRUE),
-    (NULL, 4, 'Avaliação', TRUE),
-    (NULL, 4, 'Ciência', TRUE),
-    (NULL, 4, 'História', TRUE),
-    (NULL, 4, 'Investigação', TRUE),
-    (NULL, 4, 'Medicina', TRUE),
-    (NULL, 4, 'Misticismo', TRUE),
-    (NULL, 4, 'Percepção', TRUE),
-    (NULL, 4, 'Profissão', TRUE),
-    (NULL, 5, 'Afinidade Natural', TRUE),
-    (NULL, 5, 'Diplomacia', TRUE),
-    (NULL, 5, 'Enganação', TRUE),
-    (NULL, 5, 'Intimidação', TRUE),
-    (NULL, 5, 'Intuição', TRUE),
-    (NULL, 5, 'Vontade', TRUE);
+    (1, NULL, 1, 'Atletismo', TRUE),
+    (2, NULL, 1, 'Luta', TRUE),
+    (3, NULL, 2, 'Furtividade', TRUE),
+    (4, NULL, 2, 'Pilotagem', TRUE),
+    (5, NULL, 2, 'Pontaria', TRUE),
+    (6, NULL, 2, 'Prestidigitação', TRUE),
+    (7, NULL, 2, 'Reflexos', TRUE),
+    (8, NULL, 3, 'Fortitude', TRUE),
+    (9, NULL, 4, 'Avaliação', TRUE),
+    (10, NULL, 4, 'Ciência', TRUE),
+    (11, NULL, 4, 'História', TRUE),
+    (12, NULL, 4, 'Investigação', TRUE),
+    (13, NULL, 4, 'Medicina', TRUE),
+    (14, NULL, 4, 'Misticismo', TRUE),
+    (15, NULL, 4, 'Percepção', TRUE),
+    (16, NULL, 4, 'Profissão', TRUE),
+    (17, NULL, 5, 'Afinidade Natural', TRUE),
+    (18, NULL, 5, 'Diplomacia', TRUE),
+    (19, NULL, 5, 'Enganação', TRUE),
+    (20, NULL, 5, 'Intimidação', TRUE),
+    (21, NULL, 5, 'Intuição', TRUE),
+    (22, NULL, 5, 'Vontade', TRUE);
 
 CREATE TABLE `attribute` (
     `attribute_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -135,7 +133,7 @@ CREATE TABLE `attribute` (
     `rollable` BOOLEAN NOT NULL,
     `bg_color` varchar(6) NOT NULL,
     `fill_color` varchar(6) NOT NULL,
-    `characteristic_id` INT UNSIGNED NOT NULL,
+    `characteristic_id` INT UNSIGNED NULL,
     `skill_id` INT UNSIGNED NULL,
     `operation` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`attribute_id`),
@@ -145,6 +143,7 @@ CREATE TABLE `attribute` (
 
 INSERT INTO
     `attribute` (
+        `attribute_id`,
         `name`,
         `rollable`,
         `bg_color`,
@@ -155,31 +154,34 @@ INSERT INTO
     )
 VALUES
     (
+        1,
         'Vida',
         FALSE,
         '5a1e1e',
         'b62323',
-        7,
+        NULL, -- 7,
         8,
-        '({characteristic} + {skill}) / 2'
+        '{skill}/2'
     ),
     (
+        2,
         'Sanidade',
         TRUE,
         '584377',
         '871eef',
-        4,
+        NULL, -- 4,
         22,
-        '{characteristic} + ({skill} * 5)'
+        '{skill}*5'
     ),
     (
+        3,
         'Energia',
         FALSE,
         '1d9797',
         '00ffff',
         5,
         NULL,
-        '{characteristic} * 2'
+        '{characteristic}*2'
     );
 
 CREATE TABLE `class` (
@@ -195,6 +197,7 @@ CREATE TABLE `class` (
 
 INSERT INTO
     `class` (
+        `class_id`,
         `name`,
         `attribute_id`,
         `bonus`,
@@ -203,6 +206,7 @@ INSERT INTO
     )
 VALUES
     (
+        1,
         'Lutador',
         3,
         2,
@@ -210,6 +214,7 @@ VALUES
         'Consegue usar sua ação livre para sacar qualquer arma ou objeto.'
     ),
     (
+        2,
         'Investigador',
         3,
         6,
@@ -217,6 +222,7 @@ VALUES
         'Pode usar sua perícia de Intuição para decifrar pistas secretas em um local, ou a localização delas.'
     ),
     (
+        3,
         'Estudioso',
         3,
         12,
@@ -224,6 +230,7 @@ VALUES
         'Pode gastar sua ação de movimento para usar sua perícia de Intuição e tentar analisar um inimigo para ter pistas sobre algum de seus atributos.'
     ),
     (
+        4,
         'Atirador',
         3,
         1,
@@ -231,6 +238,7 @@ VALUES
         'Gasta sua ação de movimento para Mirar, sem precisar gastar sua ação principal.'
     ),
     (
+        5,
         'Diplomata',
         3,
         8,
@@ -238,6 +246,7 @@ VALUES
         'Tem a capacidade de ganhar pontos de diplomacia com alguém. Para cada ponto de diplomacia que você tem com um NPC, você ganha um dado de vantagem nas perícias de Diplomacia e Enganação usadas com eles.'
     ),
     (
+        6,
         'Ardiloso',
         3,
         4,
@@ -296,12 +305,12 @@ CREATE TABLE `lineage` (
 );
 
 INSERT INTO
-    `lineage` (`name`, `divine`)
+    `lineage` (`lineage_id`, `name`, `divine`)
 VALUES
-    ('Amarelo', TRUE),
-    ('Azul', FALSE),
-    ('Verde', FALSE),
-    ('Vermelho', FALSE);
+    (1, 'Amarelo', TRUE),
+    (2, 'Azul', FALSE),
+    (3, 'Verde', FALSE),
+    (4, 'Vermelho', FALSE);
 
 CREATE TABLE `lineage_node` (
     `lineage_id` INT UNSIGNED NOT NULL,
@@ -776,14 +785,14 @@ CREATE TABLE `attribute_status` (
 );
 
 INSERT INTO
-    `attribute_status` (`name`, `attribute_id`)
+    `attribute_status` (`attribute_status_id`, `name`, `attribute_id`)
 VALUES
-    ('Morrendo', 1),
-    ('Enfraquecendo', 1),
-    ('Inconsciente', 1),
-    ('Lesão Grave', 1),
-    ('Traumatizado', 2),
-    ('Acessório', 3);
+    (1, 'Morrendo', 1),
+    (2, 'Enfraquecendo', 1),
+    (3, 'Inconsciente', 1),
+    (4, 'Lesão Grave', 1),
+    (5, 'Traumatizado', 2),
+    (6, 'Acessório', 3);
 
 CREATE TABLE `player_attribute` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -812,47 +821,21 @@ CREATE TABLE `player_attribute_status` (
 CREATE TABLE `equipment` (
     `equipment_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    `type` VARCHAR(255) NOT NULL,
-    `skill_id` INT UNSIGNED NOT NULL,
     `damage` VARCHAR(255) NOT NULL,
+    `kind` VARCHAR(255) NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
     `range` VARCHAR(255) NOT NULL,
-    `attacks` VARCHAR(255) NOT NULL,
     `ammo` VARCHAR(255) NOT NULL,
+    `characteristic` VARCHAR(255) NOT NULL,
     `visible` BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (`equipment_id`),
-    CONSTRAINT `fk_equipment_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill` (`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (`equipment_id`)
 );
-
-INSERT INTO
-    `equipment` (
-        `name`,
-        `type`,
-        `skill_id`,
-        `damage`,
-        `range`,
-        `attacks`,
-        `ammo`,
-        `visible`
-    )
-VALUES
-    (
-        'Desarmado',
-        'Luta',
-        2,
-        '1d3',
-        'Toque',
-        '1',
-        '-',
-        TRUE
-    );
 
 CREATE TABLE `player_equipment` (
     `player_id` INT UNSIGNED NOT NULL,
     `equipment_id` INT UNSIGNED NOT NULL,
     `current_ammo` varchar(255) NOT NULL,
-    `using` BOOLEAN NOT NULL,
     PRIMARY KEY (`player_id`, `equipment_id`),
-    CONSTRAINT `uk_player_id_equipment_id` UNIQUE (`player_id`, `equipment_id`),
     CONSTRAINT `fk_player_equipment_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_equipment_equipment_id` FOREIGN KEY (`equipment_id`) REFERENCES `equipment`(`equipment_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -864,9 +847,10 @@ CREATE TABLE `spec` (
 );
 
 INSERT INTO
-    `spec` (`name`)
+    `spec` (`spec_id`, `name`)
 VALUES
-    ('Exposição Pavorosa');
+    (1, 'Descolamento'),
+    (2, 'Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -904,14 +888,14 @@ CREATE TABLE `info` (
 );
 
 INSERT INTO
-    `info` (`name`)
+    `info` (`info_id`, `name`)
 VALUES
-    ('Nome'),
-    ('Player'),
-    ('Idade'),
-    ('Raça'),
-    ('Local de Nascimento'),
-    ('Altura');
+    (1, 'Nome'),
+    (2, 'Player'),
+    (3, 'Idade'),
+    (4, 'Raça'),
+    (5, 'Local de Nascimento'),
+    (6, 'Altura');
 
 CREATE TABLE `player_info` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -930,11 +914,11 @@ CREATE TABLE `extra_info` (
 );
 
 INSERT INTO
-    `extra_info` (`name`)
+    `extra_info` (`extra_info_id`, `name`)
 VALUES
-    ('História'),
-    ('Itens, Pessoas e Locais Importantes'),
-    ('Fobias e Manias');
+    (1, 'História'),
+    (2, 'Itens, Pessoas e Locais Importantes'),
+    (3, 'Fobias e Manias');
 
 CREATE TABLE `player_extra_info` (
     `player_id` INT UNSIGNED NOT NULL,

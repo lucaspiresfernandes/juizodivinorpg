@@ -30,12 +30,12 @@
                                 <thead>
                                     <th scope="col"></th>
                                     <th scope="col">Nome</th>
-                                    <th scope="col">Perícia</th>
-                                    <th scope="col">Tipo</th>
                                     <th scope="col">Dano</th>
+                                    <th scope="col">Classe</th>
+                                    <th scope="col">Tipo</th>
                                     <th scope="col">Alcance</th>
-                                    <th scope="col">Ataques</th>
-                                    <th scope="col">Mun. Máxima</th>
+                                    <th scope="col">Carga Máxima</th>
+                                    <th scope="col">Característica</th>
                                     <th scope="col">Visível</th>
                                 </thead>
                                 <tbody id="equipmentListTable">
@@ -184,44 +184,52 @@
                             </div>
                             <div class="row my-3">
                                 <div class="col">
-                                    <input class="acds-element form-control" id="createEquipmentType" type="text"
-                                        placeholder="Tipo" required>
-                                </div>
-                            </div>
-                            <div class="row my-3">
-                                <div class="col">
                                     <input class="acds-element form-control" id="createEquipmentDamage" type="text"
                                         placeholder="Dano" required>
                                 </div>
                             </div>
-                            <div class="row my-3">
+                             <div class="row my-2">
                                 <div class="col">
-                                    <input class="acds-element form-control" id="createEquipmentRange" type="text"
-                                        placeholder="Alcance" required>
+                                    <label for="createEquipmentKind">Classe</label>
+                                    <select id="createEquipmentKind" class="form-select acds-element">
+                                        <option value="Improvisado">Improvisado</option>
+                                        <option value="Comum">Comum</option>
+                                        <option value="Complexo">Complexo</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="row my-3">
+                            <div class="row my-2">
                                 <div class="col">
-                                    <input class="acds-element form-control" id="createEquipmentAttacks" type="text"
-                                        placeholder="Ataques" required>
+                                    <label for="createEquipmentType">Tipo</label>
+                                    <select id="createEquipmentType" class="form-select acds-element">
+                                        <option value="Leve">Leve</option>
+                                        <option value="Médio">Médio</option>
+                                        <option value="Pesado">Pesado</option>
+                                        <option value="Disparo">Disparo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col">
+                                    <label for="createEquipmentRange">Alcance</label>
+                                    <select id="createEquipmentRange" class="form-select acds-element">
+                                        <option value="Adjacente">Adjacente</option>
+                                        <option value="Curto">Curto</option>
+                                        <option value="Médio">Médio</option>
+                                        <option value="Longo">Longo</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="row my-3">
                                 <div class="col">
                                     <input class="acds-element form-control" id="createEquipmentAmmo" type="text"
-                                        placeholder="Munição" required>
+                                        placeholder="Carga Máxima" required>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row my-3">
                                 <div class="col">
-                                    <label for="combatSpecializationList">Perícia</label>
-                                    <select id="combatSpecializationList" class="form-select acds-element">
-                                        {{#each combatSpecializations}}
-                                        {{#with this}}
-                                        <option value="{{skill_id}}">{{name}}</option>
-                                        {{/with}}
-                                        {{/each}}
-                                    </select>
+                                    <input class="acds-element form-control" id="createEquipmentCharacteristic" type="text"
+                                        placeholder="Característica" required>
                                 </div>
                             </div>
                         </div>

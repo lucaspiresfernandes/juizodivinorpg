@@ -4,16 +4,14 @@
             <i class="bi bi-trash"></i>
         </button>
     </td>
-    <td><input class="form-check-input using" type="checkbox" {{#if using}}checked{{/if}}
-            onchange="equipmentUsingChange(event)"></td>
     <td class="name">{{name}}</td>
-    <td class="skill-name">{{skill_name}}</td>
-    <td class="type">{{type}}</td>
     <td class="damage">{{damage}}</td>
     <td><img class="acds-clickable dice" src="/assets/dice.png" onclick="equipmentDiceClick(event)"></td>
+    <td class="kind">{{kind}}</td>
+    <td class="type">{{type}}</td>
     <td class="range">{{range}}</td>
-    <td class="attacks">{{attacks}}</td>
     <td><input class="acds-element acds-bottom-text text-center current-ammo" type="text" value="{{current_ammo}}"
             onchange="equipmentAmmoChange(event)"></td>
     <td class="max-ammo">{{ammo}}</td>
+    <td class="characteristic">{{characteristic}}</td>
 </tr>
