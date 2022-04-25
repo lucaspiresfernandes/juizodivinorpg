@@ -107,7 +107,6 @@ router.get('/1', async (req, res) => {
 						attributes.push(newAttr);
 						instantiatedIDs.set(attrQuery.attribute_id, newAttr);
 					}
-					console.table(attributes);
 					return attributes;
 				}),
 
@@ -689,14 +688,14 @@ router.post('/player/attribute', jsonParser, async (req, res) => {
 		res.send();
 
 		const result = await con('player_attribute')
-			.select('value', 'total_value')
+			.select('value', 'max_value', 'extra_value')
 			.where('player_id', playerID)
 			.andWhere('attribute_id', attributeID)
 			.first();
 
 		const data = {
 			attributeID,
-			totalValue: result.total_value,
+			totalValue: result.max_value + result.extra_value,
 			value: result.value,
 		};
 
