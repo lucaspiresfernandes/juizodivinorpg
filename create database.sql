@@ -113,7 +113,7 @@ VALUES
     (8, NULL, 3, 'Fortitude', TRUE),
     (9, NULL, 4, 'Avaliação', TRUE),
     (10, NULL, 4, 'Ciência', TRUE),
-    (11, NULL, 4, 'História', TRUE),
+    (11, NULL, 4, 'Cultura', TRUE),
     (12, NULL, 4, 'Investigação', TRUE),
     (13, NULL, 4, 'Medicina', TRUE),
     (14, NULL, 4, 'Misticismo', TRUE),
