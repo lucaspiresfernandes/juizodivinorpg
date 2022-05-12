@@ -19,9 +19,9 @@
         </div>
     </div>
 
-    <img id="lineage" src="/assets/lineages/frameless/{{player.lineage_id}}/{{player.index}}.png" class="middle"
-            data-lineage="{{player.lineage_id}}" data-level="{{player.level}}" {{#unless
-            player.lineage_id}}hidden{{/unless}}>
+    <img id="lineage" src="/assets/lineages/frameless/{{playerLineageID}}/{{player.index}}.png" class="middle"
+            data-lineage="{{playerLineageID}}" data-level="{{player.level}}" {{#unless
+            playerLineageID}}hidden{{/unless}}>
 
     <div class="container switchable" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
         <div class="name top">{{name}}</div>

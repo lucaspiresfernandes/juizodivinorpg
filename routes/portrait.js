@@ -38,12 +38,13 @@ router.get('/:id', async (req, res) => {
         con('player_attribute_status').select('attribute_status_id', 'value')
             .where('player_id', playerID)
             .orderBy('attribute_status_id'),
-        con('player_lineage_node').select('player_lineage_node.lineage_id', 'lineage_node.index', 'lineage_node.level')
+        con('player_lineage_node').select('lineage_node.index', 'lineage_node.level')
             .join('lineage_node', builder => builder.on('lineage_node.lineage_id', 'player_lineage_node.lineage_id')
                 .on('lineage_node.index', 'player_lineage_node.index'))
             .where('player_id', playerID)
             .orderBy('lineage_node.level', 'DESC')
             .orderBy('date_conquered', 'DESC').first(),
+        con('player').select('lineage_id').where('player_id', playerID).first(),
         con('config').select('value').where('key', 'portrait_environment').first()
     ]);
 
@@ -53,7 +54,8 @@ router.get('/:id', async (req, res) => {
         attributes: results[1],
         statusState: JSON.stringify(results[2]),
         player: results[3],
-        onCombat: results[4].value === 'combat'
+        playerLineageID: results[4].lineage_id,
+        onCombat: results[5].value === 'combat'
     });
 });
 

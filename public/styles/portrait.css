@@ -75,9 +75,9 @@ body {
 
 #lineage {
 	position: absolute;
-	top: 215px;
-	left: 495px;
-	transform: translate(-50%, -50%) /*rotate(35deg)*/;
+	top: 150px;
+	left: 450px;
+	transform: translate(-50%, -50%) rotate(45deg);
 	max-width: 200px;
 }
 

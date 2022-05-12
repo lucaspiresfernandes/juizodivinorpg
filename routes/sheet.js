@@ -8,14 +8,9 @@ const classBonus = 4;
 
 //#region routes
 
-router.get('/leave', async (req, res) => {
-	req.session.destroy((err) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).send();
-		}
-		res.redirect('/');
-	});
+router.get('/leave', (req, res) => {
+	req.session = null;
+	res.redirect('/');
 });
 
 router.get('/1', async (req, res) => {
@@ -86,7 +81,7 @@ router.get('/1', async (req, res) => {
 					const instantiatedIDs = new Map();
 					for (const attrQuery of attributesQuery) {
 						attrQuery.total_value = attrQuery.max_value + attrQuery.extra_value;
-						attrQuery.coefficient = (attrQuery.value / attrQuery.total_value * 100) || 0;
+						attrQuery.coefficient = (attrQuery.value / attrQuery.total_value) * 100 || 0;
 
 						const statusObj = {
 							attribute_status_id: attrQuery.attribute_status_id,
@@ -225,8 +220,10 @@ router.get('/1', async (req, res) => {
 					'player.class_id',
 					'class.ability_title',
 					'class.ability_description',
-					'class.attribute_id',
-					'class.bonus'
+					'class.energy_bonus_attribute_id',
+					'class.energy_bonus',
+					'class.health_bonus_attribute_id',
+					'class.health_bonus'
 				)
 				.join('class', 'class.class_id', 'player.class_id')
 				.where('player_id', playerID)
@@ -477,12 +474,14 @@ router.get('/admin/1', async (req, res) => {
 							'player_attribute.attribute_id'
 						)
 						.where('player_attribute.player_id', playerID)
-						.then(attributes => attributes.map(attr => {
-							return {
-								...attr,
-								total_value: attr.max_value + attr.extra_value,
-							};
-						})),
+						.then((attributes) =>
+							attributes.map((attr) => {
+								return {
+									...attr,
+									total_value: attr.max_value + attr.extra_value,
+								};
+							})
+						),
 
 					//Specs: 2
 					con('spec')
@@ -1549,14 +1548,26 @@ router.post('/player/class', jsonParser, async (req, res) => {
 
 	try {
 		const oldClass = await con('player')
-			.select('class.class_id', 'class.attribute_id')
+			.select(
+				'class.class_id',
+				'class.energy_bonus_attribute_id',
+				'class.energy_bonus',
+				'class.health_bonus_attribute_id',
+				'class.health_bonus'
+			)
 			.leftJoin('class', 'class.class_id', 'player.class_id')
 			.where('player_id', playerID)
 			.first();
 		const oldClassID = oldClass.class_id || null;
 		await con('player').update('class_id', newClassID).where('player_id', playerID);
 		const newClass = await con('class')
-			.select('attribute_id', 'name')
+			.select(
+				'name',
+				'energy_bonus_attribute_id',
+				'energy_bonus',
+				'health_bonus_attribute_id',
+				'health_bonus'
+			)
 			.where('class_id', newClassID)
 			.first();
 
@@ -1577,8 +1588,10 @@ router.post('/player/class', jsonParser, async (req, res) => {
 							updatedSkills.map((skill) => skill.skillID)
 						)
 						.orWhereIn('attribute.attribute_id', [
-							oldClass.attribute_id || null,
-							newClass?.attribute_id || null,
+							oldClass?.energy_bonus_attribute_id || null,
+							oldClass?.health_bonus_attribute_id || null,
+							newClass?.energy_bonus_attribute_id || null,
+							newClass?.health_bonus_attribute_id || null
 						])
 				)
 				.andWhere('player_attribute.player_id', playerID)
@@ -1762,12 +1775,15 @@ async function updateAttributes(playerID, whereClause) {
 			'player_attribute.max_value'
 		)
 		.join('player_attribute', 'player_attribute.attribute_id', 'attribute.attribute_id')
-		.where(whereClause).then(attributes => attributes.map(attr => {
-			return {
-				...attr,
-				total_value: attr.max_value + attr.extra_value,
-			};
-		}));
+		.where(whereClause)
+		.then((attributes) =>
+			attributes.map((attr) => {
+				return {
+					...attr,
+					total_value: attr.max_value + attr.extra_value,
+				};
+			})
+		);
 
 	if (attributes.length === 0) return attributes;
 
@@ -1784,7 +1800,12 @@ async function updateAttributes(playerID, whereClause) {
 			.whereIn('characteristic.characteristic_id', charIDs)
 			.andWhere('player_characteristic.player_id', playerID),
 		con('class')
-			.select('class.attribute_id', 'class.bonus')
+			.select(
+				'class.energy_bonus_attribute_id',
+				'class.health_bonus_attribute_id',
+				'class.energy_bonus',
+				'class.health_bonus'
+			)
 			.join('player', 'player.class_id', 'class.class_id')
 			.where('player.player_id', playerID)
 			.first(),
@@ -1822,9 +1843,17 @@ async function updateAttributes(playerID, whereClause) {
 						.replace('{skill}', skillValue)
 				)
 			);
-			const bonus = playerClass?.attribute_id === attributeID ? playerClass.bonus : 0;
 
-			const extraValue = evaluation + bonus;
+			let classBonus = 0;
+
+			if (playerClass) {
+				if (playerClass.health_bonus_attribute_id === attributeID)
+					classBonus = playerClass.health_bonus;
+				else if (playerClass.energy_bonus_attribute_id === attributeID)
+					classBonus = playerClass.energy_bonus;
+			}
+
+			const extraValue = evaluation + classBonus;
 			const totalValue = attr.max_value + extraValue;
 			const value = clamp(attr.value, 0, totalValue);
 

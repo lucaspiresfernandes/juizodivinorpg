@@ -5,7 +5,7 @@ const registerHelpers = require('./utils/registerHelpers');
 const { Server } = require('socket.io');
 const hbs = require('hbs');
 const hbsutils = require('hbs-utils')(hbs);
-const expressSession = require('express-session');
+const session = require('cookie-session');
 
 const app = express();
 const server = http.createServer(app);
@@ -24,14 +24,11 @@ app.set('view engine', 'hbs');
 app.set('views', viewsPath);
 hbsutils.registerPartials(partialsPath, { precompile: true });
 app.use(express.static(publicPath));
-app.use(expressSession({
+app.use(session({
+    name: 'player_session',
     secret: process.env.EXPRESS_SESSION_SECRET || 'unkown',
-    cookie: {
-        sameSite: 'strict',
-        maxAge: 86400000,
-    },
-    resave: true,
-    saveUninitialized: false
+    maxAge: 86400000,
+    sameSite: 'strict'
 }));
 
 registerHelpers();

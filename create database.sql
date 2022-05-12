@@ -113,7 +113,7 @@ VALUES
     (8, NULL, 3, 'Fortitude', TRUE),
     (9, NULL, 4, 'Avaliação', TRUE),
     (10, NULL, 4, 'Ciência', TRUE),
-    (11, NULL, 4, 'Cultura', TRUE),
+    (11, NULL, 4, 'História', TRUE),
     (12, NULL, 4, 'Investigação', TRUE),
     (13, NULL, 4, 'Medicina', TRUE),
     (14, NULL, 4, 'Misticismo', TRUE),
@@ -186,20 +186,25 @@ VALUES
 CREATE TABLE `class` (
     `class_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    `attribute_id` INT UNSIGNED NOT NULL,
-    `bonus` INT SIGNED NOT NULL,
+    `energy_bonus_attribute_id` INT UNSIGNED NOT NULL,
+    `energy_bonus` INT SIGNED NOT NULL,
+    `health_bonus_attribute_id` INT UNSIGNED NOT NULL,
+    `health_bonus` INT SIGNED NOT NULL,
     `ability_title` VARCHAR(255) NOT NULL,
     `ability_description` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`class_id`),
-    CONSTRAINT `fk_class_attribute_id` FOREIGN KEY (`attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT `fk_class_energy_bonus_attribute_id` FOREIGN KEY (`energy_bonus_attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_class_health_bonus_attribute_id` FOREIGN KEY (`health_bonus_attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 INSERT INTO
     `class` (
         `class_id`,
         `name`,
-        `attribute_id`,
-        `bonus`,
+        `energy_bonus_attribute_id`,
+        `energy_bonus`,
+        `health_bonus_attribute_id`,
+        `health_bonus`,
         `ability_title`,
         `ability_description`
     )
@@ -209,6 +214,8 @@ VALUES
         'Lutador',
         3,
         2,
+        1,
+        8,
         'Saque Rápido',
         'Consegue usar sua ação livre para sacar qualquer arma ou objeto.'
     ),
@@ -217,6 +224,8 @@ VALUES
         'Investigador',
         3,
         6,
+        1,
+        5,
         'Intuição Investigativa',
         'Pode usar sua perícia de Intuição para decifrar pistas secretas em um local, ou a localização delas.'
     ),
@@ -225,6 +234,8 @@ VALUES
         'Estudioso',
         3,
         12,
+        1,
+        6,
         'Analisar Inimigo',
         'Pode gastar sua ação de movimento para usar sua perícia de Intuição e tentar analisar um inimigo para ter pistas sobre algum de seus atributos.'
     ),
@@ -233,6 +244,8 @@ VALUES
         'Atirador',
         3,
         1,
+        1,
+        4,
         'Mira Precisa',
         'Gasta sua ação de movimento para Mirar, sem precisar gastar sua ação principal.'
     ),
@@ -241,6 +254,8 @@ VALUES
         'Diplomata',
         3,
         8,
+        1,
+        6,
         'Diplomacia Assegurada',
         'Tem a capacidade de ganhar pontos de diplomacia com alguém. Para cada ponto de diplomacia que você tem com um NPC, você ganha um dado de vantagem nas perícias de Diplomacia e Enganação usadas com eles.'
     ),
@@ -249,6 +264,8 @@ VALUES
         'Ardiloso',
         3,
         4,
+        1,
+        5,
         'Furtividade das Sombras',
         'Pode gastar sua ação de movimento para tentar ficar furtivo, sem precisar gastar sua ação principal.'
     );
@@ -847,7 +864,8 @@ INSERT INTO
 VALUES
     (1, 'Deslocamento'),
     (2, 'Sabedoria'),
-    (3, 'Exposição Pavorosa');
+    (3, 'Armadura'),
+    (4, 'Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
     `player_id` INT UNSIGNED NOT NULL,
