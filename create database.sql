@@ -741,10 +741,12 @@ CREATE TABLE `player` (
     `username` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `admin` BOOLEAN NOT NULL,
+    `shadow_player_id` INT UNSIGNED NULL,
     `class_id` INT UNSIGNED NULL DEFAULT NULL,
     `lineage_id` INT UNSIGNED NULL DEFAULT NULL,
     `score` DECIMAL (15, 2) NOT NULL DEFAULT 0,
     PRIMARY KEY (`player_id`),
+    CONSTRAINT `fk_shadow_player_id` FOREIGN KEY (`shadow_player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_class_id` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -971,4 +973,5 @@ CREATE TABLE `config` (
 INSERT INTO
     `config` (`key`, `value`)
 VALUES
-    ('portrait_environment', 'idle');
+    ('portrait_environment', 'idle'),
+    ('hide_shadows', 'true');

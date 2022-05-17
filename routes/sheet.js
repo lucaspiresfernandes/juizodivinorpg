@@ -441,10 +441,13 @@ router.get('/admin/1', async (req, res) => {
 	if (!isAdmin) return res.redirect('/sheet/1');
 
 	try {
-		const charIDs = await con('player').select('player_id').where('admin', false);
+		const charIDs = await con('player')
+			.select('player_id', 'shadow_player_id')
+			.where('admin', false);
 		const characters = await Promise.all(
 			charIDs.map(async (charID) => {
 				const playerID = charID.player_id;
+				const shadowPlayerID = charID.shadow_player_id;
 				const results = await Promise.all([
 					//Info: 0
 					con('info')
@@ -548,10 +551,10 @@ router.get('/admin/1', async (req, res) => {
 
 				return {
 					playerID,
+					shadowPlayerID: shadowPlayerID || 'null',
 					info: results[0],
 					attributes: results[1],
 					specs: results[2],
-					// characteristics: results[3],
 					equipments: results[3],
 					items: results[4],
 					lineage: results[5],
@@ -566,12 +569,14 @@ router.get('/admin/1', async (req, res) => {
 			con('player_note').select('value').where('player_id', playerID).first(),
 			//Portrait Environment: 1
 			con('config').select('value').where('key', 'portrait_environment').first(),
+			con('config').select('value').where('key', 'hide_shadows').first(),
 		]);
 
 		res.render('sheetadmin1', {
 			characters,
 			adminNotes: results[0],
 			environmentState: results[1].value,
+			shadowState: results[2].value === 'true',
 		});
 	} catch (err) {
 		console.error(err);
@@ -1591,7 +1596,7 @@ router.post('/player/class', jsonParser, async (req, res) => {
 							oldClass?.energy_bonus_attribute_id || null,
 							oldClass?.health_bonus_attribute_id || null,
 							newClass?.energy_bonus_attribute_id || null,
-							newClass?.health_bonus_attribute_id || null
+							newClass?.health_bonus_attribute_id || null,
 						])
 				)
 				.andWhere('player_attribute.player_id', playerID)
@@ -1754,6 +1759,39 @@ router.delete('/player', jsonParser, async (req, res) => {
 
 	try {
 		await con('player').where('player_id', playerID).del();
+		res.send();
+	} catch (err) {
+		console.error(err);
+		res.status(500).send();
+	}
+});
+
+router.get('/shadow', jsonParser, async (req, res) => {
+	const playerID = req.session.playerID;
+	const shadowPlayerID = req.session.shadowPlayerID;
+
+	if (!playerID) return res.status(401).send();
+
+	if (shadowPlayerID) {
+		req.session.playerID = shadowPlayerID;
+		req.session.shadowPlayerID = null;
+	} else {
+		const lightPlayerID = (
+			await con('player').select('player_id').where('shadow_player_id', playerID).first()
+		)?.player_id;
+		if (lightPlayerID) {
+			req.session.playerID = lightPlayerID;
+			req.session.shadowPlayerID = playerID;
+		} else return res.status(500).send();
+	}
+
+	res.send();
+});
+
+router.post('/shadow', jsonParser, async (req, res) => {
+	const hidden = req.body.hidden;
+	try {
+		await con('config').update('value', String(hidden)).where('key', 'hide_shadows');
 		res.send();
 	} catch (err) {
 		console.error(err);

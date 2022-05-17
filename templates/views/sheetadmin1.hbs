@@ -23,25 +23,35 @@
         <div class="row display-5 text-center">
             <div class="col">Administrador</div>
         </div>
-        <div class="row my-4">
-            <div class="col text-center h5">
-                <input class="form-check-input align-self-center" type="checkbox" id="changeEnvironment" {{#ifEquals
+        <div class="row text-center my-4">
+            <div class="col h5">
+                <input class="form-check-input" type="checkbox" id="changeEnvironment" {{#ifEquals
                     environmentState "combat" }}checked{{/ifEquals}}>
                 <label class="form-check-label" for="changeEnvironment">
                     Ambiente de Combate?
+                </label>
+            </div>
+            <div class="col h5">
+                <input class="form-check-input" type="checkbox" id="hideShadows" {{#if shadowState}}checked{{/if}}>
+                <label class="form-check-label" for="hideShadows">
+                    Esconder versões alternativas?
                 </label>
             </div>
         </div>
         <div class="row justify-content-center">
             {{#each characters}}
             {{#with this}}
-            <div class="col-12 col-md-6 col-xl-4 text-center player-container" data-player-id="{{playerID}}"
-                data-attribute-status="{{attributeStatus}}">
-                <div class="row my-2 mx-md-1 acds-player-container h-100">
-                    <div class="col">
+            <div class="col-12 col-md-6 col-xl-4 col-xxl-3 my-2 h-100 text-center player-container-wrapper" {{#ifEquals
+                shadowPlayerID "null" }} {{#if ../shadowState}}style="display: none;" {{/if}} {{/ifEquals}}
+                data-shadow-player-id="{{shadowPlayerID}}">
+                <div class="row px-2">
+                    <div class="col player-container acds-player-container" data-player-id="{{playerID}}"
+                        data-attribute-status="{{attributeStatus}}">
                         <div class="row">
                             <div class="col">
+                                {{#ifNotEquals shadowPlayerID "null" }}
                                 <button class="btn btn-dark btn-sm mt-2 delete-player">Apagar</button>
+                                {{/ifNotEquals}}
                                 <div class="avatar-container">
                                     <img class="img-fluid avatar">
                                     <img class="img-fluid lineage" data-lineage="{{player.lineage_id}}"
@@ -53,7 +63,7 @@
                         </div>
                         <div class="row">
                             <div class="col h3 player-info" data-info-id="{{info.info_id}}" name="{{info.name}}">
-                                {{info.value}}
+                                {{#ifEquals shadowPlayerID "null"}}Alternativo:{{/ifEquals}} {{info.value}}
                             </div>
                         </div>
                         <div class="row my-1">
@@ -177,7 +187,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             {{/with}}
             {{/each}}

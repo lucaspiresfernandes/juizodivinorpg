@@ -23,6 +23,16 @@ $('#changeEnvironment').click(async ev => {
     catch (err) { showFailureToastMessage(err) }
 });
 
+$('#hideShadows').click(async ev => {
+    const hidden = $(ev.target).prop('checked');
+    try { 
+        await axios.post('/sheet/shadow', { hidden });
+        if (hidden) $('.player-container-wrapper[data-shadow-player-id="null"]').hide();
+        else $('.player-container-wrapper[data-shadow-player-id="null"]').show();
+    }
+    catch (err) { showFailureToastMessage(err) }
+});
+
 async function playerLineageChange(ev) {
     const lineageID = parseInt($(ev.target).val());
     const playerID = $(ev.target).parents('.player-container').data('player-id');
