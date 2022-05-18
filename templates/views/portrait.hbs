@@ -15,22 +15,27 @@
         <img id="avatar" class="middle" style="display: none;">
 
         <div class="energy-container">
-            <div class="energy top">{{attributes.2.value}}</div>
+            <div class="energy top">
+                {{#if attributes.2.visible}}{{attributes.2.value}}{{else}}?{{/if}}
+            </div>
         </div>
     </div>
 
     <img id="lineage" src="/assets/lineages/frameless/{{playerLineageID}}/{{player.index}}.png" class="middle"
-            data-lineage="{{playerLineageID}}" data-level="{{player.level}}" {{#unless
-            playerLineageID}}hidden{{/unless}}>
+        data-lineage="{{playerLineageID}}" data-level="{{player.level}}" {{#unless playerLineageID}}hidden{{/unless}}>
 
     <div class="container switchable" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
-        <div class="name top">{{name}}</div>
+        <div class="name top">{{#if info.visible}}{{info.value}}{{else}}???{{/if}}</div>
     </div>
 
     <div class="container switchable" id="combatText" {{#unless onCombat}}style="display: none;" {{/unless}}>
         <div class="combat">
-            <div class="health top">{{attributes.0.value}}/{{attributes.0.total_value}}</div>
-            <div class="sanity top">{{attributes.1.value}}/{{attributes.1.total_value}}</div>
+            <div class="health top">
+                {{#if attributes.0.visible}}{{attributes.0.value}}/{{attributes.0.total_value}}{{else}}?/?{{/if}}
+            </div>
+            <div class="sanity top">
+                {{#if attributes.1.visible}}{{attributes.1.value}}/{{attributes.1.total_value}}{{else}}?/?{{/if}}
+            </div>
         </div>
     </div>
 

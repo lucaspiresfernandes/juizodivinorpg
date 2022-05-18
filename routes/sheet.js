@@ -24,7 +24,7 @@ router.get('/1', async (req, res) => {
 		const results = await Promise.all([
 			//Info: 0
 			con('info')
-				.select('info.*', 'player_info.value')
+				.select('info.*', 'player_info.value', 'player_info.visible')
 				.join('player_info', 'info.info_id', 'player_info.info_id')
 				.where('player_info.player_id', playerID),
 
@@ -53,6 +53,7 @@ router.get('/1', async (req, res) => {
 					'player_attribute.value',
 					'player_attribute.max_value',
 					'player_attribute.extra_value',
+					'player_attribute.visible',
 					'attribute_status.attribute_status_id',
 					'attribute_status.name as attribute_status_name',
 					'player_attribute_status.value as attribute_status_value'
@@ -659,14 +660,31 @@ router.post('/player/info', jsonParser, async (req, res) => {
 	if (!playerID || !infoID) return res.status(401).send();
 
 	const value = req.body.value;
+	const visible = req.body.visible;
 	try {
 		await con('player_info')
-			.update({ value })
+			.update({ value, visible })
 			.where('player_id', playerID)
 			.andWhere('info_id', infoID);
+
 		res.send();
-		io.to('admin').emit('info changed', { playerID, infoID, value });
-		io.to(`portrait${playerID}`).emit('info changed', { infoID, value });
+
+		const result = await con('player_info')
+			.select('value', 'visible')
+			.where('player_id', playerID)
+			.andWhere('info_id', infoID)
+			.first();
+
+		io.to('admin').emit('info changed', {
+			playerID,
+			infoID,
+			value: result.value,
+		});
+		io.to(`portrait${playerID}`).emit('info changed', {
+			infoID,
+			value: result.value,
+			visible: result.visible,
+		});
 	} catch (err) {
 		console.error(err);
 		res.status(500).send();
@@ -682,17 +700,18 @@ router.post('/player/attribute', jsonParser, async (req, res) => {
 	const value = req.body.value;
 	const max_value = req.body.maxValue;
 	const extra_value = req.body.extraValue;
+	const visible = req.body.visible;
 
 	try {
 		await con('player_attribute')
-			.update({ value, max_value, extra_value })
+			.update({ value, max_value, extra_value, visible })
 			.where('player_id', playerID)
 			.andWhere('attribute_id', attributeID);
 
 		res.send();
 
 		const result = await con('player_attribute')
-			.select('value', 'max_value', 'extra_value')
+			.select('value', 'max_value', 'extra_value', 'visible')
 			.where('player_id', playerID)
 			.andWhere('attribute_id', attributeID)
 			.first();
@@ -701,6 +720,7 @@ router.post('/player/attribute', jsonParser, async (req, res) => {
 			attributeID,
 			totalValue: result.max_value + result.extra_value,
 			value: result.value,
+			visible: result.visible,
 		};
 
 		io.to('admin').emit('attribute changed', { playerID, ...data });

@@ -27,7 +27,7 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
 
 		if (clicks === 10) {
 			await axios.get('/sheet/shadow');
-            location.reload();
+			location.reload();
 			return;
 		}
 
@@ -41,43 +41,67 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
 //Info
 {
 	$('.info-container input.info-field').focusout(infoFocusOut);
-	$('.info-container label.info-field').click(infoClick);
+	$('.info-container label.info-field').dblclick(infoClick);
+	$('.info-container .visible-button').click(infoVisibleClick);
 
 	let initialValue = '';
 
 	function infoClick(ev) {
-		if (global.getClickCount(ev) < 2) return;
-
-		const forLabel = $(ev.target).attr('for');
-		const value = $(ev.target).text();
+		const el = $(ev.currentTarget);
+		const forLabel = el.attr('for');
+		const value = el.text();
 
 		const input =
 			$(`<input class="acds-element acds-bottom-text info-field" type="text" id="${forLabel}"
         value="${value}" autocomplete="off"></input>`);
+		input.focusout(infoFocusOut);
 
-		$(ev.target).parent().empty().append(input).unbind().focusout(infoFocusOut);
+		el.parent().empty().append(input).unbind();
 		input.focus()[0].selectionStart = value.length;
 		initialValue = value;
 	}
 
 	async function infoFocusOut(ev) {
-		const value = $(ev.target).val();
+		const el = $(ev.currentTarget);
 
-		if (initialValue !== value) {
-			const infoID = $(ev.target).parents('.info-container').data('info-id');
-
+		if (initialValue !== el.val()) {
+			const infoID = el.parents('.info-container').data('info-id');
 			try {
-				await axios.post('/sheet/player/info', { infoID, value });
+				await axios.post('/sheet/player/info', { infoID, value: el.val() });
 			} catch (err) {
 				showFailureToastMessage(err);
 			}
 		}
 
-		if (!value) return;
+		if (!el.val()) return;
 
-		const forID = $(ev.target).attr('id');
-		const label = $(`<label class="info-field" for="${forID}">${value}</label>`);
-		$(ev.target).parent().empty().append(label).unbind().click(infoClick);
+		const forID = el.attr('id');
+		const label = $(`<label class="info-field" for="${forID}">${el.val()}</label>`);
+		label.dblclick(infoClick);
+		el.parent().empty().append(label).unbind();
+	}
+
+	async function infoVisibleClick(ev) {
+		ev.currentTarget.blur();
+
+		const container = $(ev.target).parents('.info-container');
+		const infoID = container.data('info-id');
+		const newVisible = !container.data('visible');
+		container.data('visible', newVisible);
+
+		try {
+			await axios.post('/sheet/player/info', { infoID, visible: newVisible });
+			const el = $(ev.currentTarget);
+			if (newVisible) {
+				el.removeClass('btn-secondary').addClass('btn-primary');
+				el.empty().append($('<i class="bi bi-eye"></i>'));
+			} else {
+				el.removeClass('btn-primary').addClass('btn-secondary');
+				el.empty().append($('<i class="bi bi-eye-slash"></i>'));
+			}
+		} catch (err) {
+			showFailureToastMessage(err);
+		}
 	}
 }
 
@@ -215,6 +239,29 @@ findAvatar();
 
 		sendAttributeData(attributeID, newCur);
 		resolveAttributeBar(container, { newCur });
+	});
+
+	attributeContainer.find('.visible-button').click(async (ev) => {
+		ev.currentTarget.blur();
+
+		const container = $(ev.target).parents('.attribute-container');
+		const attributeID = container.data('attribute-id');
+		const newVisible = !container.data('visible');
+		container.data('visible', newVisible);
+
+		try {
+			await axios.post('/sheet/player/attribute', { attributeID, visible: newVisible });
+			const el = $(ev.currentTarget);
+			if (newVisible) {
+				el.removeClass('btn-secondary').addClass('btn-primary');
+				el.empty().append($('<i class="bi bi-eye"></i>'));
+			} else {
+				el.removeClass('btn-primary').addClass('btn-secondary');
+				el.empty().append($('<i class="bi bi-eye-slash"></i>'));
+			}
+		} catch (err) {
+			showFailureToastMessage(err);
+		}
 	});
 
 	function sendAttributeData(attributeID, value) {

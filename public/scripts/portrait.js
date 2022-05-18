@@ -143,9 +143,17 @@
 		const attributeID = content.attributeID;
 		const newValue = content.value;
 		const newTotalValue = content.totalValue;
-		let newText = `${newValue}`;
-		if (attributeID !== 3) newText += `/${newTotalValue}`;
-		attributes[attributeID].text(newText);
+		const visible = content.visible;
+
+		if (visible) {
+			let newText = `${newValue}`;
+			if (attributeID !== 3) newText += `/${newTotalValue}`;
+			attributes[attributeID].text(newText);
+		} else {
+			let newText = `?`;
+			if (attributeID !== 3) newText += `/?`;
+			attributes[attributeID].text(newText);
+		}
 	});
 }
 
@@ -180,8 +188,12 @@ socket.on('attribute status changed', (content) => {
 socket.on('info changed', (content) => {
 	const infoID = content.infoID;
 	if (infoID == 1) {
-		const value = content.value.toUpperCase() || 'DESCONHECIDO';
-		$('.name').text(value);
+		if (content.visible) {
+			const value = content.value.toUpperCase() || 'DESCONHECIDO';
+			$('.name').text(value);
+		} else {
+			$('.name').text('???');
+		}
 	}
 });
 

@@ -22,7 +22,7 @@
                 </div>
                 {{#each info}}
                 {{#with this}}
-                <div class="row mt-4 info-container" data-info-id="{{info_id}}">
+                <div class="row mt-4 info-container" data-info-id="{{info_id}}" data-visible="{{visible}}">
                     <div class="col mx-2">
                         <div class="row">
                             <div class="col h5">
@@ -32,6 +32,18 @@
                             </div>
                         </div>
                         <div class="row">
+                            {{#ifEquals name "Nome"}}
+                            <div class="col-auto align-self-center">
+                                <button
+                                    class="visible-button btn btn-sm {{#if visible}}btn-primary{{else}}btn-secondary{{/if}}">
+                                    {{#if visible}}
+                                    <i class="bi bi-eye"></i>
+                                    {{else}}
+                                    <i class="bi bi-eye-slash"></i>
+                                    {{/if}}
+                                </button>
+                            </div>
+                            {{/ifEquals}}
                             <div class="col">
                                 {{#if value}}
                                 <label class="info-field" for="info{{@index}}">{{value}}</label>
@@ -96,12 +108,23 @@
                     <div class="col">
                         {{#each attributes}}
                         {{#with this}}
-                        <div class="row attribute-container" data-attribute-id="{{attribute_id}}">
+                        <div class="row attribute-container" data-attribute-id="{{attribute_id}}"
+                            data-visible="{{visible}}">
                             <div class="col">
                                 <div class="row">
                                     <div class="col"><label for="attribute{{@index}}">Pontos de {{name}}</label></div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-auto align-self-center">
+                                        <button
+                                            class="visible-button btn btn-sm {{#if visible}}btn-primary{{else}}btn-secondary{{/if}}">
+                                            {{#if visible}}
+                                            <i class="bi bi-eye"></i>
+                                            {{else}}
+                                            <i class="bi bi-eye-slash"></i>
+                                            {{/if}}
+                                        </button>
+                                    </div>
                                     <div class="col">
                                         <div class="progress" style="background-color: #{{bg_color}};">
                                             <div role="progressbar" class="progress-bar" name="{{name}}"
@@ -466,8 +489,8 @@
                             </div>
                             <div class="row my-2">
                                 <div class="col">
-                                    <input class="acds-element form-control" id="createEquipmentCharacteristic" type="text"
-                                        autocomplete="off" placeholder="Característica" required>
+                                    <input class="acds-element form-control" id="createEquipmentCharacteristic"
+                                        type="text" autocomplete="off" placeholder="Característica" required>
                                 </div>
                             </div>
                         </div>
