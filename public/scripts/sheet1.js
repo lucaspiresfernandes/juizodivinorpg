@@ -25,7 +25,7 @@ function resolveAttributeBar(container, { newCur, newMax, newExtra }) {
 		clicks++;
 		if (clickInterval) clearTimeout(clickInterval);
 
-		if (clicks === 10) {
+		if (clicks === 5) {
 			await axios.get('/sheet/shadow');
 			location.reload();
 			return;
