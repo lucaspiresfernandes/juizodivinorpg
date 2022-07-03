@@ -85,14 +85,16 @@ const resolveSuccessType = {
 		const f10_10 = Math.floor((number - 10) * 0.1);
 		const f10_20 = Math.floor((number - 20) * 0.1);
 
-		if (roll > 20 - f10_20) return { description: 'Extremo', isCritical: true };
-		if (roll > 20 - f10_10) return { description: 'Bom', isCritical: true };
-		if (roll > 20 - f10) return { description: 'Normal', isCritical: true };
-		if (roll > 20 - f5) return { description: 'Extremo' };
-		if (roll > 20 - f2) return { description: 'Bom' };
-		if (roll > 20 - number) return { description: 'Normal' };
-		if (roll == 1) return { description: 'Desastre' };
-		return { description: 'Fracasso' };
+		if (roll > 20 - f10_20)
+			return { description: 'Extremo', isCritical: true, modifier: -12 };
+		if (roll > 20 - f10_10)
+			return { description: 'Bom', isCritical: true, modifier: -10 };
+		if (roll > 20 - f10) return { description: 'Normal', isCritical: true, modifier: -8 };
+		if (roll > 20 - f5) return { description: 'Extremo', modifier: -6 };
+		if (roll > 20 - f2) return { description: 'Bom', modifier: -4 };
+		if (roll > 20 - number) return { description: 'Normal', modifier: -2 };
+		if (roll == 1) return { description: 'Desastre', modifier: +2 };
+		return { description: 'Fracasso', modifier: 0 };
 	},
 
 	'100nobranch': function (number, roll) {

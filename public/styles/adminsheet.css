@@ -59,7 +59,7 @@
 }
 
 .npc-list li input.health {
-    max-width: 3em;
+    max-width: 5em;
 }
 
 .dice-list>li:nth-child(odd) {

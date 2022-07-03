@@ -206,8 +206,7 @@
                         </div>
                         <div class="row">
                             <div class="col">
-                                <img class="img-fluid acds-clickable dice" src="/assets/dice.png" data-bs-toggle="modal"
-                                    data-bs-target="#generalDiceRoll">
+                                <img id="rollGeneralDice" class="img-fluid acds-clickable dice" src="/assets/dice.png">
                             </div>
                         </div>
                     </div>
@@ -240,11 +239,6 @@
                                 <li><button class="dropdown-item btn btn-dark" data-player-id="{{playerID}}"
                                         onclick="onAddToList(event)">{{info.value}}</button></li>
                                 {{/each}}
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><button class="dropdown-item btn btn-dark"
-                                        onclick="onAddToList(event)">Novo...</button></li>
                             </ul>
                         </div>
                     </div>

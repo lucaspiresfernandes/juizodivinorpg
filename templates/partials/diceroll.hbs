@@ -39,7 +39,7 @@
         $('#diceResultDescription').text('Placeholder').hide().removeClass('critical show');
     });
 
-    async function rollDice(num, diceNum = 20, showBranches = true) {
+    async function rollDice(num, diceNum = 20, showBranches = true, showModifier = false) {
         diceRollModal.show();
         const loading = diceRoll.find('.loading');
         loading.show();
@@ -62,15 +62,25 @@
 
             diceResultDescription.show();
             let prefix = '';
-            if (successType.isCritical) {
+            if (successType && successType.isCritical) {
                 diceResultContent.addClass('critical');
                 diceResultDescription.addClass('critical');
                 prefix = 'Crítico ';
             }
-            const description = prefix + successType.description;
 
-            diceResultContent.text(roll).fadeIn('slow', () =>
-                diceResultDescription.text(description).addClass('show'));
+            let displayRoll = roll;
+            if (showModifier) {
+                const mod = successType.modifier;
+                if (mod >= 0)
+                    displayRoll += ` + ${mod}`;
+                else displayRoll += ` - ${Math.abs(mod)}`;
+            }
+
+            diceResultContent.text(displayRoll).fadeIn('slow', () => {
+                if (!successType) return;
+                let description = prefix + successType?.description;
+                diceResultDescription.text(description).addClass('show')
+            });
 
             $('#diceRollCloseButton').focus();
         }

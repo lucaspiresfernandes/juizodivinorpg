@@ -136,7 +136,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="generalDiceRollButton" class="btn btn-primary">Rolar</button>
+                <button id="generalDiceRollButton" class="btn btn-primary" data-bs-dismiss="modal">Rolar</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
@@ -150,7 +150,6 @@
         $('#generalDiceRoll').on('hidden.bs.modal', () => $(".general-dice-roll").text("0"));
 
         $('#generalDiceRollButton').click(ev => {
-            generalDiceModal.hide();
             const diceElements = $('.general-dice-roll');
 
             const dicesArray = [];

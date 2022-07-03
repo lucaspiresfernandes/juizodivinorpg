@@ -67,7 +67,7 @@ VALUES
     (5, 'Pontaria'),
     (6, 'Prestidigitação'),
     (7, 'Reflexos'),
-    (8, 'Fortitude'),
+    (8, 'Vigor'),
     (9, 'Avaliação'),
     (10, 'Ciência'),
     (11, 'Cultura'),
@@ -216,8 +216,8 @@ VALUES
         2,
         1,
         8,
-        'Saque Rápido',
-        'Consegue usar sua ação livre para sacar qualquer arma ou objeto.'
+        'Ataque de Oportunidade',
+        'Usa sua reação para atacar o inimigo quando o mesmo se afasta de você.'
     ),
     (
         2,
@@ -226,8 +226,8 @@ VALUES
         6,
         1,
         5,
-        'Intuição Investigativa',
-        'Pode usar sua perícia de Intuição para decifrar pistas secretas em um local, ou a localização delas.'
+        'Investigação Completa',
+        'Uma vez por missão, pode gastar sua ação padrão para investigar completamente uma sala. Com isso, o Mestre vai narrar as ações do Investigador ao longo da sala e dizer todas as coisas que ela encontrou, não sendo necessário qualquer tipo de teste.'
     ),
     (
         3,
@@ -236,8 +236,8 @@ VALUES
         12,
         1,
         6,
-        'Analisar Inimigo',
-        'Pode gastar sua ação de movimento para usar sua perícia de Intuição e tentar analisar um inimigo para ter pistas sobre algum de seus atributos.'
+        'Obra Predileta',
+        'Existe uma obra (fictícia) que é predileta do Estudioso e ele carrega consigo. Essa obra é relacionada a uma dessas perícias: Ciência, Cultura, Profissão ou Misticismo. Uma vez por dia, pode gastar sua ação padrão para ler uma parte da obra predileta e tentar achar alguma informação que deseja, ganhando 2 dados de vantagem na perícia relacionada à obra.'
     ),
     (
         4,
@@ -246,8 +246,8 @@ VALUES
         1,
         1,
         4,
-        'Mira Precisa',
-        'Gasta sua ação de movimento para Mirar, sem precisar gastar sua ação principal.'
+        'Mirar',
+        'Usa sua ação de movimento ou ação padrão para Mirar e ganhar vantagem no próximo ataque.'
     ),
     (
         5,
@@ -256,8 +256,8 @@ VALUES
         8,
         1,
         6,
-        'Diplomacia Assegurada',
-        'Tem a capacidade de ganhar pontos de diplomacia com alguém. Para cada ponto de diplomacia que você tem com um NPC, você ganha um dado de vantagem nas perícias de Diplomacia e Enganação usadas com eles.'
+        'Aclamação',
+        'Uma vez por dia, pode gastar sua ação padrão para determinar que um personagem o reconheça por seu trabalho, ganhando 2 dados de vantagem em rolagens de Diplomacia, Enganação ou Intuição. O trabalho precisa fazer sentido com a história e com o personagem, não podendo inventar algo que não seja coerente.'
     ),
     (
         6,
@@ -266,8 +266,8 @@ VALUES
         4,
         1,
         5,
-        'Furtividade das Sombras',
-        'Pode gastar sua ação de movimento para tentar ficar furtivo, sem precisar gastar sua ação principal.'
+        'Desencadear Ataque Furtivo',
+        'Uma vez por rodada, ao matar um inimigo com um Ataque Furtivo, ganha mais uma ação completa (padrão + movimento).'
     );
 
 CREATE TABLE `class_skill` (
@@ -805,10 +805,9 @@ INSERT INTO
     `attribute_status` (`attribute_status_id`, `name`, `attribute_id`)
 VALUES
     (1, 'Morrendo', 1),
-    (2, 'Enfraquecendo', 1),
     (3, 'Inconsciente', 1),
-    (4, 'Lesão Grave', 1),
-    (5, 'Traumatizado', 2),
+    (4, 'Ferimento Grave', 1),
+    (5, 'Enlouquecendo', 2),
     (6, 'Acessório', 3);
 
 CREATE TABLE `player_attribute` (

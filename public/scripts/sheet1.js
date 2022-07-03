@@ -132,6 +132,9 @@ $('#playerClassSelect').change(async (ev) => {
 
 	const loading = uploadAvatarContainer.find('.loading');
 
+	const generalDiceRoll = new bootstrap.Modal($('#generalDiceRoll')[0]);
+	const avatarDice = $('.avatar-container .dice');
+
 	$('#uploadAvatar').on('hidden.bs.modal', () => {
 		uploadAvatarButton.prop('disabled', false);
 		uploadAvatarCloseButton.prop('disabled', false);
@@ -160,6 +163,11 @@ $('#playerClassSelect').change(async (ev) => {
 			showFailureToastMessage(err);
 		}
 		uploadAvatarModal.hide();
+	});
+
+	avatarDice.on('click', (ev) => {
+		if (ev.ctrlKey) return rollDice(1, 20, false);
+		generalDiceRoll.show();
 	});
 }
 function findAvatar() {
@@ -719,7 +727,10 @@ async function skillChange(ev) {
 }
 
 function skillDiceClick(ev) {
-	rollDice(parseInt($(ev.target).parents('.skill-container').find('.total').text()));
+	const container = $(ev.target).parents('.skill-container');
+	const skillId = container.data('skill-id');
+	const value = parseInt(container.find('.total').text());
+	rollDice(value, 20, true, skillId === 13);
 }
 
 //Items
