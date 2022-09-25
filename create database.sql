@@ -110,7 +110,7 @@ VALUES
     (5, NULL, 2, 'Pontaria', TRUE),
     (6, NULL, 2, 'Prestidigitação', TRUE),
     (7, NULL, 2, 'Reflexos', TRUE),
-    (8, NULL, 3, 'Fortitude', TRUE),
+    (8, NULL, 3, 'Vigor', TRUE),
     (9, NULL, 4, 'Avaliação', TRUE),
     (10, NULL, 4, 'Ciência', TRUE),
     (11, NULL, 4, 'História', TRUE),

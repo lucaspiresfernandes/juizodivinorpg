@@ -68,18 +68,18 @@
                 prefix = 'Crítico ';
             }
 
-            let displayRoll = roll;
-            if (showModifier) {
-                const mod = successType.modifier;
-                if (mod >= 0)
-                    displayRoll += ` + ${mod}`;
-                else displayRoll += ` - ${Math.abs(mod)}`;
-            }
+            diceResultContent.text(roll).fadeIn('slow', () => {
+                if (showModifier) {
+                    const mod = successType.modifier;
+                    if (mod >= 0)
+                        displayRoll += `+${mod}`;
+                    else displayRoll += `-${Math.abs(mod)}`;
+                    
+                    return diceResultDescription.text(mod).addClass('show')
+                }
 
-            diceResultContent.text(displayRoll).fadeIn('slow', () => {
-                if (!successType) return;
-                let description = prefix + successType?.description;
-                diceResultDescription.text(description).addClass('show')
+                if (successType)
+                    diceResultDescription.text(prefix + successType?.description).addClass('show')
             });
 
             $('#diceRollCloseButton').focus();
