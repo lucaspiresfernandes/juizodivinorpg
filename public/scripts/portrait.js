@@ -65,12 +65,27 @@
 
 		const roll = data.results[0].roll;
 		const successType = data.results[0].successType;
-		if (successType?.isCritical) {
+
+		if (successType && successType.isCritical) {
 			$result.addClass('critical');
 			$description.addClass('critical');
 		}
+
 		$result.text(roll).fadeIn('slow', () => {
-			if (successType) $description.text(successType.description).fadeIn('slow');
+			if (!successType) return;
+
+			if (successType.modifier !== undefined) {
+				let mod = successType.modifier;
+				if (mod > 0) mod = `+${mod}`;
+				else if (mod < 0) mod = `-${Math.abs(mod)}`;
+				return $description.text(mod).fadeIn('slow');
+			}
+
+			const desc = successType.isCritical
+				? `Crítico ${successType.description}`
+				: successType.description;
+
+			$description.text(desc).fadeIn('slow');
 		});
 	}
 
@@ -180,8 +195,7 @@ socket.on('attribute status changed', (content) => {
 	updatedAttrStatus.value = content.value;
 
 	$(document.body).data('attributes', stateArray);
-	for (const state of stateArray)
-		if (state.value) return showAvatar(state.attribute_status_id);
+	for (const state of stateArray) if (state.value) return showAvatar(state.attribute_status_id);
 	showAvatar();
 });
 

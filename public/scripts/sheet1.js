@@ -730,7 +730,7 @@ function skillDiceClick(ev) {
 	const container = $(ev.target).parents('.skill-container');
 	const skillId = container.data('skill-id');
 	const value = parseInt(container.find('.total').text());
-	rollDice(value, 20, true, skillId === 13);
+	rollDice(value, 20, true, skillId);
 }
 
 //Items

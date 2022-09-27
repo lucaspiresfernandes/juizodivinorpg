@@ -17,8 +17,7 @@ async function nextInt(min, max, n) {
 	min = Math.ceil(min);
 	max = Math.floor(max);
 
-	for (let i = 0; i < n; i++)
-		data.push(Math.floor(Math.random() * (max - min + 1) + min));
+	for (let i = 0; i < n; i++) data.push(Math.floor(Math.random() * (max - min + 1) + min));
 
 	return { data };
 }
@@ -28,11 +27,11 @@ router.post('/', jsonParser, async (req, res) => {
 	const isAdmin = req.session.isAdmin;
 	const dices = req.body.dices;
 	const resolverKey = req.body.resolverKey;
+	const skillId = req.body.skillId;
 
 	if (!playerID || !dices) return res.status(401).send();
 
-	if (dices.length === 1 && dices[0].n == 1)
-		io.to(`portrait${playerID}`).emit('dice roll');
+	if (dices.length === 1 && dices[0].n == 1) io.to(`portrait${playerID}`).emit('dice roll');
 
 	const results = new Array(dices.length);
 
@@ -60,7 +59,12 @@ router.post('/', jsonParser, async (req, res) => {
 					const num = dices[index].num;
 					if (num !== undefined) {
 						const resolver = resolveSuccessType[resolverKey];
-						if (resolver) results[index].successType = resolver(num, roll);
+						if (resolver) {
+							results[index].successType = resolver(num, roll);
+							if (!skillId || skillId !== 13) {
+								delete results[index].successType.modifier;
+							}
+						}
 					}
 				});
 			})
@@ -85,16 +89,15 @@ const resolveSuccessType = {
 		const f10_10 = Math.floor((number - 10) * 0.1);
 		const f10_20 = Math.floor((number - 20) * 0.1);
 
-		if (roll > 20 - f10_20)
-			return { description: 'Extremo', isCritical: true, modifier: -12 };
-		if (roll > 20 - f10_10)
-			return { description: 'Bom', isCritical: true, modifier: -10 };
+		if (roll > 20 - f10_20) return { description: 'Extremo', isCritical: true, modifier: -12 };
+		if (roll > 20 - f10_10) return { description: 'Bom', isCritical: true, modifier: -10 };
 		if (roll > 20 - f10) return { description: 'Normal', isCritical: true, modifier: -8 };
-		if (roll > 20 - f5) return { description: 'Extremo', modifier: -6 };
-		if (roll > 20 - f2) return { description: 'Bom', modifier: -4 };
-		if (roll > 20 - number) return { description: 'Normal', modifier: -2 };
-		if (roll == 1) return { description: 'Desastre', modifier: +2 };
-		return { description: 'Fracasso', modifier: 0 };
+		if (roll > 20 - f5) return { description: 'Extremo', isCritical: false, modifier: -6 };
+		if (roll > 20 - f2) return { description: 'Bom', isCritical: false, modifier: -4 };
+		if (roll > 20 - number) return { description: 'Normal', isCritical: false, modifier: -2 };
+		if (roll == 1) return { description: 'Desastre', isCritical: false, modifier: +2 };
+
+		return { description: 'Fracasso', isCritical: false, modifier: 0 };
 	},
 
 	'100nobranch': function (number, roll) {

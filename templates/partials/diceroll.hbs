@@ -39,7 +39,7 @@
         $('#diceResultDescription').text('Placeholder').hide().removeClass('critical show');
     });
 
-    async function rollDice(num, diceNum = 20, showBranches = true, showModifier = false) {
+    async function rollDice(num, diceNum = 20, showBranches = true, skillId = undefined) {
         diceRollModal.show();
         const loading = diceRoll.find('.loading');
         loading.show();
@@ -49,7 +49,8 @@
         try {
             const response = await axios.post('/dice', {
                 dices: [{ n: 1, roll: diceNum, num }],
-                resolverKey
+                resolverKey,
+                skillId
             });
             const data = response.data;
             const result = data.results[0];
@@ -61,25 +62,28 @@
             const diceResultDescription = $('#diceResultDescription');
 
             diceResultDescription.show();
-            let prefix = '';
+
             if (successType && successType.isCritical) {
                 diceResultContent.addClass('critical');
                 diceResultDescription.addClass('critical');
-                prefix = 'Crítico ';
             }
 
             diceResultContent.text(roll).fadeIn('slow', () => {
-                if (showModifier) {
-                    const mod = successType.modifier;
-                    if (mod >= 0)
-                        displayRoll += `+${mod}`;
-                    else displayRoll += `-${Math.abs(mod)}`;
-                    
-                    return diceResultDescription.text(mod).addClass('show')
+                if (!successType) return;
+
+                if (successType.modifier !== undefined) {
+                    let mod = successType.modifier;
+                    if (mod > 0)
+                        mod = `+${mod}`;
+                    else if (mod < 0) mod = `-${Math.abs(mod)}`;
+                    return diceResultDescription.text(mod).addClass('show');
                 }
 
-                if (successType)
-                    diceResultDescription.text(prefix + successType?.description).addClass('show')
+                const desc = successType.isCritical
+                    ? `Crítico ${successType.description}`
+                    : successType.description;
+
+                diceResultDescription.text(desc).addClass('show');
             });
 
             $('#diceRollCloseButton').focus();
