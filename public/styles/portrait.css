@@ -179,3 +179,15 @@ body {
 	transform: translate(-50%, -50%);
 	text-shadow: 0 0 10px #ddaf0f, 0 0 30px #ddaf0f, 0 0 50px #ddaf0f;
 }
+
+.dice .modifier {
+	position: absolute;
+	top: 500px;
+	left: 220px;
+
+	font-size: 78px;
+	color: white;
+
+	transform: translate(-50%, -50%);
+	text-shadow: 0 0 10px #ddaf0f, 0 0 30px #ddaf0f, 0 0 50px #ddaf0f;
+}

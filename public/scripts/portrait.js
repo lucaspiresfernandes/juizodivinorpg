@@ -4,6 +4,7 @@
 	dice.load();
 	const $result = $('.dice .result');
 	const $description = $('.dice .description');
+	const $modifier = $('.dice .modifier');
 
 	const $avatar = $('#avatar');
 	const $background = $('#background');
@@ -69,21 +70,23 @@
 		if (successType && successType.isCritical) {
 			$result.addClass('critical');
 			$description.addClass('critical');
+			$modifier.addClass('critical');
 		}
 
 		$result.text(roll).fadeIn('slow', () => {
 			if (!successType) return;
 
+			const desc = successType.isCritical
+				? `Crítico ${successType.description}`
+				: successType.description;
+
 			if (successType.modifier !== undefined) {
 				let mod = successType.modifier;
 				if (mod > 0) mod = `+${mod}`;
 				else if (mod < 0) mod = `-${Math.abs(mod)}`;
-				return $description.text(mod).fadeIn('slow');
+				$modifier.text(mod).fadeIn('slow');
+				return $description.text(desc).fadeIn('slow');
 			}
-
-			const desc = successType.isCritical
-				? `Crítico ${successType.description}`
-				: successType.description;
 
 			$description.text(desc).fadeIn('slow');
 		});
@@ -92,6 +95,7 @@
 	function hideDiceResult() {
 		return new Promise((resolve) => {
 			$description.fadeOut('fast', () => $description.text('').removeClass('critical'));
+			$modifier.fadeOut('fast', () => $modifier.text('').removeClass('critical'));
 			$result.fadeOut('fast', () => {
 				$result.text('').removeClass('critical');
 				resolve();

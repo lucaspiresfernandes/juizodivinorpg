@@ -71,17 +71,17 @@
             diceResultContent.text(roll).fadeIn('slow', () => {
                 if (!successType) return;
 
+                const desc = successType.isCritical
+                    ? `Crítico ${successType.description}`
+                    : successType.description;
+
                 if (successType.modifier !== undefined) {
                     let mod = successType.modifier;
                     if (mod > 0)
                         mod = `+${mod}`;
                     else if (mod < 0) mod = `-${Math.abs(mod)}`;
-                    return diceResultDescription.text(mod).addClass('show');
+                    return diceResultDescription.text(`${desc}  ${mod}`).addClass('show');
                 }
-
-                const desc = successType.isCritical
-                    ? `Crítico ${successType.description}`
-                    : successType.description;
 
                 diceResultDescription.text(desc).addClass('show');
             });
