@@ -1,15 +1,15 @@
-const home = require('./home');
-const register = require('./register');
-const sheet = require('./sheet');
-const dice = require('./dice');
-const avatar = require('./avatar');
-const portrait = require('./portrait');
+import home from "./home.js";
+import register from "./register.js";
+import sheet from "./sheet.js";
+import dice from "./dice.js";
+import avatar from "./avatar.js";
+import portrait from "./portrait.js";
 
-module.exports = [
-    { url: '/', ref: home },
-    { url: '/register', ref: register },
-    { url: '/sheet', ref: sheet },
-    { url: '/dice', ref: dice },
-    { url: '/avatar', ref: avatar },
-    { url: '/portrait', ref: portrait },
-]
+export const routes = [
+  { url: "/", ref: home },
+  { url: "/register", ref: register },
+  { url: "/sheet", ref: sheet },
+  { url: "/dice", ref: dice },
+  { url: "/avatar", ref: avatar },
+  { url: "/portrait", ref: portrait },
+];

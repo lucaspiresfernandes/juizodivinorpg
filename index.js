@@ -1,3 +1,9 @@
-require('dotenv').config();
-const server = require('./server');
-server.start();
+import dotenv from "dotenv";
+dotenv.config();
+
+async function main() {
+  const server = await import("./server.js");
+  server.start();
+}
+
+main();

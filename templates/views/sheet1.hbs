@@ -166,10 +166,11 @@
                             {{#each status}}
                             {{#with this}}
                             <div class="col attribute-status-container"
-                                data-attribute-status-id="{{attribute_status_id}}">
+                                data-attribute-status-id="{{attribute_status_id}}" {{#ifEquals attribute_status_id
+                                7}}style="display: none;" {{/ifEquals}}>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" {{#if checked}}checked{{/if}}
-                                        id="status{{@../index}}{{@index}}">
+                                    <input class="form-check-input" type="checkbox" {{#if checked}}checked{{/if}} {{#if
+                                        link}}data-link="{{link}}" {{/if}} id="status{{@../index}}{{@index}}">
                                     <label class="form-check-label" for="status{{@../index}}{{@index}}">{{name}}</label>
                                 </div>
                             </div>

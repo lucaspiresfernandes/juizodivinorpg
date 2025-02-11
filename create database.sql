@@ -6,7 +6,7 @@ use juizodivinodb;
 
 CREATE TABLE `characteristic` (
     `characteristic_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     PRIMARY KEY (`characteristic_id`)
 );
 
@@ -21,8 +21,8 @@ VALUES
 
 CREATE TABLE `curse` (
     `curse_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `description` MEDIUMTEXT NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
+    `description` VARCHAR(8192) NOT NULL,
     `level` INT UNSIGNED NOT NULL,
     `visible` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY(`curse_id`)
@@ -45,7 +45,7 @@ VALUES
 CREATE TABLE `curse_focus` (
     `curse_id` INT UNSIGNED NOT NULL,
     `characteristic_id` INT UNSIGNED NOT NULL,
-    `description` MEDIUMTEXT NOT NULL,
+    `description` VARCHAR(8192) NOT NULL,
     PRIMARY KEY(`curse_id`, `characteristic_id`),
     CONSTRAINT `fk_curse_focus_curse_id` FOREIGN KEY (`curse_id`) REFERENCES `curse`(`curse_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_curse_focus_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -53,7 +53,7 @@ CREATE TABLE `curse_focus` (
 
 CREATE TABLE `specialization` (
     `specialization_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     PRIMARY KEY (`specialization_id`)
 );
 
@@ -85,7 +85,7 @@ VALUES
 
 CREATE TABLE `skill` (
     `skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
     `specialization_id` INT UNSIGNED NULL,
     `characteristic_id` INT UNSIGNED NOT NULL,
     `mandatory` BOOLEAN NOT NULL DEFAULT FALSE,
@@ -128,13 +128,13 @@ VALUES
 
 CREATE TABLE `attribute` (
     `attribute_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     `rollable` BOOLEAN NOT NULL,
     `bg_color` varchar(6) NOT NULL,
     `fill_color` varchar(6) NOT NULL,
     `characteristic_id` INT UNSIGNED NULL,
     `skill_id` INT UNSIGNED NULL,
-    `operation` VARCHAR(255) NOT NULL,
+    `operation` VARCHAR(512) NOT NULL,
     PRIMARY KEY (`attribute_id`),
     CONSTRAINT `fk_attribute_characteristic_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_attribute_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -185,13 +185,13 @@ VALUES
 
 CREATE TABLE `class` (
     `class_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
     `energy_bonus_attribute_id` INT UNSIGNED NOT NULL,
     `energy_bonus` INT SIGNED NOT NULL,
     `health_bonus_attribute_id` INT UNSIGNED NOT NULL,
     `health_bonus` INT SIGNED NOT NULL,
-    `ability_title` VARCHAR(255) NOT NULL,
-    `ability_description` VARCHAR(255) NOT NULL,
+    `ability_title` VARCHAR(512) NOT NULL,
+    `ability_description` VARCHAR(8192) NOT NULL,
     PRIMARY KEY (`class_id`),
     CONSTRAINT `fk_class_energy_bonus_attribute_id` FOREIGN KEY (`energy_bonus_attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_class_health_bonus_attribute_id` FOREIGN KEY (`health_bonus_attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -314,7 +314,7 @@ VALUES
 
 CREATE TABLE `lineage` (
     `lineage_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
     -- Divine lineages are special lineages which ablities can be replaced with another ability from another lineage.
     `divine` BOOLEAN NOT NULL,
     PRIMARY KEY (`lineage_id`)
@@ -332,9 +332,9 @@ CREATE TABLE `lineage_node` (
     `lineage_id` INT UNSIGNED NOT NULL,
     `index` INT UNSIGNED NOT NULL,
     `level` INT UNSIGNED NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
-    `description` TEXT NOT NULL,
-    `type` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
+    `description` VARCHAR(8192) NOT NULL,
+    `type` VARCHAR(512) NOT NULL,
     `cost` DECIMAL (15, 2) NOT NULL,
     PRIMARY KEY (`lineage_id`, `index`),
     CONSTRAINT `fk_lineage_node_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -738,15 +738,16 @@ VALUES
 
 CREATE TABLE `player` (
     `player_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `username` VARCHAR(255) NOT NULL,
-    `password` VARCHAR(255) NOT NULL,
+    `username` VARCHAR(512) NOT NULL,
+    `password` VARCHAR(512) NOT NULL,
     `admin` BOOLEAN NOT NULL,
+    `is_shadow` BOOLEAN NOT NULL,
     `shadow_player_id` INT UNSIGNED NULL,
     `class_id` INT UNSIGNED NULL DEFAULT NULL,
     `lineage_id` INT UNSIGNED NULL DEFAULT NULL,
     `score` DECIMAL (15, 2) NOT NULL DEFAULT 0,
     PRIMARY KEY (`player_id`),
-    CONSTRAINT `fk_shadow_player_id` FOREIGN KEY (`shadow_player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_shadow_player_id` FOREIGN KEY (`shadow_player_id`) REFERENCES `player`(`player_id`) ON DELETE SET NULL ON UPDATE SET NULL,
     CONSTRAINT `fk_player_class_id` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -795,7 +796,7 @@ CREATE TABLE `player_skill` (
 
 CREATE TABLE `attribute_status` (
     `attribute_status_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     `attribute_id` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`attribute_status_id`),
     CONSTRAINT `fk_attribute_status_attribute_id` FOREIGN KEY (`attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -808,7 +809,8 @@ VALUES
     (3, 'Inconsciente', 1),
     (4, 'Ferimento Grave', 1),
     (5, 'Enlouquecendo', 2),
-    (6, 'Acessório', 3);
+    (6, 'Acessório', 3),
+    (7, 'Ferido', 3);
 
 CREATE TABLE `player_attribute` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -835,13 +837,13 @@ CREATE TABLE `player_attribute_status` (
 
 CREATE TABLE `equipment` (
     `equipment_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `damage` VARCHAR(255) NOT NULL,
-    `kind` VARCHAR(255) NOT NULL,
-    `type` VARCHAR(255) NOT NULL,
-    `range` VARCHAR(255) NOT NULL,
-    `ammo` VARCHAR(255) NOT NULL,
-    `characteristic` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
+    `damage` VARCHAR(512) NOT NULL,
+    `kind` VARCHAR(512) NOT NULL,
+    `type` VARCHAR(512) NOT NULL,
+    `range` VARCHAR(512) NOT NULL,
+    `ammo` VARCHAR(512) NOT NULL,
+    `characteristic` VARCHAR(512) NOT NULL,
     `visible` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`equipment_id`)
 );
@@ -849,7 +851,7 @@ CREATE TABLE `equipment` (
 CREATE TABLE `player_equipment` (
     `player_id` INT UNSIGNED NOT NULL,
     `equipment_id` INT UNSIGNED NOT NULL,
-    `current_ammo` varchar(255) NOT NULL,
+    `current_ammo` varchar(512) NOT NULL,
     PRIMARY KEY (`player_id`, `equipment_id`),
     CONSTRAINT `fk_player_equipment_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_player_equipment_equipment_id` FOREIGN KEY (`equipment_id`) REFERENCES `equipment`(`equipment_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -857,7 +859,7 @@ CREATE TABLE `player_equipment` (
 
 CREATE TABLE `spec` (
     `spec_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     PRIMARY KEY (`spec_id`)
 );
 
@@ -872,7 +874,7 @@ VALUES
 CREATE TABLE `player_spec` (
     `player_id` INT UNSIGNED NOT NULL,
     `spec_id` INT UNSIGNED NOT NULL,
-    `value` varchar(255) NOT NULL,
+    `value` varchar(512) NOT NULL,
     PRIMARY KEY (`player_id`, `spec_id`),
     CONSTRAINT `uk_player_id_spec_id` UNIQUE (`player_id`, `spec_id`),
     CONSTRAINT `fk_player_spec_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -881,8 +883,8 @@ CREATE TABLE `player_spec` (
 
 CREATE TABLE `item` (
     `item_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `description` MEDIUMTEXT NOT NULL,
+    `name` varchar(512) NOT NULL,
+    `description` VARCHAR(8192) NOT NULL,
     `visible` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`item_id`)
 );
@@ -890,7 +892,7 @@ CREATE TABLE `item` (
 CREATE TABLE `player_item` (
     `player_id` INT UNSIGNED NOT NULL,
     `item_id` INT UNSIGNED NOT NULL,
-    `description` MEDIUMTEXT NOT NULL,
+    `description` VARCHAR(8192) NOT NULL,
     `quantity` INT UNSIGNED NOT NULL DEFAULT 1,
     PRIMARY KEY (`player_id`, `item_id`),
     CONSTRAINT `uk_player_id_item_id` UNIQUE (`player_id`, `item_id`),
@@ -900,7 +902,7 @@ CREATE TABLE `player_item` (
 
 CREATE TABLE `info` (
     `info_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     PRIMARY KEY (`info_id`)
 );
 
@@ -917,7 +919,7 @@ VALUES
 CREATE TABLE `player_info` (
     `player_id` INT UNSIGNED NOT NULL,
     `info_id` INT UNSIGNED NOT NULL,
-    `value` MEDIUMTEXT NOT NULL,
+    `value` VARCHAR(8192) NOT NULL,
     `visible` BOOLEAN NOT NULL DEFAULT TRUE,
     PRIMARY KEY (`player_id`, `info_id`),
     CONSTRAINT `uk_player_id_info_id` UNIQUE (`player_id`, `info_id`),
@@ -927,7 +929,7 @@ CREATE TABLE `player_info` (
 
 CREATE TABLE `extra_info` (
     `extra_info_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `name` varchar(512) NOT NULL,
     PRIMARY KEY (`extra_info_id`)
 );
 
@@ -941,7 +943,7 @@ VALUES
 CREATE TABLE `player_extra_info` (
     `player_id` INT UNSIGNED NOT NULL,
     `extra_info_id` INT UNSIGNED NOT NULL,
-    `value` MEDIUMTEXT NOT NULL,
+    `value` VARCHAR(8192) NOT NULL,
     PRIMARY KEY (`player_id`, `extra_info_id`),
     CONSTRAINT `uk_player_id_extra_info_id` UNIQUE (`player_id`, `extra_info_id`),
     CONSTRAINT `fk_player_extra_info_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -951,7 +953,7 @@ CREATE TABLE `player_extra_info` (
 CREATE TABLE `player_avatar` (
     `player_id` INT UNSIGNED NOT NULL,
     `attribute_status_id` INT UNSIGNED NULL,
-    `link` MEDIUMTEXT NULL DEFAULT NULL,
+    `link` VARCHAR(8192) NULL DEFAULT NULL,
     UNIQUE KEY (`player_id`, `attribute_status_id`),
     CONSTRAINT `uk_player_id_attribute_status_id` UNIQUE (`player_id`, `attribute_status_id`),
     CONSTRAINT `fk_player_avatar_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -960,14 +962,14 @@ CREATE TABLE `player_avatar` (
 
 CREATE TABLE `player_note` (
     `player_id` INT UNSIGNED NOT NULL,
-    `value` MEDIUMTEXT NOT NULL,
+    `value` VARCHAR(8192) NOT NULL,
     PRIMARY KEY (`player_id`),
     CONSTRAINT `fk_player_note_player_id` FOREIGN KEY (`player_id`) REFERENCES `player`(`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `config` (
-    `key` VARCHAR(255) NOT NULL,
-    `value` VARCHAR(255) NULL,
+    `key` VARCHAR(512) NOT NULL,
+    `value` VARCHAR(512) NULL,
     PRIMARY KEY (`key`)
 );
 
