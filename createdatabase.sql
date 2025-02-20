@@ -10,14 +10,14 @@ CREATE TABLE `characteristic` (
     PRIMARY KEY (`characteristic_id`)
 );
 
-INSERT INTO
-    `characteristic` (`characteristic_id`, `name`)
-VALUES
-    (1, 'Força'),
-    (2, 'Agilidade'),
-    (3, 'Constituição'),
-    (4, 'Intelecto'),
-    (5, 'Presença');
+-- INSERT INTO
+--     `characteristic` (`characteristic_id`, `name`)
+-- VALUES
+--     (1, 'Força'),
+--     (2, 'Agilidade'),
+--     (3, 'Constituição'),
+--     (4, 'Intelecto'),
+--     (5, 'Presença');
 
 CREATE TABLE `curse` (
     `curse_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -33,14 +33,14 @@ CREATE TABLE `curse_characteristic` (
     CONSTRAINT `fk_curse_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `curse_characteristic` (`characteristic_id`)
-VALUES
-    (1),
-    (2),
-    (3),
-    (4),
-    (5);
+-- INSERT INTO
+--     `curse_characteristic` (`characteristic_id`)
+-- VALUES
+--     (1),
+--     (2),
+--     (3),
+--     (4),
+--     (5);
 
 CREATE TABLE `curse_focus` (
     `curse_id` INT UNSIGNED NOT NULL,
@@ -57,31 +57,31 @@ CREATE TABLE `specialization` (
     PRIMARY KEY (`specialization_id`)
 );
 
-INSERT INTO
-    `specialization` (`specialization_id`, `name`)
-VALUES
-    (1, 'Atletismo'),
-    (2, 'Luta'),
-    (3, 'Furtividade'),
-    (4, 'Pilotagem'),
-    (5, 'Pontaria'),
-    (6, 'Prestidigitação'),
-    (7, 'Reflexos'),
-    (8, 'Vigor'),
-    (9, 'Avaliação'),
-    (10, 'Ciência'),
-    (11, 'Cultura'),
-    (12, 'Investigação'),
-    (13, 'Medicina'),
-    (14, 'Misticismo'),
-    (15, 'Percepção'),
-    (16, 'Profissão'),
-    (17, 'Afinidade Natural'),
-    (18, 'Diplomacia'),
-    (19, 'Enganação'),
-    (20, 'Intimidação'),
-    (21, 'Intuição'),
-    (22, 'Vontade');
+-- INSERT INTO
+--     `specialization` (`specialization_id`, `name`)
+-- VALUES
+--     (1, 'Atletismo'),
+--     (2, 'Luta'),
+--     (3, 'Furtividade'),
+--     (4, 'Pilotagem'),
+--     (5, 'Pontaria'),
+--     (6, 'Prestidigitação'),
+--     (7, 'Reflexos'),
+--     (8, 'Vigor'),
+--     (9, 'Avaliação'),
+--     (10, 'Ciência'),
+--     (11, 'Cultura'),
+--     (12, 'Investigação'),
+--     (13, 'Medicina'),
+--     (14, 'Misticismo'),
+--     (15, 'Percepção'),
+--     (16, 'Profissão'),
+--     (17, 'Afinidade Natural'),
+--     (18, 'Diplomacia'),
+--     (19, 'Enganação'),
+--     (20, 'Intimidação'),
+--     (21, 'Intuição'),
+--     (22, 'Vontade');
 
 CREATE TABLE `skill` (
     `skill_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -94,37 +94,37 @@ CREATE TABLE `skill` (
     CONSTRAINT `fk_skill_specialization_id` FOREIGN KEY (`specialization_id`) REFERENCES `specialization`(`specialization_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `skill` (
-        `skill_id`,
-        `specialization_id`,
-        `characteristic_id`,
-        `name`,
-        `mandatory`
-    )
-VALUES
-    (1, NULL, 1, 'Atletismo', TRUE),
-    (2, NULL, 1, 'Luta', TRUE),
-    (3, NULL, 2, 'Furtividade', TRUE),
-    (4, NULL, 2, 'Pilotagem', TRUE),
-    (5, NULL, 2, 'Pontaria', TRUE),
-    (6, NULL, 2, 'Prestidigitação', TRUE),
-    (7, NULL, 2, 'Reflexos', TRUE),
-    (8, NULL, 3, 'Vigor', TRUE),
-    (9, NULL, 4, 'Avaliação', TRUE),
-    (10, NULL, 4, 'Ciência', TRUE),
-    (11, NULL, 4, 'História', TRUE),
-    (12, NULL, 4, 'Investigação', TRUE),
-    (13, NULL, 4, 'Medicina', TRUE),
-    (14, NULL, 4, 'Misticismo', TRUE),
-    (15, NULL, 4, 'Percepção', TRUE),
-    (16, NULL, 4, 'Profissão', TRUE),
-    (17, NULL, 5, 'Afinidade Natural', TRUE),
-    (18, NULL, 5, 'Diplomacia', TRUE),
-    (19, NULL, 5, 'Enganação', TRUE),
-    (20, NULL, 5, 'Intimidação', TRUE),
-    (21, NULL, 5, 'Intuição', TRUE),
-    (22, NULL, 5, 'Vontade', TRUE);
+-- INSERT INTO
+--     `skill` (
+--         `skill_id`,
+--         `specialization_id`,
+--         `characteristic_id`,
+--         `name`,
+--         `mandatory`
+--     )
+-- VALUES
+--     (1, NULL, 1, 'Atletismo', TRUE),
+--     (2, NULL, 1, 'Luta', TRUE),
+--     (3, NULL, 2, 'Furtividade', TRUE),
+--     (4, NULL, 2, 'Pilotagem', TRUE),
+--     (5, NULL, 2, 'Pontaria', TRUE),
+--     (6, NULL, 2, 'Prestidigitação', TRUE),
+--     (7, NULL, 2, 'Reflexos', TRUE),
+--     (8, NULL, 3, 'Vigor', TRUE),
+--     (9, NULL, 4, 'Avaliação', TRUE),
+--     (10, NULL, 4, 'Ciência', TRUE),
+--     (11, NULL, 4, 'História', TRUE),
+--     (12, NULL, 4, 'Investigação', TRUE),
+--     (13, NULL, 4, 'Medicina', TRUE),
+--     (14, NULL, 4, 'Misticismo', TRUE),
+--     (15, NULL, 4, 'Percepção', TRUE),
+--     (16, NULL, 4, 'Profissão', TRUE),
+--     (17, NULL, 5, 'Afinidade Natural', TRUE),
+--     (18, NULL, 5, 'Diplomacia', TRUE),
+--     (19, NULL, 5, 'Enganação', TRUE),
+--     (20, NULL, 5, 'Intimidação', TRUE),
+--     (21, NULL, 5, 'Intuição', TRUE),
+--     (22, NULL, 5, 'Vontade', TRUE);
 
 CREATE TABLE `attribute` (
     `attribute_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -140,48 +140,48 @@ CREATE TABLE `attribute` (
     CONSTRAINT `fk_attribute_characteristic_characteristic_id` FOREIGN KEY (`characteristic_id`) REFERENCES `characteristic`(`characteristic_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `attribute` (
-        `attribute_id`,
-        `name`,
-        `rollable`,
-        `bg_color`,
-        `fill_color`,
-        `characteristic_id`,
-        `skill_id`,
-        `operation`
-    )
-VALUES
-    (
-        1,
-        'Vida',
-        FALSE,
-        '5a1e1e',
-        'b62323',
-        NULL, -- 7,
-        8,
-        '{skill}'
-    ),
-    (
-        2,
-        'Sanidade',
-        TRUE,
-        '584377',
-        '871eef',
-        NULL, -- 4,
-        22,
-        '{skill}*5'
-    ),
-    (
-        3,
-        'Energia',
-        FALSE,
-        '1d9797',
-        '00ffff',
-        5,
-        NULL,
-        '{characteristic}*2'
-    );
+-- INSERT INTO
+--     `attribute` (
+--         `attribute_id`,
+--         `name`,
+--         `rollable`,
+--         `bg_color`,
+--         `fill_color`,
+--         `characteristic_id`,
+--         `skill_id`,
+--         `operation`
+--     )
+-- VALUES
+--     (
+--         1,
+--         'Vida',
+--         FALSE,
+--         '5a1e1e',
+--         'b62323',
+--         NULL, -- 7,
+--         8,
+--         '{skill}'
+--     ),
+--     (
+--         2,
+--         'Sanidade',
+--         TRUE,
+--         '584377',
+--         '871eef',
+--         NULL, -- 4,
+--         22,
+--         '{skill}*5'
+--     ),
+--     (
+--         3,
+--         'Energia',
+--         FALSE,
+--         '1d9797',
+--         '00ffff',
+--         5,
+--         NULL,
+--         '{characteristic}*2'
+--     );
 
 CREATE TABLE `class` (
     `class_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -197,78 +197,78 @@ CREATE TABLE `class` (
     CONSTRAINT `fk_class_health_bonus_attribute_id` FOREIGN KEY (`health_bonus_attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `class` (
-        `class_id`,
-        `name`,
-        `energy_bonus_attribute_id`,
-        `energy_bonus`,
-        `health_bonus_attribute_id`,
-        `health_bonus`,
-        `ability_title`,
-        `ability_description`
-    )
-VALUES
-    (
-        1,
-        'Lutador',
-        3,
-        2,
-        1,
-        8,
-        'Ataque de Oportunidade',
-        'Usa sua reação para atacar o inimigo quando o mesmo se afasta de você.'
-    ),
-    (
-        2,
-        'Investigador',
-        3,
-        6,
-        1,
-        5,
-        'Investigação Completa',
-        'Uma vez por missão, pode gastar sua ação padrão para investigar completamente uma sala. Com isso, o Mestre vai narrar as ações do Investigador ao longo da sala e dizer todas as coisas que ela encontrou, não sendo necessário qualquer tipo de teste.'
-    ),
-    (
-        3,
-        'Estudioso',
-        3,
-        12,
-        1,
-        6,
-        'Obra Predileta',
-        'Existe uma obra (fictícia) que é predileta do Estudioso e ele carrega consigo. Essa obra é relacionada a uma dessas perícias: Ciência, Cultura, Profissão ou Misticismo. Uma vez por dia, pode gastar sua ação padrão para ler uma parte da obra predileta e tentar achar alguma informação que deseja, ganhando 2 dados de vantagem na perícia relacionada à obra.'
-    ),
-    (
-        4,
-        'Atirador',
-        3,
-        1,
-        1,
-        4,
-        'Mirar',
-        'Usa sua ação de movimento ou ação padrão para Mirar e ganhar vantagem no próximo ataque.'
-    ),
-    (
-        5,
-        'Diplomata',
-        3,
-        8,
-        1,
-        6,
-        'Aclamação',
-        'Uma vez por dia, pode gastar sua ação padrão para determinar que um personagem o reconheça por seu trabalho, ganhando 2 dados de vantagem em rolagens de Diplomacia, Enganação ou Intuição. O trabalho precisa fazer sentido com a história e com o personagem, não podendo inventar algo que não seja coerente.'
-    ),
-    (
-        6,
-        'Ardiloso',
-        3,
-        4,
-        1,
-        5,
-        'Desencadear Ataque Furtivo',
-        'Uma vez por rodada, ao matar um inimigo com um Ataque Furtivo, ganha mais uma ação completa (padrão + movimento).'
-    );
+-- INSERT INTO
+--     `class` (
+--         `class_id`,
+--         `name`,
+--         `energy_bonus_attribute_id`,
+--         `energy_bonus`,
+--         `health_bonus_attribute_id`,
+--         `health_bonus`,
+--         `ability_title`,
+--         `ability_description`
+--     )
+-- VALUES
+--     (
+--         1,
+--         'Lutador',
+--         3,
+--         2,
+--         1,
+--         8,
+--         'Ataque de Oportunidade',
+--         'Usa sua reação para atacar o inimigo quando o mesmo se afasta de você.'
+--     ),
+--     (
+--         2,
+--         'Investigador',
+--         3,
+--         6,
+--         1,
+--         5,
+--         'Investigação Completa',
+--         'Uma vez por missão, pode gastar sua ação padrão para investigar completamente uma sala. Com isso, o Mestre vai narrar as ações do Investigador ao longo da sala e dizer todas as coisas que ela encontrou, não sendo necessário qualquer tipo de teste.'
+--     ),
+--     (
+--         3,
+--         'Estudioso',
+--         3,
+--         12,
+--         1,
+--         6,
+--         'Obra Predileta',
+--         'Existe uma obra (fictícia) que é predileta do Estudioso e ele carrega consigo. Essa obra é relacionada a uma dessas perícias: Ciência, Cultura, Profissão ou Misticismo. Uma vez por dia, pode gastar sua ação padrão para ler uma parte da obra predileta e tentar achar alguma informação que deseja, ganhando 2 dados de vantagem na perícia relacionada à obra.'
+--     ),
+--     (
+--         4,
+--         'Atirador',
+--         3,
+--         1,
+--         1,
+--         4,
+--         'Mirar',
+--         'Usa sua ação de movimento ou ação padrão para Mirar e ganhar vantagem no próximo ataque.'
+--     ),
+--     (
+--         5,
+--         'Diplomata',
+--         3,
+--         8,
+--         1,
+--         6,
+--         'Aclamação',
+--         'Uma vez por dia, pode gastar sua ação padrão para determinar que um personagem o reconheça por seu trabalho, ganhando 2 dados de vantagem em rolagens de Diplomacia, Enganação ou Intuição. O trabalho precisa fazer sentido com a história e com o personagem, não podendo inventar algo que não seja coerente.'
+--     ),
+--     (
+--         6,
+--         'Ardiloso',
+--         3,
+--         4,
+--         1,
+--         5,
+--         'Desencadear Ataque Furtivo',
+--         'Uma vez por rodada, ao matar um inimigo com um Ataque Furtivo, ganha mais uma ação completa (padrão + movimento).'
+--     );
 
 CREATE TABLE `class_skill` (
     `class_id` INT UNSIGNED NOT NULL,
@@ -278,39 +278,39 @@ CREATE TABLE `class_skill` (
     CONSTRAINT `fk_class_skill_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skill`(`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `class_skill` (`class_id`, `skill_id`)
-VALUES
-    (1, 1),
-    (1, 2),
-    (1, 7),
-    (1, 8),
-    (1, 20),
-    (2, 9),
-    (2, 12),
-    (2, 15),
-    (2, 16),
-    (2, 21),
-    (3, 10),
-    (3, 11),
-    (3, 13),
-    (3, 14),
-    (3, 22),
-    (4, 4),
-    (4, 5),
-    (4, 7),
-    (4, 15),
-    (4, 16),
-    (5, 16),
-    (5, 17),
-    (5, 18),
-    (5, 19),
-    (5, 21),
-    (6, 2),
-    (6, 3),
-    (6, 6),
-    (6, 7),
-    (6, 19);
+-- INSERT INTO
+--     `class_skill` (`class_id`, `skill_id`)
+-- VALUES
+--     (1, 1),
+--     (1, 2),
+--     (1, 7),
+--     (1, 8),
+--     (1, 20),
+--     (2, 9),
+--     (2, 12),
+--     (2, 15),
+--     (2, 16),
+--     (2, 21),
+--     (3, 10),
+--     (3, 11),
+--     (3, 13),
+--     (3, 14),
+--     (3, 22),
+--     (4, 4),
+--     (4, 5),
+--     (4, 7),
+--     (4, 15),
+--     (4, 16),
+--     (5, 16),
+--     (5, 17),
+--     (5, 18),
+--     (5, 19),
+--     (5, 21),
+--     (6, 2),
+--     (6, 3),
+--     (6, 6),
+--     (6, 7),
+--     (6, 19);
 
 CREATE TABLE `lineage` (
     `lineage_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -320,13 +320,13 @@ CREATE TABLE `lineage` (
     PRIMARY KEY (`lineage_id`)
 );
 
-INSERT INTO
-    `lineage` (`lineage_id`, `name`, `divine`)
-VALUES
-    (1, 'Amarelo', TRUE),
-    (2, 'Azul', FALSE),
-    (3, 'Verde', FALSE),
-    (4, 'Vermelho', FALSE);
+-- INSERT INTO
+--     `lineage` (`lineage_id`, `name`, `divine`)
+-- VALUES
+--     (1, 'Amarelo', TRUE),
+--     (2, 'Azul', FALSE),
+--     (3, 'Verde', FALSE),
+--     (4, 'Vermelho', FALSE);
 
 CREATE TABLE `lineage_node` (
     `lineage_id` INT UNSIGNED NOT NULL,
@@ -340,341 +340,341 @@ CREATE TABLE `lineage_node` (
     CONSTRAINT `fk_lineage_node_lineage_id` FOREIGN KEY (`lineage_id`) REFERENCES `lineage`(`lineage_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `lineage_node` (
-        `lineage_id`,
-        `index`,
-        `level`,
-        `name`,
-        `description`,
-        `cost`,
-        `type`
-    )
-VALUES
-    (
-        1,
-        1,
-        1,
-        'Amarelinha',
-        'Permite voar.',
-        0,
-        'Passiva'
-    ),
-    (
-        1,
-        2,
-        2,
-        'Amarelo elo',
-        'Sim. Elo.',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        3,
-        3,
-        'Relomarelo',
-        'Lingua travada?',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        4,
-        3,
-        'lero lero',
-        'Ié ié!',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        5,
-        4,
-        'Amarelo',
-        'Tá ficando sério.',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        6,
-        4,
-        'Amar. Elo. Amarelo',
-        'Poético...',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        7,
-        4,
-        'Amarelado',
-        'Adjetivos, muito bom.',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        8,
-        5,
-        'Amarelão',
-        'Caralho, um amarelo muito grande.',
-        1,
-        'Passiva'
-    ),
-    (
-        1,
-        9,
-        6,
-        'Amarelo Deus',
-        'Você é o Deus do amarelo',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        1,
-        1,
-        'Azulzinho',
-        'Bem piquititinho.',
-        0,
-        'Passiva'
-    ),
-    (
-        2,
-        2,
-        2,
-        'Azulejo',
-        'Do seu banheiro.',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        3,
-        3,
-        'Azulado',
-        'Adjetivo de estado. :)',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        4,
-        3,
-        'Azulto',
-        'Um adulto azul.',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        5,
-        4,
-        'Luza',
-        '?meb odut áT',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        6,
-        4,
-        'Azul',
-        'Tá ficando sério...',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        7,
-        4,
-        'Baleia Azul',
-        'PrOOocuRANDO O NEEEeeeemO',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        8,
-        5,
-        'Azulzão',
-        'Caralho, muito azul.',
-        1,
-        'Passiva'
-    ),
-    (
-        2,
-        9,
-        6,
-        'Azul Deus',
-        'Você é o deus do azul.',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        1,
-        1,
-        'Verdinha',
-        'Hmm... Sus...',
-        0,
-        'Passiva'
-    ),
-    (
-        3,
-        2,
-        2,
-        'Verdejante',
-        'Sinceramente, eu nem sei exatamente o que isso significa.',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        3,
-        3,
-        'Verdana',
-        'Entendeu? rsrsrsrs',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        4,
-        3,
-        'Verdedito',
-        'Um veredito verde. Parece ser bom.',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        5,
-        4,
-        'Verde',
-        'ok, verde.',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        6,
-        4,
-        'Verdura',
-        'Tem que comer!',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        7,
-        4,
-        'Verme- Verde!',
-        'ERROU!',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        8,
-        5,
-        'Verdão',
-        'Muito verde!',
-        1,
-        'Passiva'
-    ),
-    (
-        3,
-        9,
-        6,
-        'Deus do verde',
-        'Você é o deus do verde',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        1,
-        1,
-        'Vermelhinho',
-        'Tá doendo?',
-        0,
-        'Passiva'
-    ),
-    (
-        4,
-        2,
-        2,
-        'Avermelhado',
-        'É como o seu sorriso me deixa... uWu',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        3,
-        3,
-        'Vermédio',
-        'Pra quando vc tá mal.',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        4,
-        3,
-        'Verme...lho',
-        'Muito nojento!',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        5,
-        4,
-        'Vermelho',
-        'OoO',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        6,
-        4,
-        'Vermelha',
-        'Tipo... o feminino de vermelho...',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        7,
-        4,
-        'Vermeja',
-        'Pra limpar a cozinha.',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        8,
-        5,
-        'Vermelhão',
-        'Meu Deus tá doendo muito!',
-        1,
-        'Passiva'
-    ),
-    (
-        4,
-        9,
-        6,
-        'Deus do Vermelho',
-        'Você é o deus do Vermelho',
-        1,
-        'Passiva'
-    );
+-- INSERT INTO
+--     `lineage_node` (
+--         `lineage_id`,
+--         `index`,
+--         `level`,
+--         `name`,
+--         `description`,
+--         `cost`,
+--         `type`
+--     )
+-- VALUES
+--     (
+--         1,
+--         1,
+--         1,
+--         'Amarelinha',
+--         'Permite voar.',
+--         0,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         2,
+--         2,
+--         'Amarelo elo',
+--         'Sim. Elo.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         3,
+--         3,
+--         'Relomarelo',
+--         'Lingua travada?',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         4,
+--         3,
+--         'lero lero',
+--         'Ié ié!',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         5,
+--         4,
+--         'Amarelo',
+--         'Tá ficando sério.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         6,
+--         4,
+--         'Amar. Elo. Amarelo',
+--         'Poético...',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         7,
+--         4,
+--         'Amarelado',
+--         'Adjetivos, muito bom.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         8,
+--         5,
+--         'Amarelão',
+--         'Caralho, um amarelo muito grande.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         1,
+--         9,
+--         6,
+--         'Amarelo Deus',
+--         'Você é o Deus do amarelo',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         1,
+--         1,
+--         'Azulzinho',
+--         'Bem piquititinho.',
+--         0,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         2,
+--         2,
+--         'Azulejo',
+--         'Do seu banheiro.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         3,
+--         3,
+--         'Azulado',
+--         'Adjetivo de estado. :)',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         4,
+--         3,
+--         'Azulto',
+--         'Um adulto azul.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         5,
+--         4,
+--         'Luza',
+--         '?meb odut áT',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         6,
+--         4,
+--         'Azul',
+--         'Tá ficando sério...',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         7,
+--         4,
+--         'Baleia Azul',
+--         'PrOOocuRANDO O NEEEeeeemO',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         8,
+--         5,
+--         'Azulzão',
+--         'Caralho, muito azul.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         2,
+--         9,
+--         6,
+--         'Azul Deus',
+--         'Você é o deus do azul.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         1,
+--         1,
+--         'Verdinha',
+--         'Hmm... Sus...',
+--         0,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         2,
+--         2,
+--         'Verdejante',
+--         'Sinceramente, eu nem sei exatamente o que isso significa.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         3,
+--         3,
+--         'Verdana',
+--         'Entendeu? rsrsrsrs',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         4,
+--         3,
+--         'Verdedito',
+--         'Um veredito verde. Parece ser bom.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         5,
+--         4,
+--         'Verde',
+--         'ok, verde.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         6,
+--         4,
+--         'Verdura',
+--         'Tem que comer!',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         7,
+--         4,
+--         'Verme- Verde!',
+--         'ERROU!',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         8,
+--         5,
+--         'Verdão',
+--         'Muito verde!',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         3,
+--         9,
+--         6,
+--         'Deus do verde',
+--         'Você é o deus do verde',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         1,
+--         1,
+--         'Vermelhinho',
+--         'Tá doendo?',
+--         0,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         2,
+--         2,
+--         'Avermelhado',
+--         'É como o seu sorriso me deixa... uWu',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         3,
+--         3,
+--         'Vermédio',
+--         'Pra quando vc tá mal.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         4,
+--         3,
+--         'Verme...lho',
+--         'Muito nojento!',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         5,
+--         4,
+--         'Vermelho',
+--         'OoO',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         6,
+--         4,
+--         'Vermelha',
+--         'Tipo... o feminino de vermelho...',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         7,
+--         4,
+--         'Vermeja',
+--         'Pra limpar a cozinha.',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         8,
+--         5,
+--         'Vermelhão',
+--         'Meu Deus tá doendo muito!',
+--         1,
+--         'Passiva'
+--     ),
+--     (
+--         4,
+--         9,
+--         6,
+--         'Deus do Vermelho',
+--         'Você é o deus do Vermelho',
+--         1,
+--         'Passiva'
+--     );
 
 CREATE TABLE `lineage_node_connection` (
     `lineage_id` INT UNSIGNED NOT NULL,
@@ -684,57 +684,57 @@ CREATE TABLE `lineage_node_connection` (
     CONSTRAINT `fk_lineage_node_connection_lineage_id_next_index` FOREIGN KEY (`lineage_id`, `next_index`) REFERENCES `lineage_node`(`lineage_id`, `index`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `lineage_node_connection` (`lineage_id`, `index`, `next_index`)
-VALUES
-    (1, 1, 2),
-    (1, 2, 3),
-    (1, 2, 4),
-    (1, 2, 6),
-    (1, 3, 5),
-    (1, 3, 6),
-    (1, 4, 6),
-    (1, 4, 7),
-    (1, 5, 9),
-    (1, 6, 8),
-    (1, 7, 9),
-    (1, 8, 9),
-    (2, 1, 2),
-    (2, 2, 3),
-    (2, 2, 4),
-    (2, 2, 6),
-    (2, 3, 5),
-    (2, 3, 6),
-    (2, 4, 6),
-    (2, 4, 7),
-    (2, 5, 9),
-    (2, 6, 8),
-    (2, 7, 9),
-    (2, 8, 9),
-    (3, 1, 2),
-    (3, 2, 3),
-    (3, 2, 4),
-    (3, 2, 6),
-    (3, 3, 5),
-    (3, 3, 6),
-    (3, 4, 6),
-    (3, 4, 7),
-    (3, 5, 9),
-    (3, 6, 8),
-    (3, 7, 9),
-    (3, 8, 9),
-    (4, 1, 2),
-    (4, 2, 3),
-    (4, 2, 4),
-    (4, 2, 6),
-    (4, 3, 5),
-    (4, 3, 6),
-    (4, 4, 6),
-    (4, 4, 7),
-    (4, 5, 9),
-    (4, 6, 8),
-    (4, 7, 9),
-    (4, 8, 9);
+-- INSERT INTO
+--     `lineage_node_connection` (`lineage_id`, `index`, `next_index`)
+-- VALUES
+--     (1, 1, 2),
+--     (1, 2, 3),
+--     (1, 2, 4),
+--     (1, 2, 6),
+--     (1, 3, 5),
+--     (1, 3, 6),
+--     (1, 4, 6),
+--     (1, 4, 7),
+--     (1, 5, 9),
+--     (1, 6, 8),
+--     (1, 7, 9),
+--     (1, 8, 9),
+--     (2, 1, 2),
+--     (2, 2, 3),
+--     (2, 2, 4),
+--     (2, 2, 6),
+--     (2, 3, 5),
+--     (2, 3, 6),
+--     (2, 4, 6),
+--     (2, 4, 7),
+--     (2, 5, 9),
+--     (2, 6, 8),
+--     (2, 7, 9),
+--     (2, 8, 9),
+--     (3, 1, 2),
+--     (3, 2, 3),
+--     (3, 2, 4),
+--     (3, 2, 6),
+--     (3, 3, 5),
+--     (3, 3, 6),
+--     (3, 4, 6),
+--     (3, 4, 7),
+--     (3, 5, 9),
+--     (3, 6, 8),
+--     (3, 7, 9),
+--     (3, 8, 9),
+--     (4, 1, 2),
+--     (4, 2, 3),
+--     (4, 2, 4),
+--     (4, 2, 6),
+--     (4, 3, 5),
+--     (4, 3, 6),
+--     (4, 4, 6),
+--     (4, 4, 7),
+--     (4, 5, 9),
+--     (4, 6, 8),
+--     (4, 7, 9),
+--     (4, 8, 9);
 
 CREATE TABLE `player` (
     `player_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -802,15 +802,15 @@ CREATE TABLE `attribute_status` (
     CONSTRAINT `fk_attribute_status_attribute_id` FOREIGN KEY (`attribute_id`) REFERENCES `attribute`(`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO
-    `attribute_status` (`attribute_status_id`, `name`, `attribute_id`)
-VALUES
-    (1, 'Morrendo', 1),
-    (3, 'Inconsciente', 1),
-    (4, 'Ferimento Grave', 1),
-    (5, 'Enlouquecendo', 2),
-    (6, 'Acessório', 3),
-    (7, 'Ferido', 3);
+-- INSERT INTO
+--     `attribute_status` (`attribute_status_id`, `name`, `attribute_id`)
+-- VALUES
+--     (1, 'Morrendo', 1),
+--     (3, 'Inconsciente', 1),
+--     (4, 'Ferimento Grave', 1),
+--     (5, 'Enlouquecendo', 2),
+--     (6, 'Acessório', 3),
+--     (7, 'Ferido', 3);
 
 CREATE TABLE `player_attribute` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -863,13 +863,13 @@ CREATE TABLE `spec` (
     PRIMARY KEY (`spec_id`)
 );
 
-INSERT INTO
-    `spec` (`spec_id`, `name`)
-VALUES
-    (1, 'Deslocamento'),
-    (2, 'Sabedoria'),
-    (3, 'Armadura'),
-    (4, 'Exposição Pavorosa');
+-- INSERT INTO
+--     `spec` (`spec_id`, `name`)
+-- VALUES
+--     (1, 'Deslocamento'),
+--     (2, 'Sabedoria'),
+--     (3, 'Armadura'),
+--     (4, 'Exposição Pavorosa');
 
 CREATE TABLE `player_spec` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -906,15 +906,15 @@ CREATE TABLE `info` (
     PRIMARY KEY (`info_id`)
 );
 
-INSERT INTO
-    `info` (`info_id`, `name`)
-VALUES
-    (1, 'Nome'),
-    (2, 'Player'),
-    (3, 'Idade'),
-    (4, 'Raça'),
-    (5, 'Local de Nascimento'),
-    (6, 'Altura');
+-- INSERT INTO
+--     `info` (`info_id`, `name`)
+-- VALUES
+--     (1, 'Nome'),
+--     (2, 'Player'),
+--     (3, 'Idade'),
+--     (4, 'Raça'),
+--     (5, 'Local de Nascimento'),
+--     (6, 'Altura');
 
 CREATE TABLE `player_info` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -933,12 +933,12 @@ CREATE TABLE `extra_info` (
     PRIMARY KEY (`extra_info_id`)
 );
 
-INSERT INTO
-    `extra_info` (`extra_info_id`, `name`)
-VALUES
-    (1, 'História'),
-    (2, 'Itens, Pessoas e Locais Importantes'),
-    (3, 'Fobias e Manias');
+-- INSERT INTO
+--     `extra_info` (`extra_info_id`, `name`)
+-- VALUES
+--     (1, 'História'),
+--     (2, 'Itens, Pessoas e Locais Importantes'),
+--     (3, 'Fobias e Manias');
 
 CREATE TABLE `player_extra_info` (
     `player_id` INT UNSIGNED NOT NULL,
@@ -973,8 +973,8 @@ CREATE TABLE `config` (
     PRIMARY KEY (`key`)
 );
 
-INSERT INTO
-    `config` (`key`, `value`)
-VALUES
-    ('portrait_environment', 'idle'),
-    ('hide_shadows', 'true');
+-- INSERT INTO
+--     `config` (`key`, `value`)
+-- VALUES
+--     ('portrait_environment', 'idle'),
+--     ('hide_shadows', 'true');
