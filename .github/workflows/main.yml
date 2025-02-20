@@ -21,6 +21,7 @@ jobs:
     - name: Deploy
       run: |
         ssh -o StrictHostKeyChecking=no root@191.252.223.15 "
+        source ~/.bashrc &&
         cd juizodivinorpg &&
         git pull origin main &&
         pm2 restart 0
