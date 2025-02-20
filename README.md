@@ -2,7 +2,7 @@
 
 ## Aplicativo Web feito para o RPG Juízo Divino: Armagedom
 
-Ficha eletrônica automatizada especificamente para o sistema do Juízo Divino: Armagedom. Possui integração com o OBS e suporte exclusivo para o Mestre
+Ficha eletrônica automatizada especificamente para o sistema do Juízo Divino: Armagedom. Possui integração com o OBS e suporte exclusivo para o Mestre.
 
 ## Imagens
 ### Login
