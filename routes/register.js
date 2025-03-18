@@ -69,7 +69,7 @@ async function registerPost(req, res) {
 
     const bodyAdminKey = req.body.adminKey;
     if (bodyAdminKey) {
-      if (config.admin_key == bodyAdminKey) admin = true;
+      if (process.env.ADMIN_KEY == bodyAdminKey) admin = true;
       else return res.status(401).send("Admin key is incorrect.");
     }
 

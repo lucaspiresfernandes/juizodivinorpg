@@ -1,10 +1,9 @@
 {
-    "info": {
-        "rpgname": "Juízo Divino",
-        "playerrole": "Investigador"
-    },
     "encryption": {
         "saltRounds": 10
     },
-    "admin_key": 123456
+    "info": {
+        "playerrole": "Investigador",
+        "rpgname": "Juízo Divino"
+    }
 }
