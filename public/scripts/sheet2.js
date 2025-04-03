@@ -19,7 +19,8 @@ description.text(addCurseList.find("option:selected").data("description"));
   });
 
   addCurseList.change((ev) => {
-    description.text($(ev.target).data("description"));
+    const selectedOption = $(ev.target).find("option:selected")
+    description.text(selectedOption.data("description"));
   });
 
   addCurseButton.click(async (ev) => {
