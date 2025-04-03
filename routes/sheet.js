@@ -386,6 +386,7 @@ router.get("/2", async (req, res) => {
               .select("curse.level")
               .join("curse", "curse.curse_id", "player_curse.curse_id")
               .where("player_curse.characteristic_id", char.characteristic_id)
+              .andWhere("player_curse.player_id", playerID)
               .then((curses) => {
                 for (const curse of curses) {
                   char.remaining_value -= curse.level;
@@ -1030,11 +1031,11 @@ router.post("/equipment", jsonParser, async (req, res) => {
       const equipmentName = name
         ? name
         : (
-            await con("equipment")
-              .select("name")
-              .where("equipment_id", equipmentID)
-              .first()
-          ).name;
+          await con("equipment")
+            .select("name")
+            .where("equipment_id", equipmentID)
+            .first()
+        ).name;
       await emitToAllPlayers(
         visible ? "equipment added" : "equipment removed",
         {
@@ -1356,7 +1357,7 @@ router.post("/item", jsonParser, async (req, res) => {
       const itemName = name
         ? name
         : (await con("item").select("name").where("item_id", itemID).first())
-            .name;
+          .name;
       await emitToAllPlayers(visible ? "item added" : "item removed", {
         itemID,
         name: itemName,
