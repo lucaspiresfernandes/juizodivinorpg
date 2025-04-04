@@ -1,4 +1,5 @@
 let currentAvatarId = null
+const PORTRAIT_WITH_IMAGES_IDS = [0, 6, 7, 8]
 
 {
 	const $dice = $('.dice video');
@@ -107,7 +108,8 @@ let currentAvatarId = null
 
 	let avatarStateChangeFunc;
 	function showAvatar(id = 0) {
-    const newId = (id === 6) ? 6 : 0;
+		const portraitId = PORTRAIT_WITH_IMAGES_IDS.find(pId => pId === id)
+    const newId = portraitId ?? 0;
     
     if (currentAvatarId === newId) return;
     
@@ -117,7 +119,21 @@ let currentAvatarId = null
     $avatar.fadeOut('fast', () => {
         $avatar.attr('src', `/avatar/${newId}?playerID=${playerID}&v=${Date.now()}`);
     });
-}
+	}
+
+	function showCorrectAvatar() {
+		const stateArray = $(document.body).data('status-state');
+		$(document.body).data('attributes', stateArray);
+
+		const injuredStatus = stateArray.find(attr => attr.attribute_status_id === 7 && !!attr.value)
+		const accessoryActive = stateArray.some(attr => attr.attribute_status_id === 6 && !!attr.value);
+	
+		if (injuredStatus) {
+			showAvatar(accessoryActive ? 8 : 7)
+		} else {
+			showAvatar(accessoryActive ? 6 : 0)
+		}
+	}
 
 	$avatar.on('load', () => {
 		$background.removeClass('dying weakening');
@@ -130,10 +146,7 @@ let currentAvatarId = null
 		$avatar.fadeIn(300);
 	});	
 
-	const array = $('body').data('status-state');
-	let attr = array.find((attr) => attr.value);
-	if (!attr) attr = { attribute_status_id: 0 };
-	showAvatar(attr.attribute_status_id);
+	showCorrectAvatar()
 
 	socket.on('dice roll', showDiceRoll);
 	socket.on('dice result', onDiceResult);
@@ -186,15 +199,7 @@ socket.on('attribute status changed', (content) => {
 	const updatedAttrStatus = stateArray.find((attr) => attr.attribute_status_id === id);
 	updatedAttrStatus.value = content.value;
 
-	$(document.body).data('attributes', stateArray);
-	
-	const accessoryActive = stateArray.some(attr => attr.attribute_status_id === 6 && attr.value === true);
-
-	if (accessoryActive) {
-		showAvatar(6);
-	} else {
-		showAvatar(0);
-	}
+	showCorrectAvatar()
 });
 
 socket.on('info changed', (content) => {

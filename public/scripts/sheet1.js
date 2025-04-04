@@ -178,29 +178,21 @@ function findAvatar() {
     .filter(function () {
       return $(this).data("link");
     })
-    .last();
 
-  let id =
-    field.length === 0
-      ? 0
-      : field
-          .parents(".attribute-status-container")
-          .data("attribute-status-id");
 
-  avatarImage.removeClass("unconscious");
-  switch (id) {
-    case 1:
-      id = 0;
-      avatarImage.addClass("unconscious");
-      break;
-    case 2:
-      id = 0;
-      avatarImage.addClass("unconscious");
-      break;
-    case 3:
-      id = 0;
-      avatarImage.addClass("unconscious");
-      break;
+  const fieldParents = field.parents(".attribute-status-container")
+  const checkedIds = fieldParents.map(function(index, el) {
+    return $(el).data("attribute-status-id");
+  }).get();
+  
+  const isInjured = checkedIds.includes(7)
+  const hasAccessory = checkedIds.includes(6)
+  let id = 0
+
+  if (isInjured) {
+    id = hasAccessory ? 8 : 7
+  } else {
+    id = hasAccessory ? 6 : 0
   }
   avatarImage.attr("src", `/avatar/${id}?v=${Date.now()}`);
 }
@@ -236,7 +228,7 @@ findAvatar();
           `.attribute-status-container[data-attribute-status-id="${ATTRIBUTE_STATUS_ID}"] input`
         );
         const value = check.prop("checked");
-        const newValue = newCur <= Math.floor(newMax / 4);
+        const newValue = newCur <= Math.floor(newMax / 3);
         if (value !== newValue) {
           check.prop("checked", newValue);
           findAvatar();
@@ -286,7 +278,7 @@ findAvatar();
           `.attribute-status-container[data-attribute-status-id="${ATTRIBUTE_STATUS_ID}"] input`
         );
         const value = check.prop("checked");
-        const newValue = newCur <= Math.floor(total / 4);
+        const newValue = newCur <= Math.floor(total / 3);
         if (value !== newValue) {
           check.prop("checked", newValue);
           findAvatar();
