@@ -1,3 +1,5 @@
+let currentAvatarId = null
+
 {
 	const $dice = $('.dice video');
 	const dice = $dice[0];
@@ -105,31 +107,17 @@
 
 	let avatarStateChangeFunc;
 	function showAvatar(id = 0) {
-		switch (id) {
-			case 1:
-				id = 0;
-				avatarStateChangeFunc = () => {
-					$background.addClass('dying');
-					$avatar.addClass('unconscious');
-				};
-				break;
-			case 2:
-				id = 0;
-				avatarStateChangeFunc = () => {
-					$background.addClass('weakening');
-					$avatar.addClass('unconscious');
-				};
-				break;
-			case 3:
-				id = 0;
-				avatarStateChangeFunc = () => $avatar.addClass('unconscious');
-				break;
-		}
-		$background.fadeOut('fast');
-		$avatar.fadeOut('fast', () =>
-			$avatar.attr('src', `/avatar/${id}?playerID=${playerID}&v=${Date.now()}`)
-		);
-	}
+    const newId = (id === 6) ? 6 : 0;
+    
+    if (currentAvatarId === newId) return;
+    
+    currentAvatarId = newId;
+    
+    $background.fadeOut('fast');
+    $avatar.fadeOut('fast', () => {
+        $avatar.attr('src', `/avatar/${newId}?playerID=${playerID}&v=${Date.now()}`);
+    });
+}
 
 	$avatar.on('load', () => {
 		$background.removeClass('dying weakening');
@@ -140,7 +128,7 @@
 		}
 		$background.fadeIn(350);
 		$avatar.fadeIn(300);
-	});
+	});	
 
 	const array = $('body').data('status-state');
 	let attr = array.find((attr) => attr.value);
@@ -199,8 +187,14 @@ socket.on('attribute status changed', (content) => {
 	updatedAttrStatus.value = content.value;
 
 	$(document.body).data('attributes', stateArray);
-	for (const state of stateArray) if (state.value) return showAvatar(state.attribute_status_id);
-	showAvatar();
+	
+	const accessoryActive = stateArray.some(attr => attr.attribute_status_id === 6 && attr.value === true);
+
+	if (accessoryActive) {
+		showAvatar(6);
+	} else {
+		showAvatar(0);
+	}
 });
 
 socket.on('info changed', (content) => {
