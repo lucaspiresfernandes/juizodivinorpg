@@ -112,6 +112,8 @@ async function registerPlayerData(playerID) {
     con("player_avatar").insert([
       { player_id: playerID, attribute_status_id: null },
       { player_id: playerID, attribute_status_id: 6 },
+      { player_id: playerID, attribute_status_id: 7 },
+      { player_id: playerID, attribute_status_id: 8 },
     ]),
 
     con("player_characteristic").insert(
