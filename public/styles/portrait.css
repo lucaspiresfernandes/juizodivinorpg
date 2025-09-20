@@ -73,14 +73,36 @@ body {
 		contrast(128%) brightness(25%);
 }
 
-#lineage {
-	position: absolute;
-	bottom: 100px;
-	left: 300px;
-	transform: translate(-50%, -50%);
-	max-width: 200px;
-	z-index: 999;
+.lineage-wrap {
+  position: absolute;
+  bottom: 100px;
+  left: 290px;
+  transform: translate(-50%, -50%);
+  z-index: 1;
 }
+
+.lineage-wrap::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  border-radius: 50%;
+  filter: blur(24px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+#lineage {
+  display: block;
+  max-width: 200px;
+  position: relative;
+  z-index: 0;
+}
+
 
 #avatar {
 	position: absolute;
@@ -125,6 +147,7 @@ body {
 	text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.75);
 
 	transform: translateY(-50%);
+	z-index: 2;
 }
 
 .container .combat {
@@ -133,6 +156,7 @@ body {
 	position: absolute;
 	transform: translateY(-50%);
 	width: auto;
+	z-index: 2;
 }
 
 .health,
@@ -151,10 +175,12 @@ body {
 	text-shadow: 0 0 10px #7e3ddf, 0 0 30px #7e3ddf, 0 0 50px #7e3ddf;
 }
 
+
 .dice video {
 	position: absolute;
 	top: 100px;
 	left: 70px;
+	z-index: 2;
 }
 
 .dice .result {
@@ -167,6 +193,7 @@ body {
 
 	transform: translate(-50%, -50%);
 	text-shadow: 0 0 10px #ddaf0f, 0 0 30px #ddaf0f, 0 0 50px #ddaf0f;
+	z-index: 2;
 }
 
 .dice .description {
@@ -179,6 +206,7 @@ body {
 
 	transform: translate(-50%, -50%);
 	text-shadow: 0 0 10px #ddaf0f, 0 0 30px #ddaf0f, 0 0 50px #ddaf0f;
+	z-index: 2;
 }
 
 .dice .modifier {
@@ -191,4 +219,5 @@ body {
 
 	transform: translate(-50%, -50%);
 	text-shadow: 0 0 10px #ddaf0f, 0 0 30px #ddaf0f, 0 0 50px #ddaf0f;
+	z-index: 2;
 }

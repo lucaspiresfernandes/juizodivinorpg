@@ -21,12 +21,17 @@
         </div>
     </div>
 
+    <div class="lineage-wrap" {{#unless playerLineageID}}hidden{{/unless}}>
+
     <img id="lineage" src="/assets/lineages/frameless/{{playerLineageID}}/{{player.index}}.png" class="middle"
-        data-lineage="{{playerLineageID}}" data-level="{{player.level}}" {{#unless playerLineageID}}hidden{{/unless}}>
+        data-lineage="{{playerLineageID}}" data-level="{{player.level}}">
+    </div>
+
 
     <div class="container switchable" id="idleText" {{#if onCombat}}style="display: none;" {{/if}}>
         <div class="name top">{{#if info.visible}}{{info.value}}{{else}}???{{/if}}</div>
     </div>
+
 
     <div class="container switchable" id="combatText" {{#unless onCombat}}style="display: none;" {{/unless}}>
         <div class="combat">
