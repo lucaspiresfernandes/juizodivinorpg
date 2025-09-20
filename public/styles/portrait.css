@@ -75,10 +75,11 @@ body {
 
 #lineage {
 	position: absolute;
-	top: 150px;
-	left: 450px;
-	transform: translate(-50%, -50%) rotate(45deg);
+	bottom: 100px;
+	left: 300px;
+	transform: translate(-50%, -50%);
 	max-width: 200px;
+	z-index: 999;
 }
 
 #avatar {
@@ -89,7 +90,7 @@ body {
 .energy-container {
 	position: absolute;
 	top: 375px;
-	left: 60px;
+	left: 30px;
 	background-image: url(/assets/energy_placeholder.png);
 	background-size: 100% 100%;
 	width: 200px;
